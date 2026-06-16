@@ -1,0 +1,1757 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EEAT + AI Content Checker — Justwords</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0a0b0f;--s1:#10121a;--s2:#181c27;--s3:#1f2433;--border:#252c3f;--border2:#2e3650;
+  --exp:#e8834a;--xpt:#4ab5e8;--aut:#9b6ef3;--tru:#4ae8a0;--aeo:#e8d24a;--ai:#e84a6f;
+  --improve:#f0b429;--text:#eceef4;--t2:#8a91aa;--t3:#525a72;--r:10px;--r2:16px;
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:'Instrument Sans',sans-serif;font-size:14px;line-height:1.6;min-height:100vh;overflow-x:hidden;}
+
+.header{background:linear-gradient(135deg,#0a0b0f,#10121a);border-bottom:1px solid var(--border);padding:14px 26px;display:flex;align-items:center;gap:18px;position:sticky;top:0;z-index:100;}
+.logo-mark{width:34px;height:34px;background:linear-gradient(135deg,var(--exp),var(--aut));border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:13px;color:#fff;flex-shrink:0;}
+.header-title{font-family:'Syne',sans-serif;font-size:18px;font-weight:700;letter-spacing:-.3px;}
+.header-title span{color:var(--t3);font-weight:400;font-size:11px;font-family:'Instrument Sans',sans-serif;display:block;margin-top:1px;}
+.header-pills{display:flex;gap:5px;margin-left:auto;flex-wrap:wrap;}
+.pill{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.7px;padding:3px 9px;border-radius:100px;border:1px solid;}
+.pill-exp{border-color:rgba(232,131,74,.4);color:var(--exp);background:rgba(232,131,74,.08);}
+.pill-xpt{border-color:rgba(74,181,232,.4);color:var(--xpt);background:rgba(74,181,232,.08);}
+.pill-aut{border-color:rgba(155,110,243,.4);color:var(--aut);background:rgba(155,110,243,.08);}
+.pill-tru{border-color:rgba(74,232,160,.4);color:var(--tru);background:rgba(74,232,160,.08);}
+.pill-aeo{border-color:rgba(232,210,74,.4);color:var(--aeo);background:rgba(232,210,74,.08);}
+.pill-ai{border-color:rgba(232,74,111,.4);color:var(--ai);background:rgba(232,74,111,.08);}
+
+.app{display:grid;grid-template-columns:400px 1fr;height:calc(100vh - 57px);}
+.left{border-right:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto;}
+.ls{padding:16px 18px;border-bottom:1px solid var(--border);}
+.ls:last-child{border-bottom:none;}
+.lbl{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.9px;color:var(--t3);margin-bottom:7px;display:flex;align-items:center;gap:5px;}
+.lbl a{color:var(--aut);text-decoration:none;font-size:10px;text-transform:none;letter-spacing:0;margin-left:auto;}
+.lbl a:hover{text-decoration:underline;}
+.key-input{width:100%;background:var(--s2);border:1px solid var(--border);border-radius:var(--r);color:var(--text);font-family:'Instrument Sans',sans-serif;font-size:13px;padding:10px 12px;outline:none;transition:border-color .2s;}
+.key-input:focus{border-color:var(--aut);}
+.key-input::placeholder{color:var(--t3);}
+.content-area{width:100%;flex:1;min-height:180px;background:var(--s2);border:1px solid var(--border);border-radius:var(--r);color:var(--text);font-family:'Instrument Sans',sans-serif;font-size:13px;line-height:1.7;padding:11px 12px;resize:vertical;outline:none;transition:border-color .2s;}
+.content-area:focus{border-color:var(--xpt);}
+.content-area::placeholder{color:var(--t3);}
+.meta{font-size:11px;color:var(--t3);margin-top:5px;display:flex;gap:10px;flex-wrap:wrap;}
+.meta strong{color:var(--t2);}
+
+.ct-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px;}
+.ct-btn{background:var(--s2);border:1.5px solid var(--border);border-radius:var(--r);padding:9px 6px;cursor:pointer;transition:all .15s;text-align:center;font-family:'Instrument Sans',sans-serif;}
+.ct-btn:hover{border-color:var(--border2);background:var(--s3);}
+.ct-btn.active{border-color:var(--aut);background:rgba(155,110,243,.1);}
+.ct-btn.active.is-ymyl{border-color:var(--tru);background:rgba(74,232,160,.07);}
+.ct-icon{font-size:17px;display:block;margin-bottom:3px;}
+.ct-label{font-size:10px;font-weight:600;color:var(--t3);display:block;line-height:1.3;}
+.ct-btn.active .ct-label{color:var(--text);}
+.ct-desc{font-size:9px;color:var(--t3);display:block;margin-top:2px;line-height:1.2;}
+.ymyl-chip{display:inline-block;font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;padding:1px 4px;border-radius:100px;background:rgba(232,210,74,.15);color:var(--aeo);margin-top:2px;}
+
+.weights-grid{display:flex;flex-direction:column;gap:8px;}
+.wr{display:flex;align-items:center;gap:8px;}
+.wname{font-size:11px;font-weight:600;width:72px;flex-shrink:0;display:flex;align-items:center;gap:4px;}
+.wdot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.wslider{flex:1;-webkit-appearance:none;appearance:none;height:3px;border-radius:2px;background:var(--border2);outline:none;cursor:pointer;}
+.wslider::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;cursor:pointer;border:2px solid var(--bg);}
+.se::-webkit-slider-thumb{background:var(--exp);}
+.sx::-webkit-slider-thumb{background:var(--xpt);}
+.sa::-webkit-slider-thumb{background:var(--aut);}
+.st::-webkit-slider-thumb{background:var(--tru);}
+.so::-webkit-slider-thumb{background:var(--aeo);}
+.wval{font-family:'Syne',sans-serif;font-size:12px;font-weight:700;width:30px;text-align:right;flex-shrink:0;}
+.wt{margin-top:7px;padding:6px 10px;border-radius:var(--r);font-size:11px;display:flex;align-items:center;gap:5px;}
+.wt-ok{background:rgba(74,232,160,.08);border:1px solid rgba(74,232,160,.25);color:var(--tru);}
+.wt-err{background:rgba(232,91,91,.08);border:1px solid rgba(232,91,91,.25);color:#e85b5b;}
+
+.param-cb{appearance:none;-webkit-appearance:none;width:14px;height:14px;border-radius:3px;border:1.5px solid var(--border2);background:var(--s3);cursor:pointer;flex-shrink:0;position:relative;transition:all .15s;}
+.param-cb:checked{background:var(--aut);border-color:var(--aut);}
+.param-cb:checked::after{content:'✓';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:8px;color:#fff;font-weight:700;}
+.param-cb.cb-locked{background:rgba(74,232,160,.15);border-color:var(--tru);cursor:not-allowed;}
+.param-cb.cb-locked:checked{background:var(--tru);}
+.param-cb.cb-na{opacity:.25;cursor:not-allowed;}
+.param-check-row{display:flex;align-items:center;gap:6px;padding:5px 0;border-bottom:1px solid var(--border);}
+.param-check-row:last-child{border-bottom:none;}
+.param-check-row.row-na{opacity:.3;}
+.param-check-row label{font-size:11px;color:var(--t2);cursor:pointer;flex:1;line-height:1.3;}
+.param-check-row .pnum{font-size:10px;color:var(--t3);font-weight:600;width:24px;flex-shrink:0;}
+.req-tag{font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.3px;padding:1px 5px;border-radius:100px;background:rgba(74,232,160,.12);color:var(--tru);flex-shrink:0;white-space:nowrap;}
+.na-tag{font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.3px;padding:1px 5px;border-radius:100px;background:rgba(82,90,114,.1);color:var(--t3);flex-shrink:0;}
+.pillar-check-section{margin-bottom:8px;}
+.pillar-check-head{display:flex;align-items:center;gap:7px;margin-bottom:5px;}
+.pillar-check-head .ph-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;flex:1;}
+.pillar-toggle-all{font-size:10px;cursor:pointer;text-decoration:underline;background:none;border:none;color:var(--aut);font-family:inherit;}
+
+.btn-analyze{width:100%;padding:13px 20px;background:linear-gradient(135deg,#7a5cf5,#5b4fd4);border:none;border-radius:var(--r);color:#fff;font-family:'Syne',sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:9px;letter-spacing:.2px;}
+.btn-analyze:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 8px 24px rgba(122,92,245,.35);}
+.btn-analyze:disabled{opacity:.45;cursor:not-allowed;transform:none;}
+.spin{width:15px;height:15px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:rot .7s linear infinite;display:none;}
+@keyframes rot{to{transform:rotate(360deg);}}
+
+.right{overflow-y:auto;background:var(--s1);}
+.empty{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:13px;color:var(--t3);}
+.empty-icon{font-size:52px;opacity:.25;}
+.empty h3{font-family:'Syne',sans-serif;font-size:18px;color:var(--t2);font-weight:600;}
+.empty p{font-size:13px;text-align:center;max-width:240px;line-height:1.6;}
+.loading{height:100%;display:none;flex-direction:column;align-items:center;justify-content:center;gap:15px;}
+.load-spin{width:44px;height:44px;border:3px solid var(--border2);border-top-color:var(--aut);border-radius:50%;animation:rot .9s linear infinite;}
+.load-text{color:var(--t2);font-size:13px;}
+.load-steps{display:flex;flex-direction:column;gap:4px;margin-top:4px;}
+.load-step{font-size:11px;color:var(--t3);display:flex;align-items:center;gap:6px;}
+.step-dot{width:6px;height:6px;border-radius:50%;background:var(--border2);}
+.step-dot.active{background:var(--aut);box-shadow:0 0 6px rgba(74,232,160,.5);}
+.step-dot.done{background:var(--tru);}
+#results{display:none;padding:22px 24px;}
+
+.pub-status{border-radius:var(--r2);padding:16px 20px;margin-bottom:18px;display:flex;align-items:center;gap:14px;border:1.5px solid;}
+.pub-blocked{background:rgba(232,91,91,.07);border-color:rgba(232,91,91,.4);}
+.pub-review{background:rgba(240,180,41,.06);border-color:rgba(240,180,41,.4);}
+.pub-cleared{background:rgba(74,232,160,.05);border-color:rgba(74,232,160,.3);}
+.pub-icon{font-size:26px;flex-shrink:0;}
+.pub-info{flex:1;}
+.pub-title{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;}
+.pub-blocked .pub-title{color:#e85b5b;}
+.pub-review .pub-title{color:var(--improve);}
+.pub-cleared .pub-title{color:var(--tru);}
+.pub-detail{font-size:12px;color:var(--t2);margin-top:3px;line-height:1.5;}
+.pub-tags{margin-top:5px;display:flex;flex-wrap:wrap;gap:4px;}
+.pub-fail-tag{font-size:10px;font-weight:600;padding:2px 8px;border-radius:100px;background:rgba(232,91,91,.12);color:#e85b5b;border:1px solid rgba(232,91,91,.2);}
+.pub-warn-tag{font-size:10px;font-weight:600;padding:2px 8px;border-radius:100px;background:rgba(240,180,41,.12);color:var(--improve);border:1px solid rgba(240,180,41,.2);}
+
+/* Three-layer scorecard */
+.scorecard{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:18px;}
+.sc-card{background:var(--s2);border:1px solid var(--border);border-radius:var(--r2);padding:15px 16px;border-top:3px solid var(--border2);}
+.sc-good{border-top-color:var(--tru);}
+.sc-warn{border-top-color:var(--improve);}
+.sc-fail{border-top-color:#e85b5b;}
+.sc-top{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:9px;}
+.sc-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--t2);}
+.sc-verdict{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;padding:3px 9px;border-radius:100px;white-space:nowrap;}
+.scv-good{background:rgba(74,232,160,.14);color:var(--tru);}
+.scv-warn{background:rgba(240,180,41,.14);color:var(--improve);}
+.scv-fail{background:rgba(232,91,91,.14);color:#e85b5b;}
+.sc-num{font-family:'Syne',sans-serif;font-size:38px;font-weight:800;line-height:1;letter-spacing:-1.5px;}
+.sc-num span{font-size:15px;opacity:.4;font-weight:600;letter-spacing:0;}
+.sc-good .sc-num{color:var(--tru);}
+.sc-warn .sc-num{color:var(--improve);}
+.sc-fail .sc-num{color:#e85b5b;}
+.sc-bar{height:4px;background:var(--border);border-radius:2px;margin-top:9px;overflow:hidden;}
+.sc-bar-fill{height:100%;border-radius:2px;transition:width .6s ease;}
+.sc-sub{font-size:10px;color:var(--t3);margin-top:7px;line-height:1.4;}
+@media(max-width:900px){.scorecard{grid-template-columns:1fr;}}
+
+.gates-panel{background:var(--s2);border:1px solid var(--border);border-radius:var(--r2);padding:16px 18px;margin-bottom:18px;}
+.gates-title{font-family:'Syne',sans-serif;font-size:11px;font-weight:700;margin-bottom:10px;display:flex;align-items:center;gap:6px;color:var(--t2);text-transform:uppercase;letter-spacing:.5px;}
+.gate-list{display:flex;flex-direction:column;gap:5px;}
+.gate-item{display:flex;align-items:center;gap:8px;padding:8px 11px;border-radius:8px;border:1px solid;}
+.gate-pass{background:rgba(74,232,160,.04);border-color:rgba(74,232,160,.2);}
+.gate-fail{background:rgba(232,91,91,.05);border-color:rgba(232,91,91,.25);}
+.gate-warn{background:rgba(240,180,41,.04);border-color:rgba(240,180,41,.2);}
+.gate-na{background:var(--s3);border-color:var(--border);opacity:.4;}
+.gate-badge{font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;padding:2px 7px;border-radius:100px;white-space:nowrap;flex-shrink:0;}
+.gb-pass{background:rgba(74,232,160,.12);color:var(--tru);}
+.gb-fail{background:rgba(232,91,91,.12);color:#e85b5b;}
+.gb-warn{background:rgba(240,180,41,.12);color:var(--improve);}
+.gb-na{background:rgba(82,90,114,.1);color:var(--t3);}
+.gate-type{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;padding:1px 5px;border-radius:100px;flex-shrink:0;}
+.gtype-hard{background:rgba(232,91,91,.1);color:#e85b5b;}
+.gtype-soft{background:rgba(240,180,41,.1);color:var(--improve);}
+.gate-name{font-size:12px;font-weight:600;color:var(--text);flex:1;}
+.gate-detail{font-size:11px;color:var(--t3);text-align:right;}
+
+.score-hero{background:linear-gradient(135deg,rgba(155,110,243,.06),rgba(74,232,160,.03),rgba(232,131,74,.03));border:1px solid var(--border);border-radius:var(--r2);padding:22px;margin-bottom:18px;position:relative;overflow:hidden;}
+.score-hero::before{content:'';position:absolute;top:-50px;right:-50px;width:180px;height:180px;border-radius:50%;background:radial-gradient(circle,rgba(155,110,243,.08),transparent 70%);pointer-events:none;}
+.score-top{display:flex;align-items:flex-start;gap:20px;}
+.score-big{font-family:'Syne',sans-serif;font-size:70px;font-weight:800;line-height:1;letter-spacing:-3px;background:linear-gradient(135deg,#fff 30%,var(--aut));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.score-pct{font-size:24px;opacity:.4;letter-spacing:0;}
+.score-meta{flex:1;padding-top:5px;}
+.score-verdict{display:inline-block;font-family:'Syne',sans-serif;font-size:12px;font-weight:700;letter-spacing:.3px;padding:4px 12px;border-radius:100px;margin-bottom:6px;}
+.vExcellent{background:rgba(74,232,160,.15);color:var(--tru);}
+.vGood{background:rgba(155,110,243,.15);color:var(--aut);}
+.vNeeds{background:rgba(232,210,74,.15);color:var(--aeo);}
+.vPoor{background:rgba(232,91,91,.15);color:#e85b5b;}
+.score-summary{font-size:12px;color:var(--t2);line-height:1.65;}
+.score-ct-badge{display:inline-flex;align-items:center;gap:4px;font-size:10px;padding:2px 9px;border-radius:100px;background:var(--s3);border:1px solid var(--border);color:var(--t2);margin-bottom:7px;margin-right:6px;}
+.pillar-bars{display:grid;grid-template-columns:repeat(5,1fr);gap:7px;margin-top:14px;}
+.pbar-card{background:var(--s2);border:1px solid var(--border);border-radius:var(--r);padding:10px 11px;}
+.pbc-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;}
+.pbc-name{font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.6px;color:var(--t3);display:flex;align-items:center;gap:3px;}
+.pbc-score{font-family:'Syne',sans-serif;font-size:12px;font-weight:700;}
+.pbc-bar{height:3px;background:var(--border);border-radius:2px;}
+.pbc-fill{height:100%;border-radius:2px;transition:width .6s ease;}
+.pbc-count{font-size:9px;color:var(--t3);margin-top:3px;}
+
+.ai-panel{background:linear-gradient(135deg,rgba(232,74,111,.07),rgba(232,74,111,.02));border:1px solid rgba(232,74,111,.3);border-radius:var(--r2);padding:18px;margin-bottom:18px;}
+.ai-panel-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px;gap:14px;}
+.ai-panel-title{font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:var(--ai);display:flex;align-items:center;gap:7px;}
+.ai-panel-sub{font-size:11px;color:var(--t3);margin-top:3px;line-height:1.4;}
+.ai-score-block{text-align:right;flex-shrink:0;}
+.ai-score-num{font-family:'Syne',sans-serif;font-size:36px;font-weight:800;line-height:1;}
+.ai-score-low{color:var(--tru);}
+.ai-score-medium{color:var(--improve);}
+.ai-score-high{color:#e85b5b;}
+.ai-risk-badge{display:inline-block;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;padding:3px 10px;border-radius:100px;margin-top:4px;}
+.arb-low{background:rgba(74,232,160,.12);color:var(--tru);}
+.arb-medium{background:rgba(240,180,41,.12);color:var(--improve);}
+.arb-high{background:rgba(232,91,91,.12);color:#e85b5b;}
+.ai-signals-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:12px;}
+.ai-sig{padding:8px 10px;border-radius:8px;border:1px solid;}
+.ais-clear{background:rgba(74,232,160,.03);border-color:rgba(74,232,160,.15);}
+.ais-low{background:rgba(240,180,41,.04);border-color:rgba(240,180,41,.2);}
+.ais-med{background:rgba(240,140,41,.05);border-color:rgba(240,140,41,.28);}
+.ais-high{background:rgba(232,91,91,.06);border-color:rgba(232,91,91,.28);}
+.ai-sig-head{display:flex;align-items:center;gap:5px;margin-bottom:3px;}
+.ai-sig-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
+.asd-clear{background:var(--tru);}
+.asd-low{background:var(--improve);}
+.asd-med{background:#e8821a;}
+.asd-high{background:#e85b5b;}
+.ai-sig-name{font-size:10px;font-weight:600;color:var(--text);flex:1;line-height:1.3;}
+.ai-sev-tag{font-size:8px;font-weight:700;text-transform:uppercase;padding:1px 5px;border-radius:100px;flex-shrink:0;}
+.ast-low{background:rgba(240,180,41,.1);color:var(--improve);}
+.ast-med{background:rgba(240,130,41,.1);color:#e8821a;}
+.ast-high{background:rgba(232,91,91,.1);color:#e85b5b;}
+.ai-sig-ev{font-size:10px;color:var(--t3);line-height:1.4;}
+.ai-rewrites{padding:12px;background:var(--s2);border-radius:var(--r);border:1px solid var(--border);}
+.airt{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--ai);margin-bottom:6px;}
+.air-list{list-style:none;display:flex;flex-direction:column;gap:5px;}
+.air-list li{font-size:11px;color:var(--t2);display:flex;align-items:flex-start;gap:6px;line-height:1.5;}
+.air-list li::before{content:'✏';color:var(--ai);flex-shrink:0;font-size:10px;margin-top:1px;}
+
+.section{margin-bottom:22px;}
+.section-head{display:flex;align-items:center;gap:10px;padding-bottom:10px;border-bottom:1px solid var(--border);margin-bottom:12px;}
+.section-icon{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:13px;}
+.section-title{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;flex:1;}
+.section-score{font-family:'Syne',sans-serif;font-size:11px;font-weight:700;padding:3px 10px;border-radius:100px;}
+.section-desc{font-size:11px;color:var(--t3);margin-top:1px;font-style:italic;}
+
+.param{background:var(--s2);border:1px solid var(--border);border-radius:var(--r);padding:12px 14px;margin-bottom:7px;border-left:3px solid transparent;}
+.param.good{border-left-color:var(--tru);}
+.param.improve{border-left-color:var(--improve);}
+.param.req-fail{border-left-color:#e85b5b;}
+.param.skipped{border-left-color:var(--border);opacity:.4;}
+.param-head{display:flex;align-items:flex-start;gap:8px;margin-bottom:7px;}
+.param-icon{width:22px;height:22px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;margin-top:1px;}
+.pi-good{background:rgba(74,232,160,.12);color:var(--tru);}
+.pi-improve{background:rgba(240,180,41,.12);color:var(--improve);}
+.pi-reqfail{background:rgba(232,91,91,.12);color:#e85b5b;}
+.pi-skip{background:rgba(82,90,114,.12);color:var(--t3);}
+.param-title{font-size:12px;font-weight:600;color:var(--text);flex:1;line-height:1.4;}
+.param-num{font-size:10px;color:var(--t3);font-weight:500;margin-top:1px;display:flex;align-items:center;gap:5px;}
+.req-star{color:var(--tru);font-size:10px;}
+.param-badge{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;padding:2px 8px;border-radius:100px;white-space:nowrap;flex-shrink:0;margin-top:1px;}
+.pb-good{background:rgba(74,232,160,.12);color:var(--tru);}
+.pb-improve{background:rgba(240,180,41,.12);color:var(--improve);}
+.pb-reqfail{background:rgba(232,91,91,.12);color:#e85b5b;}
+.pb-skip{background:rgba(82,90,114,.12);color:var(--t3);}
+.evidence{font-size:12px;color:var(--t2);padding:7px 10px;background:rgba(255,255,255,.025);border-radius:7px;line-height:1.65;}
+.suggest-block{margin-top:7px;padding:11px 13px;background:rgba(240,180,41,.04);border:1px solid rgba(240,180,41,.2);border-radius:8px;}
+.suggest-header{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--improve);margin-bottom:7px;}
+.suggest-area{font-size:11px;color:var(--t2);margin-bottom:5px;line-height:1.5;}
+.suggest-area strong{color:var(--text);font-weight:600;}
+.suggest-solution{font-size:11px;color:var(--t2);line-height:1.65;padding:7px 10px;background:rgba(255,255,255,.03);border-radius:6px;border-left:2px solid rgba(240,180,41,.4);}
+.suggest-solution strong{color:var(--aeo);font-weight:600;}
+.priority-badge{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;padding:2px 6px;border-radius:100px;margin-left:5px;}
+.prio-high{background:rgba(232,91,91,.15);color:#e85b5b;}
+.prio-med{background:rgba(240,180,41,.15);color:var(--improve);}
+.prio-low{background:rgba(74,181,232,.15);color:var(--xpt);}
+
+.editor-report{background:linear-gradient(135deg,rgba(74,181,232,.04),rgba(155,110,243,.04));border:1px solid var(--border2);border-radius:var(--r2);padding:18px;margin-bottom:18px;}
+.er-title{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;margin-bottom:12px;display:flex;align-items:center;gap:7px;color:var(--xpt);}
+.er-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:12px;}
+.er-card{background:var(--s2);border:1px solid var(--border);border-radius:var(--r);padding:11px 13px;}
+.er-card-title{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--t3);margin-bottom:7px;}
+.er-list{list-style:none;display:flex;flex-direction:column;gap:4px;}
+.er-list li{font-size:11px;color:var(--t2);display:flex;align-items:flex-start;gap:5px;line-height:1.5;}
+.er-list li::before{content:'→';color:var(--xpt);flex-shrink:0;font-size:10px;margin-top:2px;}
+.er-list.wins li::before{content:'✓';color:var(--tru);}
+.er-list.gaps li::before{content:'!';color:var(--improve);}
+.er-overall{font-size:11px;color:var(--t2);padding:10px 12px;background:var(--s2);border-radius:var(--r);border:1px solid var(--border);line-height:1.7;}
+.er-overall strong{color:var(--text);}
+
+/* Token limit warning banner */
+.token-banner{background:rgba(232,210,74,.06);border:1px solid rgba(232,210,74,.3);border-radius:var(--r);padding:8px 12px;margin-top:8px;font-size:11px;color:var(--aeo);display:none;line-height:1.5;}
+.token-banner.show{display:block;}
+.token-banner strong{color:var(--text);}
+
+/* Partial-credit param badges */
+.param.partial{border-left-color:var(--xpt);}
+.pi-partial{background:rgba(74,181,232,.12);color:var(--xpt);}
+.pb-partial{background:rgba(74,181,232,.12);color:var(--xpt);}
+
+/* Client bar */
+.client-bar{display:flex;gap:7px;align-items:center;}
+.client-bar select{flex:1;}
+.client-stamp{display:inline-flex;align-items:center;gap:5px;font-size:10px;padding:2px 10px;border-radius:100px;background:rgba(155,110,243,.12);border:1px solid rgba(155,110,243,.3);color:var(--aut);margin-bottom:7px;margin-right:6px;font-weight:600;}
+
+/* Section header action links */
+.hdr-actions{margin-left:auto;display:flex;gap:9px;}
+.mini-link{font-size:10px;color:var(--aut);cursor:pointer;text-decoration:none;text-transform:none;letter-spacing:0;background:none;border:none;font-family:inherit;}
+.mini-link:hover{text-decoration:underline;}
+.ct-btn.is-custom .ct-label::after{content:' ✎';color:var(--aut);font-size:8px;}
+
+/* Modal system */
+.overlay{position:fixed;inset:0;background:rgba(4,5,8,.7);backdrop-filter:blur(3px);z-index:500;display:none;align-items:center;justify-content:center;padding:22px;}
+.overlay.show{display:flex;}
+.modal{background:var(--s1);border:1px solid var(--border2);border-radius:var(--r2);width:100%;max-width:580px;max-height:90vh;overflow-y:auto;padding:22px 24px;box-shadow:0 24px 60px rgba(0,0,0,.5);}
+.modal-head{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+.modal-title{font-family:'Syne',sans-serif;font-size:17px;font-weight:700;flex:1;}
+.modal-sub{font-size:11px;color:var(--t3);margin-bottom:16px;line-height:1.5;}
+.modal-close{background:var(--s3);border:1px solid var(--border);color:var(--t2);width:28px;height:28px;border-radius:7px;cursor:pointer;font-size:15px;line-height:1;flex-shrink:0;}
+.modal-close:hover{background:var(--s2);color:var(--text);}
+.fld{margin-bottom:13px;}
+.fld label{display:block;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.7px;color:var(--t3);margin-bottom:5px;}
+.fld input[type=text],.fld input[type=number],.fld textarea,.fld select{width:100%;background:var(--s2);border:1px solid var(--border);border-radius:var(--r);color:var(--text);font-family:'Instrument Sans',sans-serif;font-size:13px;padding:9px 11px;outline:none;transition:border-color .2s;}
+.fld input:focus,.fld textarea:focus,.fld select:focus{border-color:var(--aut);}
+.fld textarea{resize:vertical;min-height:62px;line-height:1.6;}
+.fld-row{display:flex;gap:10px;}
+.fld-row .fld{flex:1;}
+.fld-check{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--t2);cursor:pointer;padding:6px 0;}
+.fld-check input{width:15px;height:15px;cursor:pointer;accent-color:var(--aut);}
+.help{font-size:10px;color:var(--t3);margin-top:4px;line-height:1.45;}
+.modal-actions{display:flex;gap:9px;margin-top:20px;flex-wrap:wrap;}
+.btn{padding:10px 16px;border-radius:var(--r);font-family:'Syne',sans-serif;font-weight:700;font-size:13px;cursor:pointer;border:1px solid var(--border2);background:var(--s2);color:var(--text);transition:all .15s;}
+.btn:hover{background:var(--s3);}
+.btn-primary{background:linear-gradient(135deg,#7a5cf5,#5b4fd4);border:none;color:#fff;}
+.btn-primary:hover{box-shadow:0 6px 18px rgba(122,92,245,.3);}
+.btn-danger{background:rgba(232,91,91,.1);border-color:rgba(232,91,91,.3);color:#e85b5b;}
+.btn-danger:hover{background:rgba(232,91,91,.18);}
+.btn-ghost{background:none;border-color:transparent;color:var(--t2);}
+.btn-sm{padding:6px 11px;font-size:11px;}
+.spacer{flex:1;}
+.weight-mini{display:grid;grid-template-columns:repeat(5,1fr);gap:7px;}
+.weight-mini .wm{display:flex;flex-direction:column;gap:4px;}
+.weight-mini .wm span{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;text-align:center;}
+.weight-mini input{text-align:center;padding:7px 4px!important;}
+.wsum{font-size:11px;margin-top:7px;padding:5px 9px;border-radius:7px;}
+.wsum-ok{background:rgba(74,232,160,.08);color:var(--tru);}
+.wsum-err{background:rgba(232,91,91,.08);color:#e85b5b;}
+.param-pick{max-height:230px;overflow-y:auto;border:1px solid var(--border);border-radius:var(--r);padding:8px 11px;background:var(--s2);}
+.pp-pl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;margin:9px 0 4px;}
+.pp-row{display:flex;align-items:center;gap:7px;padding:3px 0;font-size:11px;color:var(--t2);}
+.pp-row .pp-name{flex:1;line-height:1.3;}
+.pp-row select{width:auto!important;padding:3px 7px!important;font-size:10px;flex-shrink:0;}
+.list-empty{font-size:12px;color:var(--t3);text-align:center;padding:18px;}
+.list-row{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--s2);border:1px solid var(--border);border-radius:var(--r);margin-bottom:7px;}
+.list-row .lr-name{font-weight:600;font-size:13px;color:var(--text);}
+.list-row .lr-sub{font-size:10px;color:var(--t3);margin-top:1px;}
+.chip{font-size:9px;padding:2px 8px;border-radius:100px;background:var(--s3);color:var(--t2);border:1px solid var(--border);white-space:nowrap;}
+
+.divider{border:none;border-top:1px solid var(--border);margin:16px 0;}
+::-webkit-scrollbar{width:5px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+@media(max-width:900px){.app{grid-template-columns:1fr;height:auto;}.left{border-right:none;border-bottom:1px solid var(--border);}.header-pills{display:none;}.pillar-bars{grid-template-columns:1fr 1fr;}.er-grid{grid-template-columns:1fr;}.ai-signals-grid{grid-template-columns:1fr;}.ct-grid{grid-template-columns:1fr 1fr;}}
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="logo-mark">JW</div>
+  <div class="header-title">
+    EEAT + AI Content Checker
+    <span>Experience · Expertise · Authority · Trust · AEO · AI Detection · Gate Rules</span>
+  </div>
+  <div class="header-pills">
+    <span class="pill pill-exp">Experience</span>
+    <span class="pill pill-xpt">Expertise</span>
+    <span class="pill pill-aut">Authority</span>
+    <span class="pill pill-tru">Trust</span>
+    <span class="pill pill-aeo">AEO/SEO</span>
+    <span class="pill pill-ai">AI Detection</span>
+  </div>
+</header>
+
+<div class="app">
+  <div class="left">
+
+    <div class="ls">
+      <div class="lbl">Client <span class="hdr-actions"><button class="mini-link" onclick="openClientMgr()">Manage clients →</button></span></div>
+      <div class="client-bar">
+        <select class="key-input" id="clientSelect" onchange="applyClient()"></select>
+      </div>
+      <div class="meta" id="clientMeta"></div>
+    </div>
+
+    <div class="ls">
+      <label class="lbl">Groq API Key <a href="https://console.groq.com/keys" target="_blank">→ Get free key</a></label>
+      <input type="password" class="key-input" id="groqKey" placeholder="gsk_…"/>
+      <label class="lbl" style="margin-top:10px">Model</label>
+      <select class="key-input" id="modelSel">
+        <option value="llama-3.3-70b-versatile">Llama 3.3 70B — Best quality (lower daily limit)</option>
+        <option value="llama-3.1-8b-instant">Llama 3.1 8B — Fast, high daily limit</option>
+      </select>
+      <div class="help">Hit the daily token limit on 70B? Switch to 8B to keep working. One analysis = one API call.</div>
+    </div>
+
+    <div class="ls" style="flex:1;display:flex;flex-direction:column;gap:6px;">
+      <label class="lbl">Blog Content</label>
+      <textarea class="content-area" id="content" placeholder="Paste your full blog article here — title, introduction, body sections, author bio, disclaimers, internal links, everything."></textarea>
+      <div class="meta">
+        Words: <strong id="wc">0</strong> · Chars: <strong id="cc">0</strong> · Type: <strong id="ctLabel">General / Informational</strong>
+      </div>
+      <!-- Token warning shown when content is large -->
+      <div class="token-banner" id="tokenBanner">
+        <strong>Large article detected.</strong> To stay within the model's token limit, the beginning and end are sent and the middle is sampled — your intro, conclusion and structure are always analysed. For full coverage of very long pieces, use the 70B model or analyse in sections.
+      </div>
+    </div>
+
+    <div class="ls">
+      <div class="lbl">Content Category <span class="hdr-actions"><button class="mini-link" onclick="openCatModal()">+ New</button><button class="mini-link" onclick="openCatManager()">Manage</button></span></div>
+      <div class="ct-grid" id="ctGrid"></div>
+      <div class="help">Each category sets pillar weights, required &amp; N/A parameters, and gate thresholds. Create your own for niches the presets don't cover.</div>
+    </div>
+
+    <div class="ls">
+      <div class="lbl">Pillar Weights <span id="wNote" style="margin-left:auto;font-size:10px;text-transform:none;letter-spacing:0;color:var(--t3)">Must sum to 100%</span></div>
+      <div class="weights-grid">
+        <div class="wr"><div class="wname"><span class="wdot" style="background:var(--exp)"></span><span style="color:var(--exp)">Exp</span></div><input type="range" class="wslider se" id="wE" min="0" max="100" value="20" oninput="syncW()"><span class="wval" id="wEv" style="color:var(--exp)">20%</span></div>
+        <div class="wr"><div class="wname"><span class="wdot" style="background:var(--xpt)"></span><span style="color:var(--xpt)">Expt</span></div><input type="range" class="wslider sx" id="wX" min="0" max="100" value="20" oninput="syncW()"><span class="wval" id="wXv" style="color:var(--xpt)">20%</span></div>
+        <div class="wr"><div class="wname"><span class="wdot" style="background:var(--aut)"></span><span style="color:var(--aut)">Auth</span></div><input type="range" class="wslider sa" id="wA" min="0" max="100" value="20" oninput="syncW()"><span class="wval" id="wAv" style="color:var(--aut)">20%</span></div>
+        <div class="wr"><div class="wname"><span class="wdot" style="background:var(--tru)"></span><span style="color:var(--tru)">Trust</span></div><input type="range" class="wslider st" id="wT" min="0" max="100" value="20" oninput="syncW()"><span class="wval" id="wTv" style="color:var(--tru)">20%</span></div>
+        <div class="wr"><div class="wname"><span class="wdot" style="background:var(--aeo)"></span><span style="color:var(--aeo)">AEO</span></div><input type="range" class="wslider so" id="wO" min="0" max="100" value="20" oninput="syncW()"><span class="wval" id="wOv" style="color:var(--aeo)">20%</span></div>
+      </div>
+      <div class="wt wt-ok" id="wTotal">✓ Weights sum to 100% — ready to analyze</div>
+    </div>
+
+    <div class="ls" id="paramCheckboxSection">
+      <div class="lbl">Parameters to Evaluate
+        <span class="hdr-actions"><button class="mini-link" onclick="openParamModal()">+ Add parameter</button><span id="cbCount" style="color:var(--t3)">40 selected</span></span>
+      </div>
+      <div id="paramCheckboxes"></div>
+    </div>
+
+    <div class="ls">
+      <button class="btn-analyze" id="analyzeBtn" onclick="analyze()">
+        <span class="spin" id="btnSpin"></span>
+        <span id="btnTxt">⚡ Analyze EEAT + AI Content</span>
+      </button>
+    </div>
+
+  </div>
+
+  <div class="right" id="rightPanel">
+    <div class="empty" id="emptyState">
+      <div class="empty-icon">📊</div>
+      <h3>No Analysis Yet</h3>
+      <p>Select content type, adjust weights if needed, paste your article, then click Analyze.</p>
+    </div>
+    <div class="loading" id="loading">
+      <div class="load-spin"></div>
+      <div class="load-text" id="loadText">Running full EEAT + AI detection analysis…</div>
+      <div class="load-steps" id="loadSteps">
+        <div class="load-step"><div class="step-dot active" id="sd1"></div>Evaluating EEAT, AI signals &amp; gate checks</div>
+        <div class="load-step"><div class="step-dot" id="sd2"></div>Computing pillar &amp; overall scores</div>
+        <div class="load-step"><div class="step-dot" id="sd3"></div>Running structural gate checks</div>
+        <div class="load-step"><div class="step-dot" id="sd4"></div>Computing publish decision</div>
+      </div>
+    </div>
+    <div id="results"></div>
+  </div>
+</div>
+
+<!-- ── Modals ──────────────────────────────────────────────────── -->
+<div class="overlay" id="catModal">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-title" id="catModalTitle">New Content Category</div>
+      <button class="modal-close" onclick="closeModal('catModal')">✕</button>
+    </div>
+    <div class="modal-sub">Define a reusable category. Weights set each pillar's share of the score; required parameters become hard checks; N/A parameters are skipped.</div>
+    <div class="fld-row">
+      <div class="fld" style="flex:2"><label>Category Name</label><input type="text" id="catName" placeholder="e.g. SaaS / B2B Software"></div>
+      <div class="fld" style="flex:1"><label>Icon</label><input type="text" id="catIcon" placeholder="🧩" maxlength="2"></div>
+    </div>
+    <div class="fld"><label>Short Description</label><input type="text" id="catDesc" placeholder="e.g. Software guides, comparisons, onboarding"></div>
+    <label class="fld-check"><input type="checkbox" id="catYMYL"> Treat as YMYL (Your Money or Your Life) — applies stricter Trust standards</label>
+    <div class="fld" style="margin-top:13px"><label>Pillar Weights (must total 100%)</label>
+      <div class="weight-mini">
+        <div class="wm"><span style="color:var(--exp)">Exp</span><input type="number" id="catwE" min="0" max="100" value="20" oninput="catWsum()"></div>
+        <div class="wm"><span style="color:var(--xpt)">Expt</span><input type="number" id="catwX" min="0" max="100" value="20" oninput="catWsum()"></div>
+        <div class="wm"><span style="color:var(--aut)">Auth</span><input type="number" id="catwA" min="0" max="100" value="20" oninput="catWsum()"></div>
+        <div class="wm"><span style="color:var(--tru)">Trust</span><input type="number" id="catwT" min="0" max="100" value="20" oninput="catWsum()"></div>
+        <div class="wm"><span style="color:var(--aeo)">AEO</span><input type="number" id="catwO" min="0" max="100" value="20" oninput="catWsum()"></div>
+      </div>
+      <div class="wsum wsum-ok" id="catWsumNote">Total: 100%</div>
+    </div>
+    <div class="fld-row">
+      <div class="fld"><label>Min Word Count (hard gate)</label><input type="number" id="catMinWords" min="0" value="300"></div>
+      <div class="fld"><label>Trust Threshold % (blank = off)</label><input type="number" id="catTrust" min="0" max="100" placeholder="e.g. 75"></div>
+    </div>
+    <label class="fld-check"><input type="checkbox" id="catReqDisc"> Require disclaimer (hard gate)</label>
+    <label class="fld-check"><input type="checkbox" id="catReqAcc"> Require factual-accuracy pass (hard gate)</label>
+    <div class="fld" style="margin-top:13px"><label>Parameter Rules</label>
+      <div class="help" style="margin-top:0;margin-bottom:6px">For each parameter choose: <strong>Default</strong> (scored normally), <strong>Required</strong> (must be strong), or <strong>N/A</strong> (skipped for this category).</div>
+      <div class="param-pick" id="catParamPick"></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-danger btn-sm" id="catDeleteBtn" style="display:none" onclick="deleteCat()">Delete</button>
+      <span class="spacer"></span>
+      <button class="btn btn-ghost" onclick="closeModal('catModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveCat()">Save Category</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="catMgrModal">
+  <div class="modal">
+    <div class="modal-head"><div class="modal-title">Manage Categories</div><button class="modal-close" onclick="closeModal('catMgrModal')">✕</button></div>
+    <div class="modal-sub">Built-in presets can't be deleted, but you can duplicate one to a custom category and edit it.</div>
+    <div id="catMgrList"></div>
+    <div class="modal-actions"><span class="spacer"></span><button class="btn btn-primary" onclick="closeModal('catMgrModal');openCatModal()">+ New Category</button></div>
+  </div>
+</div>
+
+<div class="overlay" id="paramModal">
+  <div class="modal">
+    <div class="modal-head"><div class="modal-title">Add Custom EEAT Parameter</div><button class="modal-close" onclick="closeModal('paramModal')">✕</button></div>
+    <div class="modal-sub">Add your own quality check. It joins the chosen pillar and is evaluated alongside the built-in parameters on every analysis.</div>
+    <div class="fld"><label>Parameter Name</label><input type="text" id="pName" placeholder="e.g. Cites a named in-house data study"></div>
+    <div class="fld"><label>Pillar</label><select id="pPillar">
+      <option value="experience">🧪 Experience</option>
+      <option value="expertise">🎓 Expertise</option>
+      <option value="authority">🏛️ Authority</option>
+      <option value="trust">🛡️ Trust</option>
+      <option value="aeo">🔍 AEO / SEO</option>
+    </select></div>
+    <div class="fld"><label>Definition — what counts as "strong"</label><textarea id="pDef" placeholder="Describe exactly what the article must contain to pass. Be specific: the AI uses this to judge. e.g. 'References original first-party research conducted by the brand, with sample size and date.'"></textarea></div>
+    <div class="fld"><label>Existing Custom Parameters</label><div id="customParamList"></div></div>
+    <div class="modal-actions"><span class="spacer"></span><button class="btn btn-ghost" onclick="closeModal('paramModal')">Close</button><button class="btn btn-primary" onclick="saveCustomParam()">Add Parameter</button></div>
+  </div>
+</div>
+
+<div class="overlay" id="clientModal">
+  <div class="modal">
+    <div class="modal-head"><div class="modal-title" id="clientModalTitle">New Client</div><button class="modal-close" onclick="closeModal('clientModal')">✕</button></div>
+    <div class="modal-sub">Save a client profile so the right category, weights, and brand notes load with one click before each QC check.</div>
+    <div class="fld-row">
+      <div class="fld" style="flex:2"><label>Client Name</label><input type="text" id="clName" placeholder="e.g. Acme Health Pvt Ltd"></div>
+      <div class="fld" style="flex:1"><label>Industry</label><input type="text" id="clIndustry" placeholder="e.g. Healthcare"></div>
+    </div>
+    <div class="fld"><label>Default Content Category</label><select id="clCat"></select></div>
+    <div class="fld"><label>Brand Voice / Editorial Notes <span style="text-transform:none;color:var(--t3);font-weight:400">(shown on every report for this client)</span></label><textarea id="clNotes" placeholder="e.g. UK English. Avoid medical claims without a citation. Always include the standard medical disclaimer. Preferred reading level: general public."></textarea></div>
+    <div class="modal-actions">
+      <button class="btn btn-danger btn-sm" id="clDeleteBtn" style="display:none" onclick="deleteClient()">Delete</button>
+      <span class="spacer"></span>
+      <button class="btn btn-ghost" onclick="closeModal('clientModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveClient()">Save Client</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="clientMgrModal">
+  <div class="modal">
+    <div class="modal-head"><div class="modal-title">Client Database</div><button class="modal-close" onclick="closeModal('clientMgrModal')">✕</button></div>
+    <div class="modal-sub">All saved clients. Click one to edit its profile.</div>
+    <div id="clientMgrList"></div>
+    <div class="modal-actions"><span class="spacer"></span><button class="btn btn-primary" onclick="closeModal('clientMgrModal');openClientModal()">+ New Client</button></div>
+  </div>
+</div>
+
+<script>
+// ── Content Types ──────────────────────────────────────────────
+const CONTENT_TYPES = {
+  general: {
+    label:'General / Informational', icon:'📄', desc:'Blogs, guides, how-tos',
+    weights:{e:20,x:20,a:20,t:20,o:20}, isYMYL:false,
+    required:[], notApplicable:[],
+    gates:{minWords:300,trustThreshold:null,requireDisclaimer:false,requireAccuracy:false}
+  },
+  health: {
+    label:'Health / Medical', icon:'🏥', desc:'Medical, wellness — YMYL',
+    weights:{e:15,x:25,a:20,t:35,o:5}, isYMYL:true,
+    required:['disclaimer_for_sensitive_topics','no_factual_errors_or_outdated_info','evidence_based_claims_framed','cites_external_authoritative_source','mechanism_explanation','content_freshness_current_data'],
+    notApplicable:['quantified_business_volume','quantified_time_in_operation','seasonal_or_cyclical_pattern'],
+    gates:{minWords:600,trustThreshold:75,requireDisclaimer:true,requireAccuracy:true}
+  },
+  finance: {
+    label:'Finance', icon:'💰', desc:'Banking, investing — YMYL',
+    weights:{e:15,x:25,a:20,t:35,o:5}, isYMYL:true,
+    required:['disclaimer_for_sensitive_topics','no_factual_errors_or_outdated_info','evidence_based_claims_framed','industry_benchmarks_cited_correctly','specific_measurements_thresholds','content_freshness_current_data'],
+    notApplicable:['seasonal_or_cyclical_pattern','location_or_regional_specificity'],
+    gates:{minWords:500,trustThreshold:75,requireDisclaimer:true,requireAccuracy:true}
+  },
+  legal: {
+    label:'Legal', icon:'⚖️', desc:'Legal advice, compliance — YMYL',
+    weights:{e:10,x:25,a:30,t:30,o:5}, isYMYL:true,
+    required:['disclaimer_for_sensitive_topics','no_factual_errors_or_outdated_info','certification_or_credential_mentioned','cites_external_authoritative_source','professional_association_referenced'],
+    notApplicable:['seasonal_or_cyclical_pattern','outcome_data_from_own_work','age_demographic_or_cohort'],
+    gates:{minWords:500,trustThreshold:75,requireDisclaimer:true,requireAccuracy:true}
+  },
+  product: {
+    label:'Product / Review', icon:'🛍️', desc:'Products, services, comparisons',
+    weights:{e:30,x:15,a:15,t:25,o:15}, isYMYL:false,
+    required:['no_misleading_title_or_clickbait','informative_tone_not_sales_pitch','specific_customer_case_story','outcome_data_from_own_work'],
+    notApplicable:['professional_association_referenced','evidence_based_claims_framed'],
+    gates:{minWords:300,trustThreshold:null,requireDisclaimer:false,requireAccuracy:false}
+  },
+  technical: {
+    label:'Technical / How-To', icon:'⚙️', desc:'Dev guides, tutorials',
+    weights:{e:20,x:35,a:15,t:15,o:15}, isYMYL:false,
+    required:['step_level_process_breakdown','mechanism_explanation','correct_technical_terminology','specific_measurements_thresholds','tradeoffs_and_limitations'],
+    notApplicable:['disclaimer_for_sensitive_topics','age_demographic_or_cohort','seasonal_or_cyclical_pattern'],
+    gates:{minWords:400,trustThreshold:null,requireDisclaimer:false,requireAccuracy:false}
+  }
+};
+let selectedCT = 'general';
+
+// ── AI Signals ─────────────────────────────────────────────────
+const AI_SIGNALS = [
+  {k:'ai_generic_opener',       n:'Generic Scene-Setting Opener',    hint:'Opens with "In today\'s world…" instead of addressing topic directly'},
+  {k:'ai_filler_vocab',         n:'AI Filler Vocabulary',            hint:'Overuses: comprehensive, crucial, delve, robust, paramount, leverage, utilize'},
+  {k:'ai_transition_overuse',   n:'Transition Word Overuse',         hint:'Excessive Furthermore / Moreover / Additionally / In conclusion'},
+  {k:'ai_vague_claims',         n:'Vague / Unverifiable Claims',     hint:'Assertions without specific numbers, names, dates, or cited sources'},
+  {k:'ai_hollow_expertise',     n:'Surface-Level Expertise',         hint:'Topic coverage at Wikipedia-summary level — no practitioner depth'},
+  {k:'ai_uniform_structure',    n:'Mechanical Paragraph Structure',  hint:'Every section: intro → bullet list → wrap-up — identical formula'},
+  {k:'ai_hedged_language',      n:'Over-Hedged Language',            hint:'Excessive hedges: "may help", "could potentially", "it is important to"'},
+  {k:'ai_generic_examples',     n:'Hypothetical / Generic Examples', hint:'"Imagine a user who…" instead of real named case studies'},
+  {k:'ai_thin_conclusion',      n:'Conclusion Restates Body',        hint:'Conclusion only summarises body — no new synthesis or next step'},
+  {k:'ai_no_voice',             n:'No Authorial Voice / Stance',     hint:'Completely neutral — no opinion, no personality, reads like a template'},
+];
+
+// ── Pillars ────────────────────────────────────────────────────
+const PILLARS=[
+  {key:'experience',label:'Experience',emoji:'🧪',color:'var(--exp)',sk:'experience_score',wk:'e',
+   desc:'Has the author or business actually done this?',ic:'rgba(232,131,74,.12)',sc:'rgba(232,131,74,.12)',scolor:'var(--exp)',
+   params:[
+    {k:'first_person_narrative',n:'First-Person Narrative',num:'P1'},
+    {k:'quantified_business_volume',n:'Quantified Business Volume',num:'P2'},
+    {k:'quantified_time_in_operation',n:'Quantified Time in Operation',num:'P3'},
+    {k:'specific_customer_case_story',n:'Specific Customer or Case Story',num:'P4'},
+    {k:'outcome_data_from_own_work',n:'Outcome Data from Own Work',num:'P5'},
+    {k:'location_or_regional_specificity',n:'Location or Regional Specificity',num:'P6'},
+    {k:'seasonal_or_cyclical_pattern',n:'Seasonal or Cyclical Pattern',num:'P8'},
+    {k:'real_client_concern_quoted',n:'Real Client Concern Quoted',num:'P10'},
+    {k:'age_demographic_or_cohort',n:'Age / Demographic / Cohort Specificity',num:'P11'},
+    {k:'avoids_fabricated_experience',n:'Avoids Fabricated Experience Language',num:'P14'},
+    {k:'public_profile_info_mined',n:'Public Profile Information Mined Correctly',num:'P15'},
+  ]},
+  {key:'expertise',label:'Expertise',emoji:'🎓',color:'var(--xpt)',sk:'expertise_score',wk:'x',
+   desc:'Does the author truly understand the subject?',ic:'rgba(74,181,232,.12)',sc:'rgba(74,181,232,.12)',scolor:'var(--xpt)',
+   params:[
+    {k:'correct_technical_terminology',n:'Correct Technical Terminology',num:'P16'},
+    {k:'mechanism_explanation',n:'Mechanism Explanation — The Why & How',num:'P17'},
+    {k:'step_level_process_breakdown',n:'Step-Level Process Breakdown',num:'P18'},
+    {k:'corrects_common_misconception',n:'Corrects a Common Misconception',num:'P19'},
+    {k:'specific_measurements_thresholds',n:'Specific Measurements & Thresholds',num:'P20'},
+    {k:'tradeoffs_and_limitations',n:'Trade-offs and Limitations Stated',num:'P21'},
+    {k:'conditional_reasoning',n:'Conditional Reasoning — When X Then Y',num:'P23'},
+    {k:'industry_benchmarks_cited_correctly',n:'Industry Benchmarks Cited Correctly',num:'P24'},
+    {k:'evidence_based_claims_framed',n:'Evidence-Based Claims Framed Accurately',num:'P25'},
+  ]},
+  {key:'authority',label:'Authority',emoji:'🏛️',color:'var(--aut)',sk:'authority_score',wk:'a',
+   desc:'Is this a credible, go-to source on this topic?',ic:'rgba(155,110,243,.12)',sc:'rgba(155,110,243,.12)',scolor:'var(--aut)',
+   params:[
+    {k:'cites_external_authoritative_source',n:'Cites External Authoritative Source',num:'P30'},
+    {k:'third_party_expert_quote',n:'Third-Party Quote from Authoritative Figure',num:'P31'},
+    {k:'professional_association_referenced',n:'Professional Association Referenced',num:'P32'},
+    {k:'certification_or_credential_mentioned',n:'Certification or Credential Mentioned',num:'P33'},
+    {k:'topic_cluster_internal_links',n:'Topic Cluster — Internal Links',num:'P34'},
+    {k:'publish_or_updated_date_visible',n:'Publish or Last-Updated Date Visible',num:'P35'},
+    {k:'content_freshness_current_data',n:'Content Freshness — Current Data Cited',num:'P36'},
+  ]},
+  {key:'trust',label:'Trust',emoji:'🛡️',color:'var(--tru)',sk:'trust_score',wk:'t',
+   desc:'Is the content accurate, honest, and reliable?',ic:'rgba(74,232,160,.12)',sc:'rgba(74,232,160,.12)',scolor:'var(--tru)',
+   params:[
+    {k:'no_misleading_title_or_clickbait',n:'No Misleading Title or Clickbait',num:'P37'},
+    {k:'informative_tone_not_sales_pitch',n:'Informative Tone — Not a Covert Sales Pitch',num:'P38'},
+    {k:'descriptive_anchor_text',n:'Internal Links Use Descriptive Anchor Text',num:'P39'},
+    {k:'disclaimer_for_sensitive_topics',n:'Disclaimer Present for Sensitive Topics',num:'P40'},
+    {k:'no_factual_errors_or_outdated_info',n:'No Factual Errors or Outdated Information',num:'P41'},
+    {k:'formatting_serves_reader_not_seo',n:'Formatting Serves Reader, Not SEO',num:'P42'},
+  ]},
+  {key:'aeo',label:'AEO / SEO',emoji:'🔍',color:'var(--aeo)',sk:'aeo_score',wk:'o',
+   desc:'Does the content perform for search and AI overviews?',ic:'rgba(232,210,74,.12)',sc:'rgba(232,210,74,.12)',scolor:'var(--aeo)',
+   params:[
+    {k:'covers_topic_completely',n:'Covers the Topic Completely',num:'P43'},
+    {k:'original_point_of_view',n:'Contains an Original Point of View',num:'P44'},
+    {k:'table_of_contents',n:'Table of Contents for Long-Form Content',num:'P45'},
+    {k:'faq_section_substantive',n:'FAQ Section with Substantive Answers',num:'P46'},
+    {k:'answer_appears_early',n:'Answer or Definition Appears Early',num:'P47'},
+    {k:'no_padding_in_opening',n:'No Padding in Opening Paragraphs',num:'P48'},
+    {k:'conclusion_adds_value',n:'Conclusion Adds Value and Ends Logically',num:'P49'},
+  ]},
+];
+
+// ── Persistence layer (localStorage) ──────────────────────────
+const LS={cats:'jw_eeat_custom_cats',params:'jw_eeat_custom_params',clients:'jw_eeat_clients',lastClient:'jw_eeat_last_client'};
+function lsLoad(k,def){try{const v=localStorage.getItem(k);return v?JSON.parse(v):def;}catch(e){return def;}}
+function lsSave(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
+
+let customCats   = lsLoad(LS.cats,{});      // {key:{...same shape as CONTENT_TYPES}}
+let customParams = lsLoad(LS.params,[]);    // [{k,n,num,pillar,def}]
+let clients      = lsLoad(LS.clients,[]);   // [{id,name,industry,catKey,notes}]
+let currentClient= null;
+let ALLCATS      = {};
+
+function rebuildCats(){ ALLCATS={...CONTENT_TYPES,...customCats}; }
+function getCT(k){ return ALLCATS[k] || CONTENT_TYPES.general; }
+function isCustomCat(k){ return !!customCats[k]; }
+
+// Inject any saved custom parameters into the live PILLARS structure
+function installCustomParams(){
+  // strip previously injected customs first so re-install is idempotent
+  PILLARS.forEach(pl=>{ pl.params=pl.params.filter(p=>!p.custom); });
+  customParams.forEach(cp=>{
+    const pl=PILLARS.find(p=>p.key===cp.pillar);
+    if(pl && !pl.params.some(x=>x.k===cp.k)) pl.params.push({k:cp.k,n:cp.n,num:cp.num,custom:true});
+  });
+}
+
+// ── Build CT Selector ──────────────────────────────────────────
+function buildCTSelector(){
+  rebuildCats();
+  const grid=document.getElementById('ctGrid');
+  grid.innerHTML='';
+  Object.entries(ALLCATS).forEach(([key,ct])=>{
+    const btn=document.createElement('button');
+    btn.className='ct-btn'+(key===selectedCT?' active':'')+(ct.isYMYL?' is-ymyl':'')+(isCustomCat(key)?' is-custom':'');
+    btn.dataset.ct=key;
+    btn.onclick=()=>selectCT(key);
+    btn.innerHTML=`<span class="ct-icon">${ct.icon}</span><span class="ct-label">${ct.label}</span><span class="ct-desc">${ct.desc}</span>${ct.isYMYL?'<span class="ymyl-chip">YMYL</span>':''}`;
+    grid.appendChild(btn);
+  });
+}
+
+function selectCT(key){
+  if(!getCT(key)) return;
+  selectedCT=key;
+  const ct=getCT(key);
+  document.querySelectorAll('.ct-btn').forEach(b=>{
+    const k=b.dataset.ct;
+    b.className='ct-btn'+(k===key?' active':'')+(getCT(k).isYMYL?' is-ymyl':'')+(isCustomCat(k)?' is-custom':'');
+  });
+  document.getElementById('ctLabel').textContent=ct.label;
+  const w=ct.weights;
+  document.getElementById('wE').value=w.e;
+  document.getElementById('wX').value=w.x;
+  document.getElementById('wA').value=w.a;
+  document.getElementById('wT').value=w.t;
+  document.getElementById('wO').value=w.o;
+  syncW();
+  buildCheckboxes();
+}
+
+// ── Build Checkboxes ───────────────────────────────────────────
+function buildCheckboxes(){
+  const ct=getCT(selectedCT);
+  const required=new Set(ct.required);
+  const notApplicable=new Set(ct.notApplicable);
+  const container=document.getElementById('paramCheckboxes');
+  container.innerHTML='';
+  PILLARS.forEach(pl=>{
+    const sec=document.createElement('div');
+    sec.className='pillar-check-section';
+    const head=document.createElement('div');
+    head.className='pillar-check-head';
+    head.innerHTML=`<span class="wdot" style="background:${pl.color}"></span><span class="ph-label" style="color:${pl.color}">${pl.emoji} ${pl.label}</span><button class="pillar-toggle-all" onclick="togglePillarAll('${pl.key}',this)">all off</button>`;
+    sec.appendChild(head);
+    pl.params.forEach(param=>{
+      const isReq=required.has(param.k);
+      const isNA=notApplicable.has(param.k);
+      const row=document.createElement('div');
+      row.className='param-check-row'+(isNA?' row-na':'');
+      const cbId=`cb_${param.k}`;
+      const cbClass='param-cb'+(isReq?' cb-locked':'')+(isNA?' cb-na':'');
+      const checked=isNA?'':' checked';
+      const disabled=(isReq||isNA)?' disabled':'';
+      const tag=isReq?`<span class="req-tag">Required</span>`:isNA?`<span class="na-tag">N/A</span>`:'';
+      row.innerHTML=`<span class="pnum">${param.num}</span><input type="checkbox" class="${cbClass}" id="${cbId}" data-pillar="${pl.key}" data-key="${param.k}"${checked}${disabled} onchange="updateCbCount()"><label for="${cbId}">${param.n}</label>${tag}`;
+      sec.appendChild(row);
+    });
+    container.appendChild(sec);
+  });
+  updateCbCount();
+}
+
+function togglePillarAll(pillarKey,btn){
+  const ct=getCT(selectedCT);
+  const notApplicable=new Set(ct.notApplicable);
+  const required=new Set(ct.required);
+  const cbs=[...document.querySelectorAll(`input[data-pillar="${pillarKey}"]`)].filter(c=>!c.disabled);
+  const allChecked=cbs.every(c=>c.checked);
+  cbs.forEach(c=>{if(!notApplicable.has(c.dataset.key)&&!required.has(c.dataset.key)) c.checked=!allChecked;});
+  updateCbCount();
+}
+
+function updateCbCount(){
+  const total=document.querySelectorAll('.param-cb').length;
+  const checked=document.querySelectorAll('.param-cb:checked').length;
+  document.getElementById('cbCount').textContent=`${checked} of ${total} selected`;
+  PILLARS.forEach(pl=>{
+    const cbs=[...document.querySelectorAll(`input[data-pillar="${pl.key}"]`)].filter(c=>!c.disabled);
+    const btn=document.querySelector(`button[onclick="togglePillarAll('${pl.key}',this)"]`);
+    if(btn) btn.textContent=cbs.every(c=>c.checked)?'all off':'all on';
+  });
+}
+
+function getEnabledParams(){
+  const enabled={};
+  document.querySelectorAll('.param-cb:checked').forEach(cb=>{enabled[cb.dataset.key]=true;});
+  return enabled;
+}
+
+// ── Weights ────────────────────────────────────────────────────
+function getW(){
+  return{e:+document.getElementById('wE').value,x:+document.getElementById('wX').value,a:+document.getElementById('wA').value,t:+document.getElementById('wT').value,o:+document.getElementById('wO').value};
+}
+function syncW(){
+  const w=getW();
+  const keys={e:'wEv',x:'wXv',a:'wAv',t:'wTv',o:'wOv'};
+  Object.entries(keys).forEach(([k,id])=>document.getElementById(id).textContent=w[k]+'%');
+  const total=w.e+w.x+w.a+w.t+w.o;
+  const el=document.getElementById('wTotal');
+  if(total===100){el.className='wt wt-ok';el.textContent='✓ Weights sum to 100% — ready to analyze';}
+  else{el.className='wt wt-err';el.textContent=`⚠ Weights sum to ${total}% — must equal 100%`;}
+}
+document.getElementById('content').addEventListener('input',function(){
+  const t=this.value.trim();
+  const wc=t?t.split(/\s+/).length:0;
+  document.getElementById('wc').textContent=wc;
+  document.getElementById('cc').textContent=this.value.length;
+  // Show token warning banner for large articles
+  document.getElementById('tokenBanner').classList.toggle('show', wc > 1200);
+});
+
+// ── EEAT System Prompt (Call 1) ────────────────────────────────
+// Deliberately leaner — no AI signal definitions here, just EEAT params
+function buildEEATSys(w, enabledParams, contentType){
+  const ct = getCT(contentType);
+  const required = new Set(ct.required);
+
+  const DEFS = {
+    first_person_narrative:`P1: Uses "we/our/I" tied to real business situations.`,
+    quantified_business_volume:`P2: Specific count of clients/cases/installs. Fails on "many clients" with no number.`,
+    quantified_time_in_operation:`P3: States how long the business has operated with founding year.`,
+    specific_customer_case_story:`P4: Real scenario — when, who, specific problem, specific outcome. Fails on "imagine a customer".`,
+    outcome_data_from_own_work:`P5: Measurable result from the business's own work — before/after %, success rates.`,
+    location_or_regional_specificity:`P6: Grounds experience in real geography that changes the advice.`,
+    seasonal_or_cyclical_pattern:`P8: Time-based patterns only active practitioners would notice.`,
+    real_client_concern_quoted:`P10: Genuine customer question in the customer's own words.`,
+    age_demographic_or_cohort:`P11: Experience anchored to specific customer type (age, life stage, profession).`,
+    avoids_fabricated_experience:`P14: No invented patient stories or unverifiable internal data.`,
+    public_profile_info_mined:`P15: Uses publicly available facts accurately — no invented credentials.`,
+    correct_technical_terminology:`P16: Domain-specific terms used accurately, defined simply when needed.`,
+    mechanism_explanation:`P17: Explains the underlying process — what causes it, the stages, the mechanics.`,
+    step_level_process_breakdown:`P18: Specific numbered/sequenced steps with conditions, durations, or thresholds.`,
+    corrects_common_misconception:`P19: Identifies a widely-held wrong belief, explains why it's wrong, provides fuller truth.`,
+    specific_measurements_thresholds:`P20: Precise numbers with units and thresholds.`,
+    tradeoffs_and_limitations:`P21: Notes when advice doesn't apply, who it's not for, what can go wrong.`,
+    conditional_reasoning:`P23: If/when conditional logic — "if X then Y, but if Z then…"`,
+    industry_benchmarks_cited_correctly:`P24: Named institution/journal with date.`,
+    evidence_based_claims_framed:`P25: Claims framed as evidence-based with citations.`,
+    cites_external_authoritative_source:`P30: Names government body, regulator, professional association, or peer-reviewed research.`,
+    third_party_expert_quote:`P31: Direct quote from a named subject matter expert or institution.`,
+    professional_association_referenced:`P32: References a relevant professional body.`,
+    certification_or_credential_mentioned:`P33: Business certification/licence/accreditation mentioned.`,
+    topic_cluster_internal_links:`P34: Internal links proportionate to article length, contextually appropriate.`,
+    publish_or_updated_date_visible:`P35: Article displays a publish date; for YMYL also a last-updated date.`,
+    content_freshness_current_data:`P36: Facts, rates, regulations cited are current.`,
+    no_misleading_title_or_clickbait:`P37: Title is literal and proportionate — no superlatives or manufactured urgency.`,
+    informative_tone_not_sales_pitch:`P38: Genuinely helps the reader. Not primarily selling the business's services.`,
+    descriptive_anchor_text:`P39: Internal links use contextual descriptive anchor text, not "click here".`,
+    disclaimer_for_sensitive_topics:`P40: Clear disclaimer advising professional consultation is present.`,
+    no_factual_errors_or_outdated_info:`P41: All claims are accurate and current.`,
+    formatting_serves_reader_not_seo:`P42: Headings/lists/tables used to help reader navigate, not keyword-stuffed.`,
+    covers_topic_completely:`P43: Main question plus natural follow-up questions answered. No major subtopic gaps.`,
+    original_point_of_view:`P44: Perspective only writable with real domain access — not a paraphrase of top blogs.`,
+    table_of_contents:`P45: For long-form multi-section articles (1500+ words), a linked TOC is present.`,
+    faq_section_substantive:`P46: FAQ section with answers not already covered at length in the body.`,
+    answer_appears_early:`P47: Key answer or definition within first 100–150 words.`,
+    no_padding_in_opening:`P48: Every sentence in first 150 words moves reader toward the answer. No preamble.`,
+    conclusion_adds_value:`P49: Conclusion provides useful synthesis or next step not already stated in the body.`,
+  };
+  // Merge user-defined custom parameter definitions
+  customParams.forEach(cp => { DEFS[cp.k] = `${cp.num}: ${cp.def || cp.n}`; });
+
+  let paramDefs = '';
+  PILLARS.forEach(pl => {
+    const active = pl.params.filter(p => enabledParams[p.k]);
+    if (!active.length) return;
+    paramDefs += `\n${pl.label.toUpperCase()} (pillar weight: ${w[pl.wk]}%):\n`;
+    active.forEach(p => {
+      const isReq = required.has(p.k);
+      paramDefs += '• ' + (DEFS[p.k] || `${p.num}: ${p.n}`) + (isReq ? '  [REQUIRED — cannot be "strong" unless clearly and fully met]' : '') + '\n';
+    });
+  });
+
+  const paramKeys = Object.keys(enabledParams).map(k =>
+    `"${k}":{"status":"missing","evidence":"","priority":"medium","area":"","suggestion":"","example":""}`
+  ).join(',');
+
+  return `You are a senior EEAT content analyst at Justwords, a professional content agency. Evaluate the supplied "${ct.label}" article${ct.isYMYL ? ' — this is YMYL content, so apply stricter Trust and accuracy standards' : ''}. Be a strict, fair editor: reward only what is actually present in the text. Do not give credit for what the article *could* or *should* contain.
+
+HOW TO SCORE EACH PARAMETER — choose exactly one status:
+- "strong"  = the requirement is clearly and fully met, and you can point to specific text as proof.
+- "partial" = the requirement is attempted or partly met, but thin, vague, generic, or missing key specifics.
+- "missing" = the requirement is absent, or only a hollow gesture toward it exists.
+
+EVIDENCE RULES (critical for reliability):
+- "evidence" MUST quote or closely paraphrase a specific phrase, sentence, number, or section from the article that justifies the status. Never invent quotes. If you cannot find supporting text, the status is "missing".
+- Judge ONLY what the text shows. Generic, unverifiable, or templated writing is "partial" at best, never "strong".
+- A required parameter that is "partial" or "missing" must use priority "high".
+- For every "partial" or "missing", give a concrete "area" (what is weak) plus a "suggestion" and a short "example" edit the writer can apply.
+
+PILLAR SCORE FIELDS (experience_score etc.): these are recomputed by our system from your per-parameter statuses, so just return them as 0 — your per-parameter accuracy is what matters.
+
+VERDICT THRESHOLDS (overall 0–100): "Excellent"≥85 | "Good"≥65 | "Needs Work"≥40 | "Poor"<40. Estimate verdict from how many parameters are strong vs partial/missing, weighted by pillar.
+
+PARAMETERS TO EVALUATE:
+${paramDefs}
+Also write: a 1–2 sentence "summary" of overall quality, an "editor_note" with the single most important fix, three "top_wins" (genuine strengths), and three "top_gaps" (highest-impact fixes).
+
+──────────────────────────────────────────────
+PART 2 — AI-WRITING DETECTION ("ai_detection")
+For each of these 10 signals return found (true/false), evidence (a quote/observation), severity ("low"/"medium"/"high"):
+1. ai_generic_opener: Opens with broad preamble ("In today's world…") instead of the topic. HIGH if the whole first paragraph is scene-setting.
+2. ai_filler_vocab: Counts: comprehensive, crucial, essential, delve, robust, paramount, pivotal, leverage, utilize, noteworthy, "it is important to note". HIGH≥5, MEDIUM 3–4, LOW 1–2.
+3. ai_transition_overuse: Furthermore, Moreover, Additionally, In conclusion, In summary. HIGH≥4, MEDIUM 2–3.
+4. ai_vague_claims: Core claims with no numbers, named studies, dates, sources. HIGH if most claims lack citations.
+5. ai_hollow_expertise: No deeper than a Wikipedia summary. HIGH if the whole article is surface-level.
+6. ai_uniform_structure: Every section uses the same intro→bullets→wrap-up formula. HIGH if 3+ identical.
+7. ai_hedged_language: Every claim hedged without backing ("may help", "could potentially"). HIGH if pervasive.
+8. ai_generic_examples: All examples hypothetical ("Imagine a user who…"), no real named cases. HIGH if all hypothetical.
+9. ai_thin_conclusion: Conclusion merely restates the body. HIGH if near-verbatim summary.
+10. ai_no_voice: No authorial stance or opinion anywhere. HIGH if no perspective exists.
+risk_score = (high×3 + medium×2 + low×1) / 30 × 100, rounded. overall_risk: "low"≤25, "medium" 26–55, "high"≥56.
+rewrite_recommendations: 3 specific fixes to make the content more human and credible.
+
+──────────────────────────────────────────────
+PART 3 — PUBLISH GATE CHECKS ("gate_checks") — be strict and literal:
+- unsourced_stats: Find every numeric or percentage claim that does NOT have a citation/source within the same or next sentence. Return count and up to 3 verbatim "examples". Round/common-knowledge numbers (e.g. "3 steps") don't count.
+- citation_tier: Count external sources cited. total_citations = how many. tier1_2_count = how many are Tier 1–2 (primary research, .gov, .edu, peer-reviewed journals, official statistics, reputable named journalism). tier1_2_pct = round(tier1_2_count/total_citations*100) or 0 if none.
+- ymyl_author_bio: present=true ONLY if a named author with relevant professional credentials/qualifications is shown. Put the credentials in "credentials" and the supporting text in "evidence".
+- title_promise: delivered=true if the body actually delivers what the H1/title promises (e.g. a "review"/"comparison" actually evaluates). If it bait-and-switches, delivered=false and explain in "note".
+- contradictions: found=true if any statement contradicts an earlier one (numbers, recommendations, claims). List up to 3 verbatim "items".
+
+Return ONLY this JSON (no markdown, no backticks). Keep evidence/suggestion strings short:
+{"overall_score":0,"verdict":"Poor","summary":"","editor_note":"","top_wins":["","",""],"top_gaps":["","",""],"experience_score":0,"expertise_score":0,"authority_score":0,"trust_score":0,"aeo_score":0,"params":{${paramKeys}},"ai_detection":{"overall_risk":"low","risk_score":0,"signals":{"ai_generic_opener":{"found":false,"evidence":"","severity":"low"},"ai_filler_vocab":{"found":false,"evidence":"","severity":"low"},"ai_transition_overuse":{"found":false,"evidence":"","severity":"low"},"ai_vague_claims":{"found":false,"evidence":"","severity":"low"},"ai_hollow_expertise":{"found":false,"evidence":"","severity":"low"},"ai_uniform_structure":{"found":false,"evidence":"","severity":"low"},"ai_hedged_language":{"found":false,"evidence":"","severity":"low"},"ai_generic_examples":{"found":false,"evidence":"","severity":"low"},"ai_thin_conclusion":{"found":false,"evidence":"","severity":"low"},"ai_no_voice":{"found":false,"evidence":"","severity":"low"}},"rewrite_recommendations":["","",""]},"gate_checks":{"unsourced_stats":{"count":0,"examples":[]},"citation_tier":{"total_citations":0,"tier1_2_count":0,"tier1_2_pct":0},"ymyl_author_bio":{"present":false,"credentials":"","evidence":""},"title_promise":{"delivered":true,"note":""},"contradictions":{"found":false,"items":[]}}}`;
+}
+
+// ── Groq API call helper ───────────────────────────────────────
+async function callGroq(key, sysPrompt, userMsg, maxTokens = 6000){
+  const model = (document.getElementById('modelSel')||{}).value || 'llama-3.3-70b-versatile';
+  const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${key}` },
+    body: JSON.stringify({
+      model,
+      max_tokens: maxTokens,
+      temperature: 0.1,
+      response_format: { type: 'json_object' },
+      messages: [
+        { role: 'system', content: sysPrompt },
+        { role: 'user', content: userMsg }
+      ]
+    })
+  });
+  if (!res.ok) {
+    const e = await res.json().catch(() => ({ error: { message: `HTTP ${res.status}` } }));
+    const msg = e?.error?.message || `API error ${res.status}`;
+    if (res.status === 429) throw new Error('RATE_LIMIT::' + msg);
+    throw new Error(msg);
+  }
+  const data = await res.json();
+  const raw = data.choices?.[0]?.message?.content || '';
+  if (!raw) throw new Error('Empty response from Groq API.');
+  return JSON.parse(raw);
+}
+
+// ── Adaptive request sizing ────────────────────────────────────
+// Groq counts input + max_tokens (output reservation) against the per-minute
+// limit. The 8B model is only 6k TPM, so we must scale both the article we
+// send AND the output we reserve to the selected model's budget.
+const MODEL_LIMITS = {
+  'llama-3.3-70b-versatile': { tpm: 12000 },
+  'llama-3.1-8b-instant':    { tpm: 6000 }
+};
+function estTokens(str){ return Math.ceil((str||'').length / 4); }
+function planRequest(sysPrompt, userPrefix, articleText, numParams){
+  const model = (document.getElementById('modelSel')||{}).value || 'llama-3.3-70b-versatile';
+  const tpm = (MODEL_LIMITS[model] || { tpm:6000 }).tpm;
+  const safety = 350;
+  const sysTok = estTokens(sysPrompt) + 40;
+  const wrapTok = estTokens(userPrefix) + 30;
+  // Output floor: enough to return every parameter object without truncating the
+  // JSON (which would break parsing). Don't reserve less than this.
+  const minOut = numParams * 50 + 1200;
+  let maxTokens = Math.min(6000, minOut + 400);
+  let articleBudget = tpm - safety - maxTokens - sysTok - wrapTok;
+  if (articleBudget < 400){          // trim the output reservation down to the floor first
+    maxTokens = minOut;
+    articleBudget = tpm - safety - maxTokens - sysTok - wrapTok;
+  }
+  if (articleBudget < 400){          // even at the floor it won't fit — tell the user how to fix it
+    throw new Error('TOO_BIG::' + JSON.stringify({ tpm, numParams, model }));
+  }
+  const maxChars = Math.min(16000, articleBudget * 4);
+  return { userMsg: userPrefix + sampleArticle(articleText, maxChars), maxTokens, trimmed: articleText.length > maxChars };
+}
+
+// ── Compute score ──────────────────────────────────────────────
+// Three-tier partial credit. Backward compatible with old good/needs_improvement.
+const CREDIT = {strong:1, partial:0.5, missing:0, good:1, needs_improvement:0};
+function paramCredit(d){
+  const s = (d && d.status) || 'missing';
+  return CREDIT[s] != null ? CREDIT[s] : 0;
+}
+// Pillar credit is DERIVED from the per-parameter statuses the user can see —
+// never trusts the model's self-reported pillar totals. This is what makes the
+// headline number match the evidence below it.
+function pillarCredit(r, pl, enabledParams){
+  const active = pl.params.filter(p => enabledParams[p.k]);
+  let credit = 0;
+  active.forEach(p => { credit += paramCredit((r.params || {})[p.k]); });
+  return { credit, n: active.length };
+}
+function computeScore(r, w, enabledParams){
+  let total = 0;
+  PILLARS.forEach(pl => {
+    const { credit, n } = pillarCredit(r, pl, enabledParams);
+    if (!n) return;
+    total += credit / n * w[pl.wk];
+  });
+  return Math.round(total);
+}
+// Send the whole article when short; otherwise head + tail so conclusion-related
+// parameters are actually evaluated (the old version cut the conclusion off).
+function sampleArticle(text, max){
+  if (text.length <= max) return text;
+  const head = Math.floor(max * 0.62), tail = max - head;
+  return text.slice(0, head) + '\n\n[…middle section omitted to fit length — beginning and end preserved…]\n\n' + text.slice(text.length - tail);
+}
+
+// ── Client-side structural metrics (no LLM, no tokens) ─────────
+const FILLER_PHRASES = ['comprehensive','crucial','essential','delve','robust','paramount','pivotal','leverage','utilize','noteworthy','seamless','plethora','myriad','realm of','testament to','game-changer','unlock the','elevate your','embark on','foster','harness the','navigate the complexities','it is important to note','in today\'s world','in the world of','when it comes to','at the end of the day'];
+function clientSideMetrics(text){
+  const words = (text.trim().match(/\S+/g) || []).length || 1;
+  const lower = text.toLowerCase();
+  let filler = 0;
+  FILLER_PHRASES.forEach(ph => {
+    const re = new RegExp(ph.includes(' ') ? ph.replace(/[.*+?^${}()|[\]\\]/g,'\\$&') : '\\b'+ph+'\\b','g');
+    filler += (lower.match(re) || []).length;
+  });
+  const fillerPer1000 = filler / words * 1000;
+  // Headings: markdown (#, ##…), HTML (<h2-6>), or Setext-ish ALL-CAPS short lines
+  const headingMatches = text.match(/^#{1,6}\s+\S/gm) || [];
+  const htmlHeads = text.match(/<h[1-6][\s>]/gi) || [];
+  const headingCount = headingMatches.length + htmlHeads.length;
+  // External links
+  const urls = (text.match(/https?:\/\/[^\s)"'<>]+/gi) || []).map(u => u.replace(/[.,);]+$/,''));
+  const externalLinks = [...new Set(urls)];
+  // Intro length: chars before first heading (only meaningful if headings exist)
+  let introPct = null;
+  if (headingCount > 0) {
+    const firstMd = text.search(/^#{1,6}\s+\S/m);
+    const firstHtml = text.search(/<h[1-6][\s>]/i);
+    const idxs = [firstMd, firstHtml].filter(i => i >= 0);
+    if (idxs.length) {
+      const cut = Math.min(...idxs);
+      const introWords = (text.slice(0, cut).match(/\S+/g) || []).length;
+      introPct = Math.round(introWords / words * 100);
+    }
+  }
+  return { words, fillerCount: filler, fillerPer1000, headingCount, wordsPerHeading: headingCount ? Math.round(words/headingCount) : null, externalLinks, introPct };
+}
+
+// ── Compute gates ──────────────────────────────────────────────
+function computeGates(result, contentType, wordCount, enabledParams, metrics){
+  const ct = getCT(contentType);
+  const g = ct.gates || {};
+  const isCommercial = contentType === 'product' || g.requireExperience === true;
+  // sensible defaults so custom categories work without extra config
+  const minEEAT       = g.minEEAT ?? (ct.isYMYL ? 65 : 60);
+  const fillerMax     = g.fillerMax ?? 8;
+  const introMaxPct   = g.introMaxPct ?? 12;
+  const minWordsPerHd = g.minWordsPerHeading ?? 400;
+  const tierMinPct    = g.citationTierMinPct ?? 50;
+  const gc = result.gate_checks || {};
+  metrics = metrics || {};
+  const gates = [];
+
+  // 0) EEAT QUALITY FLOOR — fixes "score 0 but says ready to publish"
+  const eScore = result.overall_score ?? 0;
+  gates.push({ id:'eeat_quality', label:'EEAT Quality Floor',
+    type: eScore < 40 ? 'hard' : 'soft',
+    passed: eScore >= minEEAT, warning: eScore >= 40 && eScore < minEEAT, na:false,
+    detail: eScore < 40 ? `Score ${eScore}/100 — far below standard, major rework before publish`
+          : eScore < minEEAT ? `Score ${eScore}/100 — below the ${minEEAT} bar, editor review required`
+          : `Score ${eScore}/100 — meets the quality bar` });
+
+  const minW = ct.gates.minWords;
+  gates.push({ id:'word_count', label:'Minimum Word Count', passed: wordCount >= minW, type:'hard',
+    detail:`${wordCount} words — minimum: ${minW}`, na:false });
+
+  if (ct.gates.trustThreshold) {
+    const trustActive = PILLARS.find(p => p.key === 'trust').params.filter(p => enabledParams[p.k]);
+    const trustPct = trustActive.length > 0 ? Math.round((result.trust_score ?? 0) / trustActive.length * 100) : 0;
+    gates.push({ id:'ymyl_trust', label:'YMYL Trust Threshold (min 75%)', passed: trustPct >= ct.gates.trustThreshold, type:'hard',
+      detail:`Trust: ${trustPct}% — threshold: ${ct.gates.trustThreshold}%`, na:false });
+  } else {
+    gates.push({ id:'ymyl_trust', label:'YMYL Trust Threshold', passed:true, type:'hard', detail:'Not applicable for this content type', na:true });
+  }
+
+  if (ct.gates.requireDisclaimer) {
+    const d = result.params?.disclaimer_for_sensitive_topics;
+    const ok = d && (d.status === 'strong' || d.status === 'good');
+    gates.push({ id:'ymyl_disclaimer', label:'Legal / Medical Disclaimer', passed: ok, type:'hard',
+      detail: ok ? 'Disclaimer detected and adequate' : 'Disclaimer absent — REQUIRED for ' + ct.label + ' content', na:false });
+  } else {
+    gates.push({ id:'ymyl_disclaimer', label:'Legal Disclaimer', passed:true, type:'hard', detail:'Not required for this content type', na:true });
+  }
+
+  if (ct.gates.requireAccuracy) {
+    const f = result.params?.no_factual_errors_or_outdated_info;
+    const ok = f && (f.status === 'strong' || f.status === 'good');
+    gates.push({ id:'factual_accuracy', label:'Factual Accuracy Gate', passed: ok, type:'hard',
+      detail: ok ? 'No factual errors detected' : 'Factual errors or outdated info detected — REQUIRED for ' + ct.label, na:false });
+  } else {
+    gates.push({ id:'factual_accuracy', label:'Factual Accuracy', passed:true, type:'hard', detail:'Standard check — not a hard gate for this type', na:true });
+  }
+
+  const aiRisk = (result.ai_detection?.overall_risk) || 'unknown';
+  const aiScore = result.ai_detection?.risk_score ?? 0;
+  gates.push({ id:'ai_risk', label:'AI Content Risk Gate', passed: aiRisk === 'low', warning: aiRisk === 'medium',
+    type: aiRisk === 'high' ? 'hard' : 'soft', na:false,
+    detail: aiRisk === 'high' ? `Score ${aiScore}/100 — Full human rewrite required before publishing`
+           : aiRisk === 'medium' ? `Score ${aiScore}/100 — Flagged for targeted human edits`
+           : `Score ${aiScore}/100 — Passes AI content detection` });
+
+  // ─── The 10 proposed publish gate rules ───────────────────────
+  // #1 Zero unsourced statistics (HARD)
+  const us = gc.unsourced_stats || {count:0,examples:[]};
+  gates.push({ id:'unsourced_stats', label:'No Unsourced Statistics', type:'hard', na:false,
+    passed:(us.count||0)===0,
+    detail:(us.count||0)===0 ? 'Every numeric claim is sourced'
+      : `${us.count} unsourced stat${us.count>1?'s':''}${us.examples&&us.examples.length?' — e.g. "'+us.examples[0]+'"':''}` });
+
+  // #2 External links resolve — advisory: a browser can't check cross-site 404s,
+  // so this is a manual checklist item (low) rather than an auto-block.
+  const links = metrics.externalLinks || [];
+  gates.push({ id:'links_resolve', label:'External Links Resolve (manual)', type:'soft', low:true, na: links.length===0,
+    passed:false, warning: links.length>0,
+    detail: links.length===0 ? 'No external links found'
+      : `${links.length} external link${links.length>1?'s':''} — manually verify none are 404 (browser can't auto-check)` });
+
+  // #3 YMYL credentialed author bio (HARD, YMYL only)
+  if (ct.isYMYL){
+    const bio = gc.ymyl_author_bio || {present:false};
+    gates.push({ id:'ymyl_author_bio', label:'Credentialed Author Bio (YMYL)', type:'hard', na:false,
+      passed: bio.present===true,
+      detail: bio.present===true ? `Credentialed author present${bio.credentials?': '+bio.credentials:''}`
+        : 'No credentialed author bio — Google requires this on YMYL content' });
+  } else {
+    gates.push({ id:'ymyl_author_bio', label:'Credentialed Author Bio', type:'hard', na:true, passed:true, detail:'Only required for YMYL content' });
+  }
+
+  // #4 Commercial-intent needs an experience signal (HARD, commercial only)
+  if (isCommercial){
+    const exp = PILLARS.find(p=>p.key==='experience');
+    const expActive = exp.params.filter(p=>enabledParams[p.k]);
+    const expStrong = expActive.filter(p=>{const d=(result.params||{})[p.k];const s=d&&d.status;return s==='strong'||s==='good';}).length;
+    gates.push({ id:'experience_signal', label:'Experience Signal (commercial)', type:'hard', na:false,
+      passed: expStrong>=1,
+      detail: expStrong>=1 ? `${expStrong} first-hand experience signal${expStrong>1?'s':''} present`
+        : 'A review/comparison with no experience signal fails its own promise — add real testing or usage' });
+  } else {
+    gates.push({ id:'experience_signal', label:'Experience Signal', type:'hard', na:true, passed:true, detail:'Only required for review/comparison content' });
+  }
+
+  // #5 Filler-phrase density (SOFT)
+  const fp = metrics.fillerPer1000 ?? 0;
+  gates.push({ id:'filler_density', label:'Filler-Phrase Density', type:'soft', na:false,
+    passed: fp < fillerMax, warning: fp >= fillerMax,
+    detail:`${fp.toFixed(1)} per 1000 words (${metrics.fillerCount||0} total) — max ${fillerMax}` });
+
+  // #6 Citation tier mix ≥50% Tier 1-2 (SOFT)
+  const cit = gc.citation_tier || {total_citations:0,tier1_2_pct:0};
+  gates.push({ id:'citation_tier', label:'Citation Quality (≥'+tierMinPct+'% Tier 1–2)', type:'soft',
+    na:(cit.total_citations||0)===0, passed:(cit.tier1_2_pct||0)>=tierMinPct, warning:(cit.tier1_2_pct||0)<tierMinPct,
+    detail:(cit.total_citations||0)===0 ? 'No external citations found'
+      : `${cit.tier1_2_pct||0}% of ${cit.total_citations} sources are Tier 1–2 (primary/.gov/.edu/journals)` });
+
+  // #7 Intro not over 12% of article (SOFT)
+  const ip = metrics.introPct;
+  gates.push({ id:'intro_length', label:'Lean Intro (≤'+introMaxPct+'%)', type:'soft',
+    na: ip==null, passed: ip!=null && ip<=introMaxPct, warning: ip!=null && ip>introMaxPct,
+    detail: ip==null ? 'No headings detected — add ## headings to enable this check'
+      : `Intro is ${ip}% of the article — max ${introMaxPct}%` });
+
+  // #8 Structural minimum — 1 subheading per 400 words (NICE-TO-HAVE / soft, low)
+  const wph = metrics.wordsPerHeading;
+  gates.push({ id:'subheadings', label:'Structure (1 subhead / '+minWordsPerHd+'w)', type:'soft', low:true,
+    na:false, passed: (metrics.headingCount||0)>0 && wph!=null && wph<=minWordsPerHd,
+    warning: !((metrics.headingCount||0)>0 && wph!=null && wph<=minWordsPerHd) && wordCount>minWordsPerHd,
+    detail:(metrics.headingCount||0)===0 ? (wordCount>minWordsPerHd?`Wall of text — 0 subheadings in ${wordCount} words`:'Short enough to skip subheadings')
+      : `${metrics.headingCount} subheading${metrics.headingCount>1?'s':''} — ~1 per ${wph} words` });
+
+  // #9 Title-promise check (SOFT)
+  const tp = gc.title_promise || {delivered:true};
+  gates.push({ id:'title_promise', label:'Title Delivers on Its Promise', type:'soft', na:false,
+    passed: tp.delivered!==false, warning: tp.delivered===false,
+    detail: tp.delivered===false ? (tp.note||'Body does not deliver what the title promises') : 'Article delivers on the H1/title' });
+
+  // #10 No internal contradictions (SOFT)
+  const con = gc.contradictions || {found:false,items:[]};
+  gates.push({ id:'contradictions', label:'No Internal Contradictions', type:'soft', na:false,
+    passed: con.found!==true, warning: con.found===true,
+    detail: con.found===true ? `Contradiction flagged${con.items&&con.items.length?': "'+con.items[0]+'"':''}` : 'No contradictions detected' });
+
+  return gates;
+}
+
+// ── Step indicator helpers ─────────────────────────────────────
+function stepDone(id){ document.getElementById(id).className = 'step-dot done'; }
+function stepActive(id){ document.getElementById(id).className = 'step-dot active'; }
+function updateLoadText(t){ document.getElementById('loadText').textContent = t; }
+
+// ── Main Analyze ───────────────────────────────────────────────
+async function analyze(){
+  const key  = document.getElementById('groqKey').value.trim();
+  const text = document.getElementById('content').value.trim();
+  if (!key)  { alert('Please enter your Groq API key.\nGet one free at console.groq.com/keys'); return; }
+  if (text.length < 80) { alert('Please paste your blog content first.'); return; }
+  const w = getW();
+  if (w.e + w.x + w.a + w.t + w.o !== 100) { alert('Pillar weights must sum to 100% before analyzing.'); return; }
+  const enabledParams = getEnabledParams();
+  if (!Object.keys(enabledParams).length) { alert('Please select at least one parameter to evaluate.'); return; }
+  const wordCount = text.split(/\s+/).length;
+
+  // UI — loading state
+  const btn = document.getElementById('analyzeBtn');
+  btn.disabled = true;
+  document.getElementById('btnSpin').style.display = 'block';
+  document.getElementById('btnTxt').textContent = 'Analyzing…';
+  document.getElementById('emptyState').style.display = 'none';
+  document.getElementById('results').style.display = 'none';
+  document.getElementById('loading').style.display = 'flex';
+  ['sd1','sd2','sd3','sd4'].forEach(id => document.getElementById(id).className = 'step-dot');
+  stepActive('sd1');
+
+  try {
+    // ── SINGLE LLM CALL: EEAT + AI detection + gate checks ─────
+    // One call instead of two halves the article tokens sent per analysis —
+    // the main lever on Groq's daily token limit.
+    updateLoadText('Analysing EEAT, AI signals & gate checks…');
+    stepActive('sd1');
+    const sysPrompt = buildEEATSys(w, enabledParams, selectedCT);
+    const numParams = Object.keys(enabledParams).length;
+    const plan = planRequest(sysPrompt, `Analyze this ${getCT(selectedCT).label} article. Title is the first line. Full text:\n\n`, text, numParams);
+    const merged = await callGroq(key, sysPrompt, plan.userMsg, plan.maxTokens);
+    stepDone('sd1'); stepActive('sd2');
+
+    // Derive pillar scores from the per-parameter verdicts so the headline
+    // score always matches the evidence shown to the editor.
+    PILLARS.forEach(pl => { merged[pl.sk] = pillarCredit(merged, pl, enabledParams).credit; });
+    merged.overall_score = computeScore(merged, w, enabledParams);
+    if (!merged.ai_detection) merged.ai_detection = { overall_risk:'unknown', risk_score:0, signals:{}, rewrite_recommendations:[] };
+    if (!merged.gate_checks)  merged.gate_checks  = {};
+    stepDone('sd2'); stepActive('sd3');
+
+    updateLoadText('Running gate-rule checks…');
+    const metrics = clientSideMetrics(text);
+    stepDone('sd3'); stepActive('sd4');
+
+    updateLoadText('Computing scores & publish decision…');
+    const gates = computeGates(merged, selectedCT, wordCount, enabledParams, metrics);
+    stepDone('sd4');
+
+    render(merged, w, enabledParams, gates);
+
+  } catch(err){
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('emptyState').style.display = 'flex';
+    const msg = typeof err.message === 'string' ? err.message : '';
+    const isRL = msg.startsWith('RATE_LIMIT::');
+    const isBig = msg.startsWith('TOO_BIG::');
+    if (isBig) {
+      let info = {}; try { info = JSON.parse(msg.replace('TOO_BIG::','')); } catch(e){}
+      const is8b = (info.model||'').includes('8b');
+      document.getElementById('emptyState').innerHTML =
+        `<div class="empty-icon">📉</div><h3 style="color:var(--improve)">Request Too Large for This Model</h3>`+
+        `<p style="color:var(--t2);max-width:360px;text-align:center">The ${is8b?'Llama 3.1 8B':'selected'} model allows only <strong style="color:var(--text)">${info.tpm||'6000'} tokens/minute</strong>, and this analysis (${info.numParams||'many'} parameters + your article) needs more.<br><br>`+
+        `<strong style="color:var(--text)">Fixes, easiest first:</strong><br>`+
+        `${is8b?'• Switch the model to <strong style="color:var(--xpt)">Llama 3.3 70B</strong> (12k/min)<br>':''}`+
+        `• Deselect some parameters in the left panel<br>`+
+        `• Paste a shorter article (or analyse in sections)</p>`;
+    } else if (isRL) {
+      const raw = err.message.replace('RATE_LIMIT::','');
+      const m = raw.match(/try again in ([\dhms.\s]+?)[.\)]/i);
+      const wait = m ? m[1].trim() : 'a little while';
+      document.getElementById('emptyState').innerHTML =
+        `<div class="empty-icon">⏳</div><h3 style="color:var(--improve)">Daily Token Limit Reached</h3>`+
+        `<p style="color:var(--t2);max-width:340px;text-align:center">Groq's free tier caps tokens per day on the 70B model. Resets in <strong style="color:var(--text)">${wait}</strong>.<br><br>`+
+        `<strong style="color:var(--text)">Keep working now:</strong> switch the model dropdown to <strong style="color:var(--xpt)">Llama 3.1 8B (high-limit)</strong> and re-run — it has a far larger daily allowance.<br><br>`+
+        `Or upgrade at <span style="color:var(--aut)">console.groq.com/settings/billing</span>.</p>`;
+    } else {
+      document.getElementById('emptyState').innerHTML = `<div class="empty-icon">⚠️</div><h3 style="color:#e85b5b">Analysis Failed</h3><p style="color:var(--t2);max-width:320px;text-align:center">${err.message}</p>`;
+    }
+  } finally {
+    btn.disabled = false;
+    document.getElementById('btnSpin').style.display = 'none';
+    document.getElementById('btnTxt').textContent = '⚡ Analyze EEAT + AI Content';
+    document.getElementById('loading').style.display = 'none';
+  }
+}
+
+// ── Helpers ────────────────────────────────────────────────────
+function vc(s){
+  if (s >= 85) return {cls:'vExcellent', label:'Excellent'};
+  if (s >= 65) return {cls:'vGood', label:'Good'};
+  if (s >= 40) return {cls:'vNeeds', label:'Needs Work'};
+  return {cls:'vPoor', label:'Poor'};
+}
+
+// Three independent layer scores, each with its own Good / Not-Good verdict.
+function renderScorecard(r, gates, cntStrong, cntPartial, cntMissing){
+  const colors={good:'var(--tru)',warn:'var(--improve)',fail:'#e85b5b'};
+
+  // 1) EEAT quality (the weighted parameter score)
+  const eScore=r.overall_score ?? 0;
+  const eStat=eScore>=65?'good':eScore>=40?'warn':'fail';
+  const eVerd=eScore>=65?'GOOD':eScore>=40?'NEEDS WORK':'POOR';
+
+  // 2) AI authenticity (inverted risk — higher = more human)
+  const ai=r.ai_detection||{};
+  const risk=ai.overall_risk||'unknown';
+  const authScore=Math.max(0,100-(ai.risk_score ?? 0));
+  const aStat=risk==='low'?'good':risk==='medium'?'warn':'fail';
+  const aVerd=risk==='low'?'GOOD':risk==='medium'?'CAUTION':'NOT GOOD';
+  const aSub=risk==='low'?'Reads human-written':risk==='medium'?'Some AI signals — needs edits':'Strong AI signals — rewrite';
+
+  // 3) Gate compliance ("low" = nice-to-have, never blocks the decision)
+  const applicable=gates.filter(g=>!g.na);
+  const hardFails=applicable.filter(g=>!g.passed && g.type==='hard');
+  const softWarns=applicable.filter(g=>!g.low && ((!g.passed && g.type==='soft')||g.warning));
+  const passed=applicable.filter(g=>g.passed && !g.warning).length;
+  const gScore=applicable.length?Math.round(passed/applicable.length*100):100;
+  const gStat=hardFails.length?'fail':softWarns.length?'warn':'good';
+  const gVerd=hardFails.length?'NOT GOOD':softWarns.length?'REVIEW':'GOOD';
+  const gSub=`${passed}/${applicable.length} gates passed`+(hardFails.length?` · ${hardFails.length} hard fail`:'')+(softWarns.length?` · ${softWarns.length} need review`:'');
+
+  const card=(stat,label,verd,num,unit,sub)=>`<div class="sc-card sc-${stat}">
+    <div class="sc-top"><span class="sc-label">${label}</span><span class="sc-verdict scv-${stat}">${verd}</span></div>
+    <div class="sc-num">${num}<span>${unit}</span></div>
+    <div class="sc-bar"><div class="sc-bar-fill" style="width:${Math.max(0,Math.min(100,num))}%;background:${colors[stat]}"></div></div>
+    <div class="sc-sub">${sub}</div>
+  </div>`;
+
+  return `<div class="scorecard">
+    ${card(eStat,'🎯 EEAT Quality',eVerd,eScore,'/100',`${cntStrong} strong · ${cntPartial} partial · ${cntMissing} missing`)}
+    ${card(aStat,'🤖 AI Authenticity',aVerd,authScore,'/100',`${aSub} · risk ${ai.risk_score ?? 0}/100`)}
+    ${card(gStat,'🔒 Gate Compliance',gVerd,gScore,'%',gSub)}
+  </div>`;
+}
+
+function renderPubStatus(gates){
+  const hardFails = gates.filter(g => !g.na && !g.passed && g.type === 'hard');
+  const softWarns = gates.filter(g => !g.na && !g.low && ((!g.passed && g.type === 'soft') || g.warning));
+  if (hardFails.length) {
+    const tags = hardFails.map(g => `<span class="pub-fail-tag">${g.label}</span>`).join('');
+    return `<div class="pub-status pub-blocked"><div class="pub-icon">🚫</div><div class="pub-info"><div class="pub-title">BLOCKED — Do Not Publish</div><div class="pub-detail">${hardFails.length} critical gate${hardFails.length > 1 ? 's' : ''} failed. Fix all blocked items before going live.</div><div class="pub-tags">${tags}</div></div></div>`;
+  }
+  if (softWarns.length) {
+    const tags = softWarns.map(g => `<span class="pub-warn-tag">${g.label}</span>`).join('');
+    return `<div class="pub-status pub-review"><div class="pub-icon">⚠️</div><div class="pub-info"><div class="pub-title">REVIEW REQUIRED Before Publishing</div><div class="pub-detail">${softWarns.length} flag${softWarns.length > 1 ? 's' : ''} need editor review before this can go live.</div><div class="pub-tags">${tags}</div></div></div>`;
+  }
+  return `<div class="pub-status pub-cleared"><div class="pub-icon">✅</div><div class="pub-info"><div class="pub-title">CLEARED — Ready for Publishing</div><div class="pub-detail">All gate rules passed. Proceed with standard editorial sign-off.</div></div></div>`;
+}
+
+function renderGates(gates){
+  const items = gates.map(g => {
+    const cls = g.na ? 'gate-na' : g.passed ? 'gate-pass' : g.warning ? 'gate-warn' : 'gate-fail';
+    const badge = g.na ? `<span class="gate-badge gb-na">N/A</span>` : g.passed ? `<span class="gate-badge gb-pass">PASS</span>` : g.warning ? `<span class="gate-badge gb-warn">WARN</span>` : `<span class="gate-badge gb-fail">FAIL</span>`;
+    const typetag = !g.na ? `<span class="gate-type ${g.type === 'hard' ? 'gtype-hard' : 'gtype-soft'}">${g.type}</span>` : '';
+    return `<div class="gate-item ${cls}">${badge}${typetag}<div class="gate-name">${g.label}</div><div class="gate-detail">${g.detail}</div></div>`;
+  }).join('');
+  return `<div class="gates-panel"><div class="gates-title">🔒 Gate Rules</div><div class="gate-list">${items}</div></div>`;
+}
+
+function renderAIDetection(aiData){
+  if (!aiData) return '';
+  const risk = aiData.overall_risk || 'unknown';
+  const score = aiData.risk_score ?? 0;
+  const scoreClass = risk === 'high' ? 'ai-score-high' : risk === 'medium' ? 'ai-score-medium' : 'ai-score-low';
+  const badgeCls = risk === 'high' ? 'arb-high' : risk === 'medium' ? 'arb-medium' : 'arb-low';
+  const riskLabel = risk === 'high' ? 'HIGH RISK — Rewrite Required' : risk === 'medium' ? 'MEDIUM RISK — Review Flagged' : 'LOW RISK — Passes Detection';
+
+  const signals = AI_SIGNALS.map(sig => {
+    const d = (aiData.signals || {})[sig.k] || { found:false, evidence:sig.hint, severity:'low' };
+    const found = d.found === true || d.found === 'true';
+    const sev = d.severity || 'low';
+    const cardCls = !found ? 'ais-clear' : sev === 'high' ? 'ais-high' : sev === 'medium' ? 'ais-med' : 'ais-low';
+    const dotCls = !found ? 'asd-clear' : sev === 'high' ? 'asd-high' : sev === 'medium' ? 'asd-med' : 'asd-low';
+    const sevTag = found ? `<span class="ai-sev-tag ast-${sev}">${sev}</span>` : '';
+    return `<div class="ai-sig ${cardCls}"><div class="ai-sig-head"><span class="ai-sig-dot ${dotCls}"></span><span class="ai-sig-name">${sig.n}</span>${sevTag}</div><div class="ai-sig-ev">${d.evidence || sig.hint}</div></div>`;
+  }).join('');
+
+  const rewrites = (aiData.rewrite_recommendations || []).map(r => `<li>${r}</li>`).join('');
+  return `<div class="ai-panel">
+    <div class="ai-panel-top">
+      <div><div class="ai-panel-title">🤖 AI Content Detection</div><div class="ai-panel-sub">10-signal analysis for human authenticity and editorial voice</div></div>
+      <div class="ai-score-block"><div class="ai-score-num ${scoreClass}">${score}</div><div class="ai-risk-badge ${badgeCls}">${riskLabel}</div></div>
+    </div>
+    <div class="ai-signals-grid">${signals}</div>
+    ${rewrites ? `<div class="ai-rewrites"><div class="airt">✏ Rewrite Recommendations</div><ul class="air-list">${rewrites}</ul></div>` : ''}
+  </div>`;
+}
+
+// ── Main Render ────────────────────────────────────────────────
+function render(r, w, enabledParams, gates){
+  const p = r.params || {};
+  const ct = getCT(selectedCT);
+  const required = new Set(ct.required);
+  const naSet = new Set(ct.notApplicable);
+  const enabledList = Object.keys(enabledParams);
+  const statusOf = k => (p[k] && p[k].status) || 'missing';
+  const norm = s => (s === 'good' ? 'strong' : s === 'needs_improvement' ? 'missing' : s);
+  const cntStrong = enabledList.filter(k => norm(statusOf(k)) === 'strong').length;
+  const cntPartial = enabledList.filter(k => norm(statusOf(k)) === 'partial').length;
+  const cntMissing = enabledList.length - cntStrong - cntPartial;
+  const verdict = vc(r.overall_score);
+
+  const fmt = n => (Number.isInteger(n) ? n : n.toFixed(1));
+  const pbarsHTML = PILLARS.map(pl => {
+    const active = pl.params.filter(pm => enabledParams[pm.k]);
+    if (!active.length) return `<div class="pbar-card" style="opacity:.3"><div class="pbc-top"><div class="pbc-name"><span class="wdot" style="background:${pl.color}"></span>${pl.emoji} ${pl.label}</div><div class="pbc-score" style="color:var(--t3)">N/A</div></div><div class="pbc-bar"><div class="pbc-fill" style="width:0%"></div></div><div class="pbc-count">0 selected</div></div>`;
+    const s = Math.max(0, Math.min(active.length, r[pl.sk] ?? 0));
+    const pct = Math.round(s / active.length * 100);
+    return `<div class="pbar-card"><div class="pbc-top"><div class="pbc-name"><span class="wdot" style="background:${pl.color}"></span>${pl.emoji} ${pl.label}</div><div class="pbc-score" style="color:${pl.color}">${fmt(s)}/${active.length}</div></div><div class="pbc-bar"><div class="pbc-fill" style="width:${pct}%;background:${pl.color}"></div></div><div class="pbc-count">${pct}% · wt ${w[pl.wk]}%</div></div>`;
+  }).join('');
+
+  const wins = (r.top_wins || []).slice(0, 3);
+  const gaps = (r.top_gaps || []).slice(0, 3);
+  const editorReport = `<div class="editor-report">
+    <div class="er-title">📋 Editor's Brief — Action Summary</div>
+    <div class="er-grid">
+      <div class="er-card"><div class="er-card-title" style="color:var(--tru)">✓ What's Working</div><ul class="er-list wins">${wins.map(x => `<li>${x}</li>`).join('') || '<li style="color:var(--t3)">None identified.</li>'}</ul></div>
+      <div class="er-card"><div class="er-card-title" style="color:var(--improve)">! Top Gaps to Fix</div><ul class="er-list gaps">${gaps.map(x => `<li>${x}</li>`).join('') || '<li style="color:var(--t3)">None identified.</li>'}</ul></div>
+    </div>
+    <div class="er-overall"><strong>Editor note:</strong> ${r.editor_note || r.summary || ''}</div>
+  </div>`;
+
+  const secHTML = PILLARS.map((pl, i) => {
+    const activeParams = pl.params.filter(pm => enabledParams[pm.k]);
+    const skippedParams = pl.params.filter(pm => !enabledParams[pm.k] && !naSet.has(pm.k));
+    const naParams = pl.params.filter(pm => naSet.has(pm.k));
+    if (!activeParams.length && !skippedParams.length && !naParams.length) return '';
+    const s = Math.max(0, Math.min(activeParams.length, r[pl.sk] ?? 0));
+
+    const cards = [
+      ...activeParams.map(param => {
+        const d = p[param.k] || {};
+        const st = norm(d.status || 'missing');           // strong | partial | missing
+        const good = st === 'strong';
+        const isReq = required.has(param.k);
+        const reqFail = isReq && !good;
+        const priority = d.priority || (reqFail ? 'high' : 'medium');
+        const prioCls = priority === 'high' ? 'prio-high' : priority === 'low' ? 'prio-low' : 'prio-med';
+        // visual class: required-fail (red) > partial (blue) > strong (green) > missing (amber)
+        const paramCls = reqFail ? 'req-fail' : good ? 'good' : st === 'partial' ? 'partial' : 'improve';
+        const iconCls  = reqFail ? 'pi-reqfail' : good ? 'pi-good' : st === 'partial' ? 'pi-partial' : 'pi-improve';
+        const badgeCls = reqFail ? 'pb-reqfail' : good ? 'pb-good' : st === 'partial' ? 'pb-partial' : 'pb-improve';
+        const badgeTxt = reqFail ? 'REQ FAIL' : good ? 'STRONG' : st === 'partial' ? 'PARTIAL' : 'MISSING';
+        const icon = good ? '✓' : reqFail ? '✗' : st === 'partial' ? '◐' : '↑';
+        return `<div class="param ${paramCls}">
+          <div class="param-head">
+            <div class="param-icon ${iconCls}">${icon}</div>
+            <div style="flex:1">
+              <div class="param-title">${param.n}${param.custom ? ' <span class="chip" style="font-size:8px">custom</span>' : ''}</div>
+              <div class="param-num">${param.num}${isReq ? '&nbsp;<span class="req-star">★ Required</span>' : ''}</div>
+            </div>
+            <div class="param-badge ${badgeCls}">${badgeTxt}</div>
+            ${!good ? `<span class="priority-badge ${prioCls}">${priority.charAt(0).toUpperCase() + priority.slice(1)}</span>` : ''}
+          </div>
+          <div class="evidence">${d.evidence || '—'}</div>
+          ${!good && (d.area || d.suggestion) ? `<div class="suggest-block">
+            <div class="suggest-header">✏️ Editor Suggestion</div>
+            ${d.area ? `<div class="suggest-area"><strong>Area:</strong> ${d.area}</div>` : ''}
+            <div class="suggest-solution">${d.suggestion || ''}${d.example ? `<br><strong>Example:</strong> ${d.example}` : ''}</div>
+          </div>` : ''}
+        </div>`;
+      }),
+      ...skippedParams.map(param => `<div class="param skipped"><div class="param-head"><div class="param-icon pi-skip">–</div><div style="flex:1"><div class="param-title" style="color:var(--t3)">${param.n}</div><div class="param-num">${param.num}</div></div><div class="param-badge pb-skip">SKIPPED</div></div><div class="evidence" style="color:var(--t3)">Not selected for this evaluation.</div></div>`),
+      ...naParams.map(param => `<div class="param skipped"><div class="param-head"><div class="param-icon pi-skip">–</div><div style="flex:1"><div class="param-title" style="color:var(--t3)">${param.n}</div><div class="param-num">${param.num}&nbsp;<span style="color:var(--t3);font-size:9px;">N/A for ${ct.label}</span></div></div><div class="param-badge pb-skip">N/A</div></div><div class="evidence" style="color:var(--t3)">Not applicable for ${ct.label} content.</div></div>`)
+    ].join('');
+
+    return `${i > 0 ? '<hr class="divider">' : ''}<div class="section">
+      <div class="section-head">
+        <div class="section-icon" style="background:${pl.ic}">${pl.emoji}</div>
+        <div style="flex:1"><div class="section-title" style="color:${pl.color}">${pl.label}</div><div class="section-desc">${pl.desc}</div></div>
+        <div class="section-score" style="background:${pl.sc};color:${pl.scolor}">${activeParams.length > 0 ? s + '/' + activeParams.length : 'N/A'}</div>
+      </div>
+      ${cards}
+    </div>`;
+  }).join('');
+
+  document.getElementById('results').innerHTML = `
+    ${renderPubStatus(gates)}
+    ${renderScorecard(r, gates, cntStrong, cntPartial, cntMissing)}
+    ${renderGates(gates)}
+    <div class="score-hero">
+      <div class="score-top">
+        <div class="score-big">${r.overall_score}<span class="score-pct">%</span></div>
+        <div class="score-meta">
+          <div>${currentClient ? `<span class="client-stamp">👤 ${currentClient.name}${currentClient.industry ? ' · ' + currentClient.industry : ''}</span>` : ''}<span class="score-ct-badge">${ct.icon} ${ct.label}${ct.isYMYL ? ' · YMYL' : ''}</span><span class="score-verdict ${verdict.cls}">${verdict.label}</span></div>
+          <div class="score-summary">${r.summary || ''}</div>
+          <div style="margin-top:8px;font-size:10px;color:var(--t3)">${cntStrong} strong · ${cntPartial} partial · ${cntMissing} missing — of ${enabledList.length} parameters</div>
+          ${currentClient && currentClient.notes ? `<div style="margin-top:8px;font-size:11px;color:var(--t2);padding:8px 10px;background:var(--s2);border:1px solid var(--border);border-radius:8px;line-height:1.55"><strong style="color:var(--aut)">Client brief:</strong> ${currentClient.notes}</div>` : ''}
+        </div>
+      </div>
+      <div class="pillar-bars">${pbarsHTML}</div>
+    </div>
+    ${renderAIDetection(r.ai_detection)}
+    ${editorReport}
+    ${secHTML}`;
+  document.getElementById('results').style.display = 'block';
+  document.getElementById('rightPanel').scrollTop = 0;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// CUSTOM CATEGORIES · CUSTOM PARAMETERS · CLIENT DATABASE
+// ═══════════════════════════════════════════════════════════════
+function openModal(id){ document.getElementById(id).classList.add('show'); }
+function closeModal(id){ document.getElementById(id).classList.remove('show'); }
+document.querySelectorAll('.overlay').forEach(o=>o.addEventListener('click',e=>{ if(e.target===o) o.classList.remove('show'); }));
+function slugify(s){ return (s||'').toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_+|_+$/g,'').slice(0,36) || 'item'; }
+function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,6); }
+
+// ── Custom categories ──────────────────────────────────────────
+let editingCatKey = null;
+function catWsum(){
+  const t=['catwE','catwX','catwA','catwT','catwO'].reduce((a,id)=>a+(+document.getElementById(id).value||0),0);
+  const note=document.getElementById('catWsumNote');
+  note.textContent=`Total: ${t}%`;
+  note.className='wsum '+(t===100?'wsum-ok':'wsum-err');
+  return t;
+}
+function buildCatParamPick(reqSet,naSet){
+  const c=document.getElementById('catParamPick'); c.innerHTML='';
+  PILLARS.forEach(pl=>{
+    const h=document.createElement('div'); h.className='pp-pl'; h.style.color=pl.color; h.textContent=`${pl.emoji} ${pl.label}`; c.appendChild(h);
+    pl.params.forEach(param=>{
+      const sel=reqSet.has(param.k)?'required':naSet.has(param.k)?'na':'default';
+      const row=document.createElement('div'); row.className='pp-row';
+      row.innerHTML=`<span class="pp-name">${param.n} <span style="color:var(--t3)">${param.num}</span></span>
+        <select data-key="${param.k}">
+          <option value="default"${sel==='default'?' selected':''}>Default</option>
+          <option value="required"${sel==='required'?' selected':''}>Required</option>
+          <option value="na"${sel==='na'?' selected':''}>N/A</option>
+        </select>`;
+      c.appendChild(row);
+    });
+  });
+}
+function openCatModal(editKey){
+  editingCatKey = editKey && customCats[editKey] ? editKey : null;
+  const ct = editingCatKey ? customCats[editingCatKey] : null;
+  document.getElementById('catModalTitle').textContent = editingCatKey ? 'Edit Category' : 'New Content Category';
+  document.getElementById('catDeleteBtn').style.display = editingCatKey ? 'inline-block' : 'none';
+  document.getElementById('catName').value = ct ? ct.label : '';
+  document.getElementById('catIcon').value = ct ? ct.icon : '🧩';
+  document.getElementById('catDesc').value = ct ? ct.desc : '';
+  document.getElementById('catYMYL').checked = ct ? !!ct.isYMYL : false;
+  const w = ct ? ct.weights : {e:20,x:20,a:20,t:20,o:20};
+  document.getElementById('catwE').value=w.e; document.getElementById('catwX').value=w.x;
+  document.getElementById('catwA').value=w.a; document.getElementById('catwT').value=w.t;
+  document.getElementById('catwO').value=w.o;
+  const g = ct ? ct.gates : {minWords:300,trustThreshold:null,requireDisclaimer:false,requireAccuracy:false};
+  document.getElementById('catMinWords').value=g.minWords;
+  document.getElementById('catTrust').value=g.trustThreshold==null?'':g.trustThreshold;
+  document.getElementById('catReqDisc').checked=!!g.requireDisclaimer;
+  document.getElementById('catReqAcc').checked=!!g.requireAccuracy;
+  buildCatParamPick(new Set(ct?ct.required:[]), new Set(ct?ct.notApplicable:[]));
+  catWsum();
+  openModal('catModal');
+}
+function saveCat(){
+  const name=document.getElementById('catName').value.trim();
+  if(!name){ alert('Please enter a category name.'); return; }
+  if(catWsum()!==100){ alert('Pillar weights must total exactly 100%.'); return; }
+  const required=[], notApplicable=[];
+  document.querySelectorAll('#catParamPick select').forEach(s=>{
+    if(s.value==='required') required.push(s.dataset.key);
+    else if(s.value==='na') notApplicable.push(s.dataset.key);
+  });
+  const trustRaw=document.getElementById('catTrust').value.trim();
+  const obj={
+    label:name,
+    icon:document.getElementById('catIcon').value.trim()||'🧩',
+    desc:document.getElementById('catDesc').value.trim()||'Custom category',
+    isYMYL:document.getElementById('catYMYL').checked,
+    weights:{e:+document.getElementById('catwE').value,x:+document.getElementById('catwX').value,a:+document.getElementById('catwA').value,t:+document.getElementById('catwT').value,o:+document.getElementById('catwO').value},
+    required, notApplicable,
+    gates:{minWords:+document.getElementById('catMinWords').value||0,trustThreshold:trustRaw===''?null:+trustRaw,requireDisclaimer:document.getElementById('catReqDisc').checked,requireAccuracy:document.getElementById('catReqAcc').checked},
+    custom:true
+  };
+  let key=editingCatKey;
+  if(!key){ key='c_'+slugify(name); while(ALLCATS[key]&&!customCats[key]) key='c_'+slugify(name)+'_'+uid().slice(0,3); }
+  customCats[key]=obj;
+  lsSave(LS.cats,customCats);
+  rebuildCats(); buildCTSelector(); buildClCatSelect();
+  selectCT(key);
+  closeModal('catModal');
+}
+function deleteCat(){
+  if(!editingCatKey) return;
+  if(!confirm('Delete this category? Clients using it will fall back to General.')) return;
+  delete customCats[editingCatKey];
+  lsSave(LS.cats,customCats);
+  // repoint any clients on this category
+  clients.forEach(c=>{ if(c.catKey===editingCatKey) c.catKey='general'; });
+  lsSave(LS.clients,clients);
+  if(selectedCT===editingCatKey) selectedCT='general';
+  rebuildCats(); buildCTSelector(); buildClientSelect(); buildClCatSelect();
+  selectCT(selectedCT);
+  closeModal('catModal'); closeModal('catMgrModal');
+}
+function duplicateCat(key){
+  const src=getCT(key);
+  const copy=JSON.parse(JSON.stringify(src));
+  copy.label=src.label+' (copy)'; copy.custom=true;
+  const nk='c_'+slugify(copy.label)+'_'+uid().slice(0,3);
+  customCats[nk]=copy; lsSave(LS.cats,customCats);
+  rebuildCats();
+  closeModal('catMgrModal'); openCatModal(nk);
+}
+function openCatManager(){
+  const list=document.getElementById('catMgrList'); list.innerHTML='';
+  Object.entries(ALLCATS).forEach(([key,ct])=>{
+    const custom=isCustomCat(key);
+    const row=document.createElement('div'); row.className='list-row';
+    row.innerHTML=`<div style="flex:1"><div class="lr-name">${ct.icon} ${ct.label} ${ct.isYMYL?'<span class="chip">YMYL</span>':''} ${custom?'<span class="chip" style="color:var(--aut)">custom</span>':'<span class="chip">preset</span>'}</div><div class="lr-sub">${ct.desc} · ${ct.required.length} required · ${ct.notApplicable.length} N/A</div></div>`;
+    const btns=document.createElement('div'); btns.style.display='flex'; btns.style.gap='6px';
+    if(custom){
+      btns.innerHTML=`<button class="btn btn-sm" onclick="closeModal('catMgrModal');openCatModal('${key}')">Edit</button>`;
+    } else {
+      btns.innerHTML=`<button class="btn btn-sm btn-ghost" onclick="duplicateCat('${key}')">Duplicate</button>`;
+    }
+    row.appendChild(btns); list.appendChild(row);
+  });
+  openModal('catMgrModal');
+}
+
+// ── Custom parameters ──────────────────────────────────────────
+function openParamModal(){ renderCustomParamList(); openModal('paramModal'); }
+function renderCustomParamList(){
+  const el=document.getElementById('customParamList');
+  if(!customParams.length){ el.innerHTML='<div class="list-empty">No custom parameters yet.</div>'; return; }
+  el.innerHTML=customParams.map(cp=>{
+    const pl=PILLARS.find(p=>p.key===cp.pillar);
+    return `<div class="list-row"><div style="flex:1"><div class="lr-name">${cp.n}</div><div class="lr-sub">${pl?pl.emoji+' '+pl.label:cp.pillar} · ${cp.num}</div></div><button class="btn btn-sm btn-danger" onclick="deleteCustomParam('${cp.k}')">Delete</button></div>`;
+  }).join('');
+}
+function saveCustomParam(){
+  const name=document.getElementById('pName').value.trim();
+  const pillar=document.getElementById('pPillar').value;
+  const def=document.getElementById('pDef').value.trim();
+  if(!name){ alert('Please enter a parameter name.'); return; }
+  if(!def){ alert('Please describe what counts as a strong pass — the AI uses this to judge.'); return; }
+  const n=customParams.filter(c=>c.pillar===pillar).length+1;
+  const prefix={experience:'CE',expertise:'CX',authority:'CA',trust:'CT',aeo:'CO'}[pillar]||'C';
+  customParams.push({k:'cp_'+slugify(name)+'_'+uid().slice(0,3),n:name,num:prefix+n,pillar,def});
+  lsSave(LS.params,customParams);
+  installCustomParams();
+  buildCheckboxes();
+  document.getElementById('pName').value=''; document.getElementById('pDef').value='';
+  renderCustomParamList();
+}
+function deleteCustomParam(k){
+  customParams=customParams.filter(c=>c.k!==k);
+  lsSave(LS.params,customParams);
+  installCustomParams();
+  buildCheckboxes();
+  renderCustomParamList();
+}
+
+// ── Client database ────────────────────────────────────────────
+let editingClientId=null;
+function buildClientSelect(){
+  const sel=document.getElementById('clientSelect');
+  sel.innerHTML='<option value="">— No client selected —</option>'+clients.map(c=>`<option value="${c.id}">${c.name}${c.industry?' · '+c.industry:''}</option>`).join('');
+  if(currentClient) sel.value=currentClient.id;
+}
+function buildClCatSelect(){
+  const sel=document.getElementById('clCat');
+  if(!sel) return;
+  const cur=sel.value;
+  sel.innerHTML=Object.entries(ALLCATS).map(([k,ct])=>`<option value="${k}">${ct.icon} ${ct.label}</option>`).join('');
+  if(cur && ALLCATS[cur]) sel.value=cur;
+}
+function applyClient(){
+  const id=document.getElementById('clientSelect').value;
+  currentClient = clients.find(c=>c.id===id) || null;
+  lsSave(LS.lastClient, id);
+  const meta=document.getElementById('clientMeta');
+  if(currentClient){
+    if(currentClient.catKey && getCT(currentClient.catKey)) selectCT(currentClient.catKey);
+    meta.innerHTML=`Default: <strong>${getCT(currentClient.catKey||'general').label}</strong>`+(currentClient.notes?` · <span style="color:var(--aut);cursor:pointer" onclick="openClientModal('${currentClient.id}')">brief saved</span>`:'');
+  } else {
+    meta.innerHTML='';
+  }
+}
+function openClientMgr(){
+  const list=document.getElementById('clientMgrList');
+  list.innerHTML = clients.length ? clients.map(c=>`<div class="list-row"><div style="flex:1"><div class="lr-name">${c.name}</div><div class="lr-sub">${c.industry||'—'} · ${getCT(c.catKey||'general').label}</div></div><button class="btn btn-sm" onclick="closeModal('clientMgrModal');openClientModal('${c.id}')">Edit</button></div>`).join('') : '<div class="list-empty">No clients yet. Add your first client to get started.</div>';
+  openModal('clientMgrModal');
+}
+function openClientModal(editId){
+  buildClCatSelect();
+  editingClientId = editId && clients.find(c=>c.id===editId) ? editId : null;
+  const c = editingClientId ? clients.find(x=>x.id===editingClientId) : null;
+  document.getElementById('clientModalTitle').textContent = editingClientId ? 'Edit Client' : 'New Client';
+  document.getElementById('clDeleteBtn').style.display = editingClientId ? 'inline-block' : 'none';
+  document.getElementById('clName').value = c ? c.name : '';
+  document.getElementById('clIndustry').value = c ? c.industry||'' : '';
+  document.getElementById('clCat').value = c ? (ALLCATS[c.catKey]?c.catKey:'general') : selectedCT;
+  document.getElementById('clNotes').value = c ? c.notes||'' : '';
+  openModal('clientModal');
+}
+function saveClient(){
+  const name=document.getElementById('clName').value.trim();
+  if(!name){ alert('Please enter a client name.'); return; }
+  const obj={
+    id: editingClientId || 'cl_'+uid(),
+    name,
+    industry:document.getElementById('clIndustry').value.trim(),
+    catKey:document.getElementById('clCat').value,
+    notes:document.getElementById('clNotes').value.trim()
+  };
+  if(editingClientId){ const i=clients.findIndex(c=>c.id===editingClientId); clients[i]=obj; }
+  else clients.push(obj);
+  lsSave(LS.clients,clients);
+  currentClient=obj;
+  buildClientSelect(); document.getElementById('clientSelect').value=obj.id; applyClient();
+  closeModal('clientModal'); closeModal('clientMgrModal');
+}
+function deleteClient(){
+  if(!editingClientId) return;
+  if(!confirm('Delete this client profile?')) return;
+  clients=clients.filter(c=>c.id!==editingClientId);
+  lsSave(LS.clients,clients);
+  if(currentClient && currentClient.id===editingClientId){ currentClient=null; }
+  buildClientSelect(); applyClient();
+  closeModal('clientModal'); closeModal('clientMgrModal');
+}
+
+// ── Init ──────────────────────────────────────────────────────
+installCustomParams();
+rebuildCats();
+buildCTSelector();
+buildCheckboxes();
+buildClientSelect();
+buildClCatSelect();
+(function restoreClient(){
+  const last=lsLoad(LS.lastClient,'');
+  if(last && clients.find(c=>c.id===last)){ document.getElementById('clientSelect').value=last; applyClient(); }
+})();
+syncW();
+</script>
+</body>
+</html>
