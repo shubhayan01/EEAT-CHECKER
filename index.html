@@ -758,9 +758,11 @@ function buildCheckboxes(){
       const row=document.createElement('div');
       row.className='param-check-row'+(isNA?' row-na':'');
       const cbId=`cb_${param.k}`;
-      const cbClass='param-cb'+(isReq?' cb-locked':'')+(isNA?' cb-na':'');
+      // Required params are still ticked by default, but editors CAN untick them
+      // (e.g. when a "required" check doesn't fit a particular client's blog).
+      const cbClass='param-cb'+(isNA?' cb-na':'');
       const checked=isNA?'':' checked';
-      const disabled=(isReq||isNA)?' disabled':'';
+      const disabled=isNA?' disabled':'';
       const tag=isReq?`<span class="req-tag">Required</span>`:isNA?`<span class="na-tag">N/A</span>`:'';
       row.innerHTML=`<span class="pnum">${param.num}</span><input type="checkbox" class="${cbClass}" id="${cbId}" data-pillar="${pl.key}" data-key="${param.k}"${checked}${disabled} onchange="updateCbCount()"><label for="${cbId}">${param.n}</label>${tag}`;
       sec.appendChild(row);
@@ -776,7 +778,7 @@ function togglePillarAll(pillarKey,btn){
   const required=new Set(ct.required);
   const cbs=[...document.querySelectorAll(`input[data-pillar="${pillarKey}"]`)].filter(c=>!c.disabled);
   const allChecked=cbs.every(c=>c.checked);
-  cbs.forEach(c=>{if(!notApplicable.has(c.dataset.key)&&!required.has(c.dataset.key)) c.checked=!allChecked;});
+  cbs.forEach(c=>{if(!notApplicable.has(c.dataset.key)) c.checked=!allChecked;});
   updateCbCount();
 }
 
@@ -826,15 +828,15 @@ function buildEEATSys(w, enabledParams, contentType){
   const required = new Set(ct.required);
 
   const DEFS = {
-    first_person_narrative:`P1: Uses "we/our/I" tied to real business situations.`,
-    quantified_business_volume:`P2: Specific count of clients/cases/installs. Fails on "many clients" with no number.`,
-    quantified_time_in_operation:`P3: States how long the business has operated with founding year.`,
-    specific_customer_case_story:`P4: Real scenario — when, who, specific problem, specific outcome. Fails on "imagine a customer".`,
-    outcome_data_from_own_work:`P5: Measurable result from the business's own work — before/after %, success rates.`,
-    location_or_regional_specificity:`P6: Grounds experience in real geography that changes the advice.`,
-    seasonal_or_cyclical_pattern:`P8: Time-based patterns only active practitioners would notice.`,
-    real_client_concern_quoted:`P10: Genuine customer question in the customer's own words.`,
-    age_demographic_or_cohort:`P11: Experience anchored to specific customer type (age, life stage, profession).`,
+    first_person_narrative:`P1: First-hand experience told in first person — "I/my" OR "we/our/us" are equally valid. For a company or brand, "we/our" is the EXPECTED voice and counts fully; never downgrade "we" relative to "I".`,
+    quantified_business_volume:`P2: A specific count of clients/cases/installs when the piece speaks to the business's own track record. Mark "na" if the article is purely educational and makes no track-record claim.`,
+    quantified_time_in_operation:`P3: States how long the business has operated (e.g. a founding year or "for over X years"). Mark "na" for purely educational pieces that make no such claim.`,
+    specific_customer_case_story:`P4: A real scenario — who, the specific problem, and the outcome. A hypothetical "imagine a customer" is "partial" at best.`,
+    outcome_data_from_own_work:`P5: A measurable result from the business's own work — before/after, %, success rates. Mark "na" if the piece isn't about the business's own results.`,
+    location_or_regional_specificity:`P6: Experience grounded in a real place ONLY when the topic is genuinely place-specific. If the subject is not regional (most general, medical, or how-to topics), mark this "na" — do NOT mark it "missing".`,
+    seasonal_or_cyclical_pattern:`P8: Time/seasonal patterns a practitioner would notice. If the topic is evergreen and not time-dependent, mark this "na".`,
+    real_client_concern_quoted:`P10: A genuine customer question or concern in the customer's own words (or closely paraphrased). Mark "na" if the format isn't suited to this.`,
+    age_demographic_or_cohort:`P11: Advice anchored to a specific customer type (age, life stage, profession). If the topic is general-audience by nature, mark this "na".`,
     avoids_fabricated_experience:`P14: No invented patient stories or unverifiable internal data.`,
     public_profile_info_mined:`P15: Uses publicly available facts accurately — no invented credentials.`,
     correct_technical_terminology:`P16: Domain-specific terms used accurately, defined simply when needed.`,
@@ -865,7 +867,7 @@ function buildEEATSys(w, enabledParams, contentType){
     faq_section_substantive:`P46: FAQ section with answers not already covered at length in the body.`,
     answer_appears_early:`P47: Key answer or definition within first 100–150 words.`,
     no_padding_in_opening:`P48: Every sentence in first 150 words moves reader toward the answer. No preamble.`,
-    conclusion_adds_value:`P49: Conclusion provides useful synthesis or next step not already stated in the body.`,
+    conclusion_adds_value:`P49: The ending adds something — a synthesis, recommendation, or clear next step. It does NOT need a "Conclusion" heading or the phrase "in conclusion"; any closing passage that does this counts, in whatever phrasing the writer used.`,
   };
   // Merge user-defined custom parameter definitions
   customParams.forEach(cp => { DEFS[cp.k] = `${cp.num}: ${cp.def || cp.n}`; });
@@ -885,17 +887,24 @@ function buildEEATSys(w, enabledParams, contentType){
     `"${k}":{"status":"missing","evidence":"","priority":"medium","area":"","suggestion":"","example":""}`
   ).join(',');
 
-  return `You are a senior EEAT content analyst at Justwords, a professional content agency. Evaluate the supplied "${ct.label}" article${ct.isYMYL ? ' — this is YMYL content, so apply stricter Trust and accuracy standards' : ''}. Be a strict, fair editor: reward only what is actually present in the text. Do not give credit for what the article *could* or *should* contain.
+  return `You are a senior EEAT content analyst at Justwords, a professional content agency. Your reports are read by editors who produce content on behalf of many different companies across many industries. Evaluate the supplied "${ct.label}" article${ct.isYMYL ? ' — this is YMYL content, so apply stricter Trust and accuracy standards' : ''}. Judge the MEANING and INTENT of the writing, not the presence of specific keywords. Be fair and experienced, like a real editor who understands the "feel" of a piece.
 
-HOW TO SCORE EACH PARAMETER — choose exactly one status:
-- "strong"  = the requirement is clearly and fully met, and you can point to specific text as proof.
-- "partial" = the requirement is attempted or partly met, but thin, vague, generic, or missing key specifics.
-- "missing" = the requirement is absent, or only a hollow gesture toward it exists.
+HOW TO SCORE EACH PARAMETER — this is a PRESENCE / PASS-FAIL check, NOT a depth or maturity ranking. The question is only "is the thing this parameter asks for present?" — not "could the writer add even more of it?". The moment the requirement is reasonably met, it PASSES as "strong". Choose exactly one status:
+- "strong"  = the requirement is met. What the parameter asks for is present in the text (in any wording, implied by context, or spread across sections). It is "strong" even if it is brief, even if it appears only once, and even if you can imagine richer or more detailed versions. Once it is present, it passes — full stop.
+- "partial" = use SPARINGLY. Only when the writer clearly gestures at the requirement but it does not actually qualify yet — i.e. it is so vague, generic, or hedged that a fair reader could NOT conclude the requirement is genuinely met. "It's present but could be expanded / could add more examples / could go deeper" is NOT partial — that is "strong".
+- "missing" = the requirement is genuinely absent — no reasonable reader would find it in the text.
+- "na"      = the requirement does not apply to THIS article's topic. Use this instead of penalising the piece for something its subject never called for (e.g. location/region for a topic that isn't place-specific, a seasonal pattern for an evergreen topic, a demographic cohort for general-audience advice, business-volume numbers for a purely educational explainer). "na" parameters are excluded from the score entirely — they neither help nor hurt.
 
-EVIDENCE RULES (critical for reliability):
-- "evidence" MUST quote or closely paraphrase a specific phrase, sentence, number, or section from the article that justifies the status. Never invent quotes. If you cannot find supporting text, the status is "missing".
-- Judge ONLY what the text shows. Generic, unverifiable, or templated writing is "partial" at best, never "strong".
-- A required parameter that is "partial" or "missing" must use priority "high".
+JUDGEMENT PRINCIPLES (important — earlier versions of this tool were far too strict; correct that):
+- Once a requirement is present, mark it "strong" and move on. NEVER return "partial" or "missing" whose only complaint or suggestion is to "add more" of something that is already there. If it is present, it is "strong" — even a single clear instance is enough. (Example: "Our specialists have supported mothers across the Twin Cities…" fully satisfies First-Person Narrative — that is "strong", not "partial pending more anecdotes".)
+- Reward substance over vocabulary. A point made well in plain language is "strong" even if it avoids the textbook term. Never fail or downgrade a parameter just because one expected word, number, or formatting element is missing while the substance is present.
+- First-person experience counts whether the author writes "I", "my", "we", "our" or "us". For a company or brand, "we/our" IS the normal and correct voice — treat it as fully equivalent to "I", and never mark it merely "partial" because it says "we" instead of "I".
+- A conclusion, takeaway, or wrap-up does NOT need a "Conclusion" heading or the words "in conclusion". Any closing passage that synthesises, gives a recommendation, or points to a next step satisfies a conclusion requirement, in whatever phrasing the writer chose.
+- When in genuine doubt between two statuses, do not default to the harsher one — pick the status a fair human editor would defend.
+
+EVIDENCE RULES:
+- "evidence" should quote or closely paraphrase the specific text (a phrase, sentence, number, or section — or a clearly paraphrased idea) that justifies the status. Never invent quotes. If you truly cannot find supporting text or substance, the status is "missing".
+- A required parameter that is genuinely "partial" or "missing" must use priority "high". If a required parameter genuinely does not apply to the topic, you may still use "na".
 - For every "partial" or "missing", give a concrete "area" (what is weak) plus a "suggestion" and a short "example" edit the writer can apply.
 
 PILLAR SCORE FIELDS (experience_score etc.): these are recomputed by our system from your per-parameter statuses, so just return them as 0 — your per-parameter accuracy is what matters.
@@ -917,7 +926,7 @@ For each of these 10 signals return found (true/false), evidence (a quote/observ
 6. ai_uniform_structure: Every section uses the same intro→bullets→wrap-up formula. HIGH if 3+ identical.
 7. ai_hedged_language: Every claim hedged without backing ("may help", "could potentially"). HIGH if pervasive.
 8. ai_generic_examples: All examples hypothetical ("Imagine a user who…"), no real named cases. HIGH if all hypothetical.
-9. ai_thin_conclusion: Conclusion merely restates the body. HIGH if near-verbatim summary.
+9. ai_thin_conclusion: The ending merely repeats the body with no new synthesis, recommendation, or next step. Do NOT flag simply because there is no "Conclusion" heading or the phrase "in conclusion" — judge only whether the closing actually adds anything. HIGH only if the ending is a near-verbatim summary.
 10. ai_no_voice: No authorial stance or opinion anywhere. HIGH if no perspective exists.
 risk_score = (high×3 + medium×2 + low×1) / 30 × 100, rounded. overall_risk: "low"≤25, "medium" 26–55, "high"≥56.
 rewrite_recommendations: 3 specific fixes to make the content more human and credible.
@@ -1004,20 +1013,31 @@ function paramCredit(d){
 // Pillar credit is DERIVED from the per-parameter statuses the user can see —
 // never trusts the model's self-reported pillar totals. This is what makes the
 // headline number match the evidence below it.
+// A parameter the model judged "na" (doesn't apply to this article's topic) is
+// dropped from BOTH the credit and the denominator, so it can't drag a score down.
+function isModelNA(d){ const s = d && d.status; return s === 'na' || s === 'not_applicable'; }
 function pillarCredit(r, pl, enabledParams){
   const active = pl.params.filter(p => enabledParams[p.k]);
-  let credit = 0;
-  active.forEach(p => { credit += paramCredit((r.params || {})[p.k]); });
-  return { credit, n: active.length };
+  let credit = 0, n = 0;
+  active.forEach(p => {
+    const d = (r.params || {})[p.k];
+    if (isModelNA(d)) return;
+    n++;
+    credit += paramCredit(d);
+  });
+  return { credit, n };
 }
 function computeScore(r, w, enabledParams){
-  let total = 0;
+  let total = 0, wsum = 0;
   PILLARS.forEach(pl => {
     const { credit, n } = pillarCredit(r, pl, enabledParams);
-    if (!n) return;
+    if (!n) return;                       // no scorable params (all N/A or none enabled)
     total += credit / n * w[pl.wk];
+    wsum  += w[pl.wk];
   });
-  return Math.round(total);
+  // Rescale by the weight that actually applied, so a fully-N/A pillar doesn't
+  // cap the achievable score below 100.
+  return wsum > 0 ? Math.round(total / wsum * 100) : 0;
 }
 // Send the whole article when short; otherwise head + tail so conclusion-related
 // parameters are actually evaluated (the old version cut the conclusion off).
@@ -1060,6 +1080,23 @@ function clientSideMetrics(text){
   return { words, fillerCount: filler, fillerPer1000, headingCount, wordsPerHeading: headingCount ? Math.round(words/headingCount) : null, externalLinks, introPct };
 }
 
+// ── Deterministic AI-risk score ────────────────────────────────
+// The model used to self-report risk_score with a formula, which made it flip
+// (pass one run, fail the next, even on identical text). We instead compute it
+// ourselves from the signals it returned, so the same signals always give the
+// same score and the same pass/fail.
+function computeAIRisk(aiData){
+  const sev = { high:3, medium:2, low:1 };
+  let sum = 0;
+  Object.values((aiData && aiData.signals) || {}).forEach(d => {
+    const found = d && (d.found === true || d.found === 'true');
+    if (found) sum += sev[d.severity] || 1;
+  });
+  const score = Math.round(sum / 30 * 100);
+  const risk = score <= 25 ? 'low' : score <= 55 ? 'medium' : 'high';
+  return { score, risk };
+}
+
 // ── Compute gates ──────────────────────────────────────────────
 function computeGates(result, contentType, wordCount, enabledParams, metrics){
   const ct = getCT(contentType);
@@ -1089,8 +1126,9 @@ function computeGates(result, contentType, wordCount, enabledParams, metrics){
     detail:`${wordCount} words — minimum: ${minW}`, na:false });
 
   if (ct.gates.trustThreshold) {
-    const trustActive = PILLARS.find(p => p.key === 'trust').params.filter(p => enabledParams[p.k]);
-    const trustPct = trustActive.length > 0 ? Math.round((result.trust_score ?? 0) / trustActive.length * 100) : 0;
+    const trustPl = PILLARS.find(p => p.key === 'trust');
+    const tc = pillarCredit(result, trustPl, enabledParams);   // na-aware denominator
+    const trustPct = tc.n > 0 ? Math.round(tc.credit / tc.n * 100) : 0;
     gates.push({ id:'ymyl_trust', label:'YMYL Trust Threshold (min 75%)', passed: trustPct >= ct.gates.trustThreshold, type:'hard',
       detail:`Trust: ${trustPct}% — threshold: ${ct.gates.trustThreshold}%`, na:false });
   } else {
@@ -1125,11 +1163,13 @@ function computeGates(result, contentType, wordCount, enabledParams, metrics){
 
   // ─── The 10 proposed publish gate rules ───────────────────────
   // #1 Zero unsourced statistics (HARD)
+  // Soft (review) not hard-block: LLM stat detection over-flags common knowledge,
+  // so this should prompt an editor check, not auto-block an otherwise good piece.
   const us = gc.unsourced_stats || {count:0,examples:[]};
-  gates.push({ id:'unsourced_stats', label:'No Unsourced Statistics', type:'hard', na:false,
-    passed:(us.count||0)===0,
+  gates.push({ id:'unsourced_stats', label:'No Unsourced Statistics', type:'soft', na:false,
+    passed:(us.count||0)===0, warning:(us.count||0)>0,
     detail:(us.count||0)===0 ? 'Every numeric claim is sourced'
-      : `${us.count} unsourced stat${us.count>1?'s':''}${us.examples&&us.examples.length?' — e.g. "'+us.examples[0]+'"':''}` });
+      : `${us.count} stat${us.count>1?'s':''} to verify${us.examples&&us.examples.length?' — e.g. "'+us.examples[0]+'"':''}` });
 
   // #2 External links resolve — advisory: a browser can't check cross-site 404s,
   // so this is a manual checklist item (low) rather than an auto-block.
@@ -1252,6 +1292,10 @@ async function analyze(){
     merged.overall_score = computeScore(merged, w, enabledParams);
     if (!merged.ai_detection) merged.ai_detection = { overall_risk:'unknown', risk_score:0, signals:{}, rewrite_recommendations:[] };
     if (!merged.gate_checks)  merged.gate_checks  = {};
+    // Recompute AI risk deterministically from the signals so it never flip-flops.
+    const aiR = computeAIRisk(merged.ai_detection);
+    merged.ai_detection.risk_score   = aiR.score;
+    merged.ai_detection.overall_risk = aiR.risk;
     stepDone('sd2'); stepActive('sd3');
 
     updateLoadText('Running gate-rule checks…');
@@ -1373,6 +1417,8 @@ function renderGates(gates){
   return `<div class="gates-panel"><div class="gates-title">🔒 Gate Rules</div><div class="gate-list">${items}</div></div>`;
 }
 
+
+
 function renderAIDetection(aiData){
   if (!aiData) return '';
   const risk = aiData.overall_risk || 'unknown';
@@ -1411,18 +1457,24 @@ function render(r, w, enabledParams, gates){
   const enabledList = Object.keys(enabledParams);
   const statusOf = k => (p[k] && p[k].status) || 'missing';
   const norm = s => (s === 'good' ? 'strong' : s === 'needs_improvement' ? 'missing' : s);
-  const cntStrong = enabledList.filter(k => norm(statusOf(k)) === 'strong').length;
-  const cntPartial = enabledList.filter(k => norm(statusOf(k)) === 'partial').length;
-  const cntMissing = enabledList.length - cntStrong - cntPartial;
+  // A param the model marked "na" (doesn't apply to this article) is excluded from
+  // all scoring and the strong/partial/missing tallies.
+  const naStatus = k => { const s = norm(statusOf(k)); return s === 'na' || s === 'not_applicable'; };
+  const scoredList = enabledList.filter(k => !naStatus(k));
+  const naCount = enabledList.length - scoredList.length;
+  const cntStrong = scoredList.filter(k => norm(statusOf(k)) === 'strong').length;
+  const cntPartial = scoredList.filter(k => norm(statusOf(k)) === 'partial').length;
+  const cntMissing = scoredList.length - cntStrong - cntPartial;
   const verdict = vc(r.overall_score);
 
   const fmt = n => (Number.isInteger(n) ? n : n.toFixed(1));
   const pbarsHTML = PILLARS.map(pl => {
     const active = pl.params.filter(pm => enabledParams[pm.k]);
-    if (!active.length) return `<div class="pbar-card" style="opacity:.3"><div class="pbc-top"><div class="pbc-name"><span class="wdot" style="background:${pl.color}"></span>${pl.emoji} ${pl.label}</div><div class="pbc-score" style="color:var(--t3)">N/A</div></div><div class="pbc-bar"><div class="pbc-fill" style="width:0%"></div></div><div class="pbc-count">0 selected</div></div>`;
-    const s = Math.max(0, Math.min(active.length, r[pl.sk] ?? 0));
-    const pct = Math.round(s / active.length * 100);
-    return `<div class="pbar-card"><div class="pbc-top"><div class="pbc-name"><span class="wdot" style="background:${pl.color}"></span>${pl.emoji} ${pl.label}</div><div class="pbc-score" style="color:${pl.color}">${fmt(s)}/${active.length}</div></div><div class="pbc-bar"><div class="pbc-fill" style="width:${pct}%;background:${pl.color}"></div></div><div class="pbc-count">${pct}% · wt ${w[pl.wk]}%</div></div>`;
+    const scored = active.filter(pm => !naStatus(pm.k));
+    if (!scored.length) return `<div class="pbar-card" style="opacity:.3"><div class="pbc-top"><div class="pbc-name"><span class="wdot" style="background:${pl.color}"></span>${pl.emoji} ${pl.label}</div><div class="pbc-score" style="color:var(--t3)">N/A</div></div><div class="pbc-bar"><div class="pbc-fill" style="width:0%"></div></div><div class="pbc-count">${active.length?'all N/A for this article':'0 selected'}</div></div>`;
+    const s = Math.max(0, Math.min(scored.length, r[pl.sk] ?? 0));
+    const pct = Math.round(s / scored.length * 100);
+    return `<div class="pbar-card"><div class="pbc-top"><div class="pbc-name"><span class="wdot" style="background:${pl.color}"></span>${pl.emoji} ${pl.label}</div><div class="pbc-score" style="color:${pl.color}">${fmt(s)}/${scored.length}</div></div><div class="pbc-bar"><div class="pbc-fill" style="width:${pct}%;background:${pl.color}"></div></div><div class="pbc-count">${pct}% · wt ${w[pl.wk]}%</div></div>`;
   }).join('');
 
   const wins = (r.top_wins || []).slice(0, 3);
@@ -1441,12 +1493,17 @@ function render(r, w, enabledParams, gates){
     const skippedParams = pl.params.filter(pm => !enabledParams[pm.k] && !naSet.has(pm.k));
     const naParams = pl.params.filter(pm => naSet.has(pm.k));
     if (!activeParams.length && !skippedParams.length && !naParams.length) return '';
-    const s = Math.max(0, Math.min(activeParams.length, r[pl.sk] ?? 0));
+    const scoredParams = activeParams.filter(pm => !naStatus(pm.k));
+    const s = Math.max(0, Math.min(scoredParams.length, r[pl.sk] ?? 0));
 
     const cards = [
       ...activeParams.map(param => {
         const d = p[param.k] || {};
-        const st = norm(d.status || 'missing');           // strong | partial | missing
+        const st = norm(d.status || 'missing');           // strong | partial | missing | na
+        // Model judged this parameter doesn't apply to the article's topic.
+        if (st === 'na' || st === 'not_applicable') {
+          return `<div class="param skipped"><div class="param-head"><div class="param-icon pi-skip">–</div><div style="flex:1"><div class="param-title" style="color:var(--t3)">${param.n}</div><div class="param-num">${param.num}&nbsp;<span style="color:var(--t3);font-size:9px;">N/A — not relevant to this topic</span></div></div><div class="param-badge pb-skip">N/A</div></div><div class="evidence" style="color:var(--t3)">${d.evidence || "The analyst judged this parameter does not apply to this article's topic, so it does not affect the score."}</div></div>`;
+        }
         const good = st === 'strong';
         const isReq = required.has(param.k);
         const reqFail = isReq && !good;
@@ -1484,7 +1541,7 @@ function render(r, w, enabledParams, gates){
       <div class="section-head">
         <div class="section-icon" style="background:${pl.ic}">${pl.emoji}</div>
         <div style="flex:1"><div class="section-title" style="color:${pl.color}">${pl.label}</div><div class="section-desc">${pl.desc}</div></div>
-        <div class="section-score" style="background:${pl.sc};color:${pl.scolor}">${activeParams.length > 0 ? s + '/' + activeParams.length : 'N/A'}</div>
+        <div class="section-score" style="background:${pl.sc};color:${pl.scolor}">${scoredParams.length > 0 ? s + '/' + scoredParams.length : 'N/A'}</div>
       </div>
       ${cards}
     </div>`;
@@ -1500,7 +1557,7 @@ function render(r, w, enabledParams, gates){
         <div class="score-meta">
           <div>${currentClient ? `<span class="client-stamp">👤 ${currentClient.name}${currentClient.industry ? ' · ' + currentClient.industry : ''}</span>` : ''}<span class="score-ct-badge">${ct.icon} ${ct.label}${ct.isYMYL ? ' · YMYL' : ''}</span><span class="score-verdict ${verdict.cls}">${verdict.label}</span></div>
           <div class="score-summary">${r.summary || ''}</div>
-          <div style="margin-top:8px;font-size:10px;color:var(--t3)">${cntStrong} strong · ${cntPartial} partial · ${cntMissing} missing — of ${enabledList.length} parameters</div>
+          <div style="margin-top:8px;font-size:10px;color:var(--t3)">${cntStrong} strong · ${cntPartial} partial · ${cntMissing} missing — of ${scoredList.length} scored parameter${scoredList.length===1?'':'s'}${naCount>0?` · ${naCount} N/A (excluded)`:''}</div>
           ${currentClient && currentClient.notes ? `<div style="margin-top:8px;font-size:11px;color:var(--t2);padding:8px 10px;background:var(--s2);border:1px solid var(--border);border-radius:8px;line-height:1.55"><strong style="color:var(--aut)">Client brief:</strong> ${currentClient.notes}</div>` : ''}
         </div>
       </div>
