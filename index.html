@@ -446,6 +446,10 @@ body{background:var(--bg);color:var(--text);font-family:'Instrument Sans',sans-s
       <div class="lbl">Parameters to Evaluate
         <span class="hdr-actions"><button class="mini-link" onclick="openParamModal()">+ Add parameter</button><span id="cbCount" style="color:var(--t3)">40 selected</span></span>
       </div>
+      <label class="autona-toggle" style="display:flex;align-items:flex-start;gap:7px;font-size:11px;color:var(--t2);margin:2px 0 9px;cursor:pointer;line-height:1.4">
+        <input type="checkbox" id="autoNAToggle" onchange="setAutoNA(this.checked)" style="margin-top:1px;flex:0 0 auto">
+        <span>Let the analyst auto-exclude parameters it judges <em>not applicable</em> to the article's topic. <span style="color:var(--t3)">Off (default) = every selected parameter is scored; a "doesn't apply" verdict counts as missing.</span></span>
+      </label>
       <div id="paramCheckboxes"></div>
     </div>
 
@@ -702,13 +706,18 @@ const PILLARS=[
 ];
 
 // ── Persistence layer (localStorage) ──────────────────────────
-const LS={cats:'jw_eeat_custom_cats',params:'jw_eeat_custom_params',clients:'jw_eeat_clients',lastClient:'jw_eeat_last_client'};
+const LS={cats:'jw_eeat_custom_cats',params:'jw_eeat_custom_params',clients:'jw_eeat_clients',lastClient:'jw_eeat_last_client',autoNA:'jw_eeat_auto_na'};
 function lsLoad(k,def){try{const v=localStorage.getItem(k);return v?JSON.parse(v):def;}catch(e){return def;}}
 function lsSave(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
 
 let customCats   = lsLoad(LS.cats,{});      // {key:{...same shape as CONTENT_TYPES}}
 let customParams = lsLoad(LS.params,[]);    // [{k,n,num,pillar,def}]
 let clients      = lsLoad(LS.clients,[]);   // [{id,name,industry,catKey,notes}]
+// When TRUE the model may exclude a checked parameter from scoring by returning
+// status "na" (lenient: a check that doesn't fit the topic neither helps nor hurts).
+// When FALSE (default) the checkbox is the contract — every checked parameter is
+// scored, and any model "na" is treated as a real (0-credit) verdict. Editor-toggled.
+let allowAutoNA  = lsLoad(LS.autoNA,false);
 let currentClient= null;
 let ALLCATS      = {};
 
@@ -821,6 +830,26 @@ function getEnabledParams(){
   return enabled;
 }
 
+// Holds the last raw analysis so the auto-NA toggle can re-score without a new
+// LLM call. Note: the prompt also changes with the toggle, so a fresh Analyze is
+// still recommended for the model to re-judge — but the displayed report and
+// score update immediately from the cached verdicts.
+let lastAnalysis = null;
+function setAutoNA(on){
+  allowAutoNA = !!on;
+  lsSave(LS.autoNA, allowAutoNA);
+  if (lastAnalysis) recomputeAndRender();
+}
+function recomputeAndRender(){
+  const L = lastAnalysis; if (!L) return;
+  const { merged, w, enabledParams, ct, wordCount, metrics } = L;
+  // Re-derive pillar + overall scores under the current auto-NA setting.
+  PILLARS.forEach(pl => { merged[pl.sk] = pillarCredit(merged, pl, enabledParams).credit; });
+  merged.overall_score = computeScore(merged, w, enabledParams);
+  const gates = computeGates(merged, ct, wordCount, enabledParams, metrics);
+  render(merged, w, enabledParams, gates);
+}
+
 // ── Weights ────────────────────────────────────────────────────
 function getW(){
   return{e:+document.getElementById('wE').value,x:+document.getElementById('wX').value,a:+document.getElementById('wA').value,t:+document.getElementById('wT').value,o:+document.getElementById('wO').value};
@@ -915,7 +944,7 @@ HOW TO SCORE EACH PARAMETER — this is a PRESENCE / PASS-FAIL check, NOT a dept
 - "strong"  = the requirement is met. What the parameter asks for is present in the text (in any wording, implied by context, or spread across sections). It is "strong" even if it is brief, even if it appears only once, and even if you can imagine richer or more detailed versions. Once it is present, it passes — full stop.
 - "partial" = use SPARINGLY. Only when the writer clearly gestures at the requirement but it does not actually qualify yet — i.e. it is so vague, generic, or hedged that a fair reader could NOT conclude the requirement is genuinely met. "It's present but could be expanded / could add more examples / could go deeper" is NOT partial — that is "strong".
 - "missing" = the requirement is genuinely absent — no reasonable reader would find it in the text.
-- "na"      = the requirement does not apply to THIS article's topic. Use this instead of penalising the piece for something its subject never called for (e.g. location/region for a topic that isn't place-specific, a seasonal pattern for an evergreen topic, a demographic cohort for general-audience advice, business-volume numbers for a purely educational explainer). "na" parameters are excluded from the score entirely — they neither help nor hurt.
+${allowAutoNA ? `- "na"      = the requirement does not apply to THIS article's topic. Use this instead of penalising the piece for something its subject never called for (e.g. location/region for a topic that isn't place-specific, a seasonal pattern for an evergreen topic, a demographic cohort for general-audience advice, business-volume numbers for a purely educational explainer). "na" parameters are excluded from the score entirely — they neither help nor hurt.` : `STRICT MODE — DO NOT use a "na" / "not_applicable" status. The editor has explicitly selected every parameter below, so each one MUST be scored as "strong", "partial", or "missing". If a requirement genuinely is not relevant to this topic, that means the article does not satisfy it, so return "missing" (not "na"). Ignore any "Mark na if…" guidance in the parameter definitions below — it does not apply in this mode.`}
 
 JUDGEMENT PRINCIPLES (important — earlier versions of this tool were far too strict; correct that):
 - Once a requirement is present, mark it "strong" and move on. NEVER return "partial" or "missing" whose only complaint or suggestion is to "add more" of something that is already there. If it is present, it is "strong" — even a single clear instance is enough. (Example: "Our specialists have supported mothers across the Twin Cities…" fully satisfies First-Person Narrative — that is "strong", not "partial pending more anecdotes".)
@@ -926,7 +955,7 @@ JUDGEMENT PRINCIPLES (important — earlier versions of this tool were far too s
 
 EVIDENCE RULES:
 - "evidence" should quote or closely paraphrase the specific text (a phrase, sentence, number, or section — or a clearly paraphrased idea) that justifies the status. Never invent quotes. If you truly cannot find supporting text or substance, the status is "missing".
-- A required parameter that is genuinely "partial" or "missing" must use priority "high". If a required parameter genuinely does not apply to the topic, you may still use "na".
+- A required parameter that is genuinely "partial" or "missing" must use priority "high".${allowAutoNA ? ' If a required parameter genuinely does not apply to the topic, you may still use "na".' : ''}
 - For every "partial" or "missing", give a concrete "area" (what is weak) plus a "suggestion" and a short "example" edit the writer can apply.
 
 PILLAR SCORE FIELDS (experience_score etc.): these are recomputed by our system from your per-parameter statuses, so just return them as 0 — your per-parameter accuracy is what matters.
@@ -1037,7 +1066,7 @@ function paramCredit(d){
 // headline number match the evidence below it.
 // A parameter the model judged "na" (doesn't apply to this article's topic) is
 // dropped from BOTH the credit and the denominator, so it can't drag a score down.
-function isModelNA(d){ const s = d && d.status; return s === 'na' || s === 'not_applicable'; }
+function isModelNA(d){ if(!allowAutoNA) return false; const s = d && d.status; return s === 'na' || s === 'not_applicable'; }
 function pillarCredit(r, pl, enabledParams){
   const active = pl.params.filter(p => enabledParams[p.k]);
   let credit = 0, n = 0;
@@ -1334,6 +1363,9 @@ async function analyze(){
     const gates = computeGates(merged, selectedCT, wordCount, enabledParams, metrics);
     stepDone('sd4');
 
+    // Cache the raw model result so toggling auto-NA can re-score + re-render
+    // without spending another LLM call.
+    lastAnalysis = { merged, w, enabledParams, ct: selectedCT, wordCount, metrics };
     render(merged, w, enabledParams, gates);
 
   } catch(err){
@@ -1489,7 +1521,7 @@ function render(r, w, enabledParams, gates){
   const norm = s => (s === 'good' ? 'strong' : s === 'needs_improvement' ? 'missing' : s);
   // A param the model marked "na" (doesn't apply to this article) is excluded from
   // all scoring and the strong/partial/missing tallies.
-  const naStatus = k => { const s = norm(statusOf(k)); return s === 'na' || s === 'not_applicable'; };
+  const naStatus = k => { if(!allowAutoNA) return false; const s = norm(statusOf(k)); return s === 'na' || s === 'not_applicable'; };
   const scoredList = enabledList.filter(k => !naStatus(k));
   const naCount = enabledList.length - scoredList.length;
   const cntStrong = scoredList.filter(k => norm(statusOf(k)) === 'strong').length;
@@ -1531,11 +1563,18 @@ function render(r, w, enabledParams, gates){
 
     const cards = [
       ...activeParams.map(param => {
-        const d = p[param.k] || {};
-        const st = norm(d.status || 'missing');           // strong | partial | missing | na
+        let d = p[param.k] || {};
+        let st = norm(d.status || 'missing');             // strong | partial | missing | na
         // Model judged this parameter doesn't apply to the article's topic.
         if (st === 'na' || st === 'not_applicable') {
-          return `<div class="param skipped"><div class="param-head"><div class="param-icon pi-skip">–</div><div style="flex:1"><div class="param-title" style="color:var(--t3)">${param.n}</div><div class="param-num">${param.num}&nbsp;<span style="color:var(--t3);font-size:9px;">N/A — not relevant to this topic</span></div></div><div class="param-badge pb-skip">N/A</div></div><div class="evidence" style="color:var(--t3)">${d.evidence || "The analyst judged this parameter does not apply to this article's topic, so it does not affect the score."}</div></div>`;
+          if (allowAutoNA) {
+            // Lenient mode: excluded from the score, neither helps nor hurts.
+            return `<div class="param skipped"><div class="param-head"><div class="param-icon pi-skip">–</div><div style="flex:1"><div class="param-title" style="color:var(--t3)">${param.n}</div><div class="param-num">${param.num}&nbsp;<span style="color:var(--t3);font-size:9px;">N/A — not relevant to this topic</span></div></div><div class="param-badge pb-skip">N/A</div></div><div class="evidence" style="color:var(--t3)">${d.evidence || "The analyst judged this parameter does not apply to this article's topic, so it does not affect the score."}</div></div>`;
+          }
+          // Strict mode: the editor opted this parameter in, so a "doesn't apply"
+          // verdict is scored as MISSING rather than silently dropped.
+          st = 'missing';
+          d = { ...d, evidence: d.evidence ? `Analyst flagged this as not relevant to the topic — counted as missing because the parameter is selected. ${d.evidence}` : 'The analyst judged this parameter does not apply to this topic. It is selected, so it is scored as missing — deselect it (or mark it N/A for this category) if it should not count.', area: d.area || 'Parameter not addressed for this topic', suggestion: d.suggestion || 'Add content that satisfies this check, or deselect the parameter if it genuinely does not apply.' };
         }
         const good = st === 'strong';
         const isReq = required.has(param.k);
@@ -1890,6 +1929,7 @@ buildCTSelector();
 buildCheckboxes();
 buildClientSelect();
 buildClCatSelect();
+(function initAutoNA(){ const t=document.getElementById('autoNAToggle'); if(t) t.checked=allowAutoNA; })();
 (function restoreClient(){
   const last=lsLoad(LS.lastClient,'');
   if(last && clients.find(c=>c.id===last)){ document.getElementById('clientSelect').value=last; applyClient(); }
