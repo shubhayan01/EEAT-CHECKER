@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>EEAT + AI Content Checker — Justwords</title>
+<title>Content Score + Gate Checker — Justwords</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -94,7 +94,29 @@ body{background:var(--bg);color:var(--text);font-family:'Instrument Sans',sans-s
 .spin{width:15px;height:15px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:rot .7s linear infinite;display:none;}
 @keyframes rot{to{transform:rotate(360deg);}}
 
-.right{overflow-y:auto;background:var(--s1);}
+.right{display:flex;flex-direction:column;background:var(--s1);overflow:hidden;}
+.tabbar{display:flex;gap:2px;padding:0 14px;background:var(--s2);border-bottom:1px solid var(--border);flex-shrink:0;position:sticky;top:0;z-index:20;}
+.tab{background:none;border:none;border-bottom:2px solid transparent;padding:12px 15px;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:var(--t3);cursor:pointer;transition:all .15s;margin-bottom:-1px;}
+.tab:hover{color:var(--t2);}
+.tab.active{color:var(--aut);border-bottom-color:var(--aut);}
+.tabpane{flex:1;overflow-y:auto;display:none;}
+.tabpane.active{display:block;}
+.analysis-form{width:100%;max-width:430px;margin-top:8px;text-align:left;}
+.analysis-form .lbl{margin-bottom:6px;}
+.comp-card{background:var(--s2);border:1px solid var(--border);border-radius:var(--r);padding:13px 15px;margin-bottom:8px;border-left:3px solid var(--aeo);}
+.comp-rank{font-family:'Syne',sans-serif;font-size:11px;font-weight:800;color:var(--aeo);text-transform:uppercase;letter-spacing:.5px;}
+.comp-title{font-size:13px;font-weight:600;color:var(--text);margin:3px 0;line-height:1.4;}
+.comp-url{font-size:10px;color:var(--xpt);word-break:break-all;text-decoration:none;}
+.comp-url:hover{text-decoration:underline;}
+.comp-meta{font-size:11px;color:var(--t3);margin-top:5px;display:flex;gap:12px;flex-wrap:wrap;}
+.comp-strengths{margin-top:7px;font-size:11px;color:var(--t2);line-height:1.6;}
+.comp-strengths li{margin-left:16px;}
+.verdict-banner{background:linear-gradient(135deg,rgba(155,110,243,.08),rgba(74,232,160,.04));border:1px solid var(--border);border-radius:var(--r2);padding:16px 18px;margin-bottom:18px;}
+.vb-pos{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;margin-bottom:4px;}
+.vb-text{font-size:12px;color:var(--t2);line-height:1.6;}
+.chiprow{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px;}
+.kwchip{font-size:10px;padding:2px 9px;border-radius:100px;background:rgba(232,91,91,.1);color:#d83a3a;border:1px solid rgba(232,91,91,.2);}
+.kwchip.have{background:rgba(74,232,160,.1);color:var(--tru);border-color:rgba(74,232,160,.2);}
 .empty{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:13px;color:var(--t3);}
 .empty-icon{font-size:52px;opacity:.25;}
 .empty h3{font-family:'Syne',sans-serif;font-size:18px;color:var(--t2);font-weight:600;}
@@ -144,7 +166,28 @@ body{background:var(--bg);color:var(--text);font-family:'Instrument Sans',sans-s
 .sc-bar{height:4px;background:var(--border);border-radius:2px;margin-top:9px;overflow:hidden;}
 .sc-bar-fill{height:100%;border-radius:2px;transition:width .6s ease;}
 .sc-sub{font-size:10px;color:var(--t3);margin-top:7px;line-height:1.4;}
-@media(max-width:900px){.scorecard{grid-template-columns:1fr;}}
+.scorecard-2{grid-template-columns:repeat(2,1fr);}
+@media(max-width:900px){.scorecard,.scorecard-2{grid-template-columns:1fr;}}
+
+/* Score explanation + priority fixes */
+.explain,.fixes{background:var(--s2);border:1px solid var(--border);border-radius:var(--r2);padding:16px 18px;margin-bottom:18px;}
+.explain-title{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;margin-bottom:9px;display:flex;align-items:center;gap:7px;flex-wrap:wrap;}
+.exp-formula{font-size:12px;color:var(--t2);background:var(--s3);border:1px solid var(--border);border-radius:8px;padding:10px 12px;line-height:1.7;margin-bottom:12px;}
+.exp-formula strong{color:var(--text);}
+.explain-basis{font-size:11px;color:var(--t3);margin-top:12px;line-height:1.7;}
+.fixlist{display:flex;flex-direction:column;gap:6px;}
+.fixrow{display:flex;gap:11px;align-items:flex-start;padding:9px 12px;background:var(--s1);border:1px solid var(--border);border-radius:9px;border-left:3px solid var(--border2);}
+.fixrow.p1{border-left-color:#d83a3a;}
+.fixrow.p2{border-left-color:var(--improve);}
+.fixrow.p3{border-left-color:var(--xpt);}
+.fixrank{font-family:'Syne',sans-serif;font-weight:800;font-size:14px;color:var(--t3);width:18px;flex-shrink:0;text-align:center;}
+.fixbody{flex:1;min-width:0;}
+.fixname{font-size:12px;font-weight:600;color:var(--text);line-height:1.4;display:flex;align-items:center;gap:7px;flex-wrap:wrap;}
+.fixwhy{font-size:11px;color:var(--t2);margin-top:3px;line-height:1.55;}
+.fixtag{font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;padding:1px 6px;border-radius:100px;white-space:nowrap;}
+.fixtag.t1{background:rgba(232,91,91,.12);color:#d83a3a;}
+.fixtag.t2{background:rgba(240,180,41,.14);color:var(--improve);}
+.fixtag.t3{background:rgba(74,181,232,.14);color:var(--xpt);}
 
 .gates-panel{background:var(--s2);border:1px solid var(--border);border-radius:var(--r2);padding:16px 18px;margin-bottom:18px;}
 .gates-title{font-family:'Syne',sans-serif;font-size:11px;font-weight:700;margin-bottom:10px;display:flex;align-items:center;gap:6px;color:var(--t2);text-transform:uppercase;letter-spacing:.5px;}
@@ -154,11 +197,13 @@ body{background:var(--bg);color:var(--text);font-family:'Instrument Sans',sans-s
 .gate-fail{background:rgba(232,91,91,.05);border-color:rgba(232,91,91,.25);}
 .gate-warn{background:rgba(240,180,41,.04);border-color:rgba(240,180,41,.2);}
 .gate-na{background:var(--s3);border-color:var(--border);opacity:.4;}
+.gate-info{background:rgba(74,181,232,.05);border-color:rgba(74,181,232,.25);}
 .gate-badge{font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;padding:2px 7px;border-radius:100px;white-space:nowrap;flex-shrink:0;}
 .gb-pass{background:rgba(74,232,160,.12);color:var(--tru);}
 .gb-fail{background:rgba(232,91,91,.12);color:#d83a3a;}
 .gb-warn{background:rgba(240,180,41,.12);color:var(--improve);}
 .gb-na{background:rgba(82,90,114,.1);color:var(--t3);}
+.gb-info{background:rgba(74,181,232,.12);color:var(--xpt);}
 .gate-type{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;padding:1px 5px;border-radius:100px;flex-shrink:0;}
 .gtype-hard{background:rgba(232,91,91,.1);color:#d83a3a;}
 .gtype-soft{background:rgba(240,180,41,.1);color:var(--improve);}
@@ -360,14 +405,16 @@ body{background:var(--bg);color:var(--text);font-family:'Instrument Sans',sans-s
   @page{margin:14mm;}
   html,body{background:#fff!important;}
   body{-webkit-print-color-adjust:exact;print-color-adjust:exact;font-size:12px;}
-  .header,.left,.loading,.empty,.overlay,.no-print,.report-toolbar,::-webkit-scrollbar{display:none!important;}
+  .header,.left,.loading,.empty,.overlay,.no-print,.report-toolbar,.tabbar,::-webkit-scrollbar{display:none!important;}
   .app{display:block!important;height:auto!important;}
   .right{display:block!important;overflow:visible!important;height:auto!important;background:#fff!important;border:none!important;}
-  #results{display:block!important;padding:0!important;}
+  .tabpane{display:none!important;overflow:visible!important;}
+  .tabpane.active{display:block!important;}
+  #results,#analysisResults{display:block!important;padding:0!important;}
   .print-head{display:block!important;margin-bottom:16px;padding-bottom:12px;border-bottom:2px solid var(--border);}
   .print-head .ph-t{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--text);}
   .print-head .ph-s{font-size:11px;color:var(--t2);margin-top:3px;}
-  .section,.param,.sc-card,.gate-item,.ai-sig,.pbar-card,.er-card,.pub-status,.gates-panel,.score-hero,.ai-panel,.editor-report{break-inside:avoid;}
+  .section,.param,.sc-card,.gate-item,.ai-sig,.pbar-card,.er-card,.pub-status,.gates-panel,.score-hero,.ai-panel,.editor-report,.comp-card,.verdict-banner,.explain,.fixes{break-inside:avoid;}
   .scorecard,.pillar-bars,.ai-signals-grid,.er-grid{break-inside:avoid;}
 }
 </style>
@@ -377,16 +424,15 @@ body{background:var(--bg);color:var(--text);font-family:'Instrument Sans',sans-s
 <header class="header">
   <div class="logo-mark">JW</div>
   <div class="header-title">
-    EEAT + AI Content Checker
-    <span>Experience · Expertise · Authority · Trust · AEO · AI Detection · Gate Rules</span>
+    Content Quality Checker
+    <span>Experience · Expertise · Authority · Trust · Gate Rules</span>
   </div>
   <div class="header-pills">
     <span class="pill pill-exp">Experience</span>
     <span class="pill pill-xpt">Expertise</span>
     <span class="pill pill-aut">Authority</span>
     <span class="pill pill-tru">Trust</span>
-    <span class="pill pill-aeo">AEO/SEO</span>
-    <span class="pill pill-ai">AI Detection</span>
+    <span class="pill pill-aeo">Gate Rules</span>
   </div>
 </header>
 
@@ -410,6 +456,9 @@ body{background:var(--bg);color:var(--text);font-family:'Instrument Sans',sans-s
         <option value="llama-3.1-8b-instant">Llama 3.1 8B — Fast, high daily limit</option>
       </select>
       <div class="help">Hit the daily token limit on 70B? Switch to 8B to keep working. One analysis = one API call.</div>
+      <label class="lbl" style="margin-top:10px">Google Search Key <span style="color:var(--t3);text-transform:none;letter-spacing:0;font-weight:400">(Serper.dev — Content Analysis tab only)</span> <a href="https://serper.dev/api-key" target="_blank">→ Get free key</a></label>
+      <input type="password" class="key-input" id="serperKey" placeholder="Serper.dev API key (optional)"/>
+      <div class="help">Only needed for the <strong>Content Analysis</strong> tab, which searches Google for your topic and compares the top-ranking blogs against yours. The Content Score tab doesn't use it.</div>
     </div>
 
     <div class="ls" style="flex:1;display:flex;flex-direction:column;gap:6px;">
@@ -420,7 +469,7 @@ body{background:var(--bg);color:var(--text);font-family:'Instrument Sans',sans-s
       </div>
       <!-- Token warning shown when content is large -->
       <div class="token-banner" id="tokenBanner">
-        <strong>Large article detected.</strong> To stay within the model's token limit, the beginning and end are sent and the middle is sampled — your intro, conclusion and structure are always analysed. For full coverage of very long pieces, use the 70B model or analyse in sections.
+        <strong>Long article.</strong> If it exceeds the model's token budget, the beginning and end are sent in full and only the middle is sampled — your intro, conclusion and structure are always analysed, so scores stay reliable. This is not an error. For complete coverage of very long pieces, use the 70B model or analyse in sections.
       </div>
     </div>
 
@@ -430,55 +479,80 @@ body{background:var(--bg);color:var(--text);font-family:'Instrument Sans',sans-s
       <div class="help">Each category sets pillar weights, required &amp; N/A parameters, and gate thresholds. Create your own for niches the presets don't cover.</div>
     </div>
 
-    <div class="ls">
-      <div class="lbl">Pillar Weights <span id="wNote" style="margin-left:auto;font-size:10px;text-transform:none;letter-spacing:0;color:var(--t3)">Must sum to 100%</span></div>
-      <div class="weights-grid">
-        <div class="wr"><div class="wname"><span class="wdot" style="background:var(--exp)"></span><span style="color:var(--exp)">Exp</span></div><input type="range" class="wslider se" id="wE" min="0" max="100" value="20" oninput="syncW()"><span class="wval" id="wEv" style="color:var(--exp)">20%</span></div>
-        <div class="wr"><div class="wname"><span class="wdot" style="background:var(--xpt)"></span><span style="color:var(--xpt)">Expt</span></div><input type="range" class="wslider sx" id="wX" min="0" max="100" value="20" oninput="syncW()"><span class="wval" id="wXv" style="color:var(--xpt)">20%</span></div>
-        <div class="wr"><div class="wname"><span class="wdot" style="background:var(--aut)"></span><span style="color:var(--aut)">Auth</span></div><input type="range" class="wslider sa" id="wA" min="0" max="100" value="20" oninput="syncW()"><span class="wval" id="wAv" style="color:var(--aut)">20%</span></div>
-        <div class="wr"><div class="wname"><span class="wdot" style="background:var(--tru)"></span><span style="color:var(--tru)">Trust</span></div><input type="range" class="wslider st" id="wT" min="0" max="100" value="20" oninput="syncW()"><span class="wval" id="wTv" style="color:var(--tru)">20%</span></div>
-        <div class="wr"><div class="wname"><span class="wdot" style="background:var(--aeo)"></span><span style="color:var(--aeo)">AEO</span></div><input type="range" class="wslider so" id="wO" min="0" max="100" value="20" oninput="syncW()"><span class="wval" id="wOv" style="color:var(--aeo)">20%</span></div>
-      </div>
-      <div class="wt wt-ok" id="wTotal">✓ Weights sum to 100% — ready to analyze</div>
-    </div>
-
     <div class="ls" id="paramCheckboxSection">
       <div class="lbl">Parameters to Evaluate
         <span class="hdr-actions"><button class="mini-link" onclick="openParamModal()">+ Add parameter</button><span id="cbCount" style="color:var(--t3)">40 selected</span></span>
       </div>
-      <label class="autona-toggle" style="display:flex;align-items:flex-start;gap:7px;font-size:11px;color:var(--t2);margin:2px 0 9px;cursor:pointer;line-height:1.4">
-        <input type="checkbox" id="autoNAToggle" onchange="setAutoNA(this.checked)" style="margin-top:1px;flex:0 0 auto">
-        <span>Let the analyst auto-exclude parameters it judges <em>not applicable</em> to the article's topic. <span style="color:var(--t3)">Off (default) = every selected parameter is scored; a "doesn't apply" verdict counts as missing.</span></span>
-      </label>
+      <div class="help" style="margin:0 0 9px">Exactly the ticked checks are scored — nothing is excluded automatically. Each category starts you with the checks that fit it; tick or untick any to match this article.</div>
       <div id="paramCheckboxes"></div>
     </div>
 
     <div class="ls">
       <button class="btn-analyze" id="analyzeBtn" onclick="analyze()">
         <span class="spin" id="btnSpin"></span>
-        <span id="btnTxt">⚡ Analyze EEAT + AI Content</span>
+        <span id="btnTxt">⚡ Analyze Content Score</span>
       </button>
     </div>
 
   </div>
 
   <div class="right" id="rightPanel">
-    <div class="empty" id="emptyState">
-      <div class="empty-icon">📊</div>
-      <h3>No Analysis Yet</h3>
-      <p>Select content type, adjust weights if needed, paste your article, then click Analyze.</p>
+    <div class="tabbar no-print">
+      <button class="tab active" id="tabBtnScore" onclick="switchTab('score')">🎯 Content Score</button>
+      <button class="tab" id="tabBtnAnalysis" onclick="switchTab('analysis')">🔎 Content Analysis</button>
     </div>
-    <div class="loading" id="loading">
-      <div class="load-spin"></div>
-      <div class="load-text" id="loadText">Running full EEAT + AI detection analysis…</div>
-      <div class="load-steps" id="loadSteps">
-        <div class="load-step"><div class="step-dot active" id="sd1"></div>Evaluating EEAT, AI signals &amp; gate checks</div>
-        <div class="load-step"><div class="step-dot" id="sd2"></div>Computing pillar &amp; overall scores</div>
-        <div class="load-step"><div class="step-dot" id="sd3"></div>Running structural gate checks</div>
-        <div class="load-step"><div class="step-dot" id="sd4"></div>Computing publish decision</div>
+
+    <!-- ── TAB 1: Content Score ── -->
+    <div class="tabpane active" id="paneScore">
+      <div class="empty" id="emptyState">
+        <div class="empty-icon">📊</div>
+        <h3>No Analysis Yet</h3>
+        <p>Pick a content category, paste your article, then click Analyze Content Score.</p>
       </div>
+      <div class="loading" id="loading">
+        <div class="load-spin"></div>
+        <div class="load-text" id="loadText">Running content quality analysis…</div>
+        <div class="load-steps" id="loadSteps">
+          <div class="load-step"><div class="step-dot active" id="sd1"></div>Evaluating content quality &amp; gate checks</div>
+          <div class="load-step"><div class="step-dot" id="sd2"></div>Computing pillar &amp; overall scores</div>
+          <div class="load-step"><div class="step-dot" id="sd3"></div>Running structural gate checks</div>
+          <div class="load-step"><div class="step-dot" id="sd4"></div>Computing publish decision</div>
+        </div>
+      </div>
+      <div id="results"></div>
     </div>
-    <div id="results"></div>
+
+    <!-- ── TAB 2: Content Analysis (competitive) ── -->
+    <div class="tabpane" id="paneAnalysis">
+      <div class="empty" id="analysisEmpty">
+        <div class="empty-icon">🔎</div>
+        <h3>Competitive Content Analysis</h3>
+        <p>Enter the topic/keyword you want to rank for. The tool searches Google, reads the top-ranking blogs, and shows exactly how to beat them.</p>
+        <div class="analysis-form">
+          <label class="lbl">Topic / Target Keyword</label>
+          <input type="text" class="key-input" id="topicInput" placeholder="e.g. how to prevent recurrent miscarriage"/>
+          <label class="lbl" style="margin-top:10px">Competitor URLs <span style="color:var(--t3);text-transform:none;letter-spacing:0;font-weight:400">— optional, skips Google search if filled</span></label>
+          <input type="text" class="key-input" id="compUrl1" placeholder="https://competitor-1.com/article (optional)" style="margin-bottom:6px"/>
+          <input type="text" class="key-input" id="compUrl2" placeholder="https://competitor-2.com/article (optional)"/>
+          <div class="help" style="margin-top:8px">Uses the same article you pasted on the left. With a Serper key it auto-finds the top 2 Google results for your topic; or paste 2 competitor URLs to compare against those instead.</div>
+          <button class="btn-analyze" id="analysisBtn" onclick="runCompetitiveAnalysis()" style="margin-top:12px">
+            <span class="spin" id="anaSpin"></span>
+            <span id="anaBtnTxt">🔎 Search Google &amp; Compare</span>
+          </button>
+        </div>
+      </div>
+      <div class="loading" id="analysisLoading">
+        <div class="load-spin"></div>
+        <div class="load-text" id="anaLoadText">Searching Google &amp; reading competitors…</div>
+        <div class="load-steps" id="anaLoadSteps">
+          <div class="load-step"><div class="step-dot active" id="ad1"></div>Searching Google for the topic</div>
+          <div class="load-step"><div class="step-dot" id="ad2"></div>Reading the top-ranking blogs</div>
+          <div class="load-step"><div class="step-dot" id="ad3"></div>Comparing against your article</div>
+          <div class="load-step"><div class="step-dot" id="ad4"></div>Building the ranking action plan</div>
+        </div>
+      </div>
+      <div id="analysisResults"></div>
+    </div>
   </div>
 </div>
 
@@ -496,24 +570,14 @@ body{background:var(--bg);color:var(--text);font-family:'Instrument Sans',sans-s
     </div>
     <div class="fld"><label>Short Description</label><input type="text" id="catDesc" placeholder="e.g. Software guides, comparisons, onboarding"></div>
     <label class="fld-check"><input type="checkbox" id="catYMYL"> Treat as YMYL (Your Money or Your Life) — applies stricter Trust standards</label>
-    <div class="fld" style="margin-top:13px"><label>Pillar Weights (must total 100%)</label>
-      <div class="weight-mini">
-        <div class="wm"><span style="color:var(--exp)">Exp</span><input type="number" id="catwE" min="0" max="100" value="20" oninput="catWsum()"></div>
-        <div class="wm"><span style="color:var(--xpt)">Expt</span><input type="number" id="catwX" min="0" max="100" value="20" oninput="catWsum()"></div>
-        <div class="wm"><span style="color:var(--aut)">Auth</span><input type="number" id="catwA" min="0" max="100" value="20" oninput="catWsum()"></div>
-        <div class="wm"><span style="color:var(--tru)">Trust</span><input type="number" id="catwT" min="0" max="100" value="20" oninput="catWsum()"></div>
-        <div class="wm"><span style="color:var(--aeo)">AEO</span><input type="number" id="catwO" min="0" max="100" value="20" oninput="catWsum()"></div>
-      </div>
-      <div class="wsum wsum-ok" id="catWsumNote">Total: 100%</div>
-    </div>
-    <div class="fld-row">
+    <div class="fld-row" style="margin-top:13px">
       <div class="fld"><label>Min Word Count (hard gate)</label><input type="number" id="catMinWords" min="0" value="300"></div>
       <div class="fld"><label>Trust Threshold % (blank = off)</label><input type="number" id="catTrust" min="0" max="100" placeholder="e.g. 75"></div>
     </div>
     <label class="fld-check"><input type="checkbox" id="catReqDisc"> Require disclaimer (hard gate)</label>
     <label class="fld-check"><input type="checkbox" id="catReqAcc"> Require factual-accuracy pass (hard gate)</label>
     <div class="fld" style="margin-top:13px"><label>Parameter Rules</label>
-      <div class="help" style="margin-top:0;margin-bottom:6px">For each parameter choose: <strong>Default</strong> (scored normally), <strong>Required</strong> (must be strong), or <strong>N/A</strong> (skipped for this category).</div>
+      <div class="help" style="margin-top:0;margin-bottom:6px">For each parameter choose: <strong>Default</strong> (ticked &amp; scored), <strong>Required</strong> (ticked, flagged as must-pass), or <strong>Off</strong> (starts unticked — the editor can still tick it per article). Nothing is ever excluded automatically at analysis time.</div>
       <div class="param-pick" id="catParamPick"></div>
     </div>
     <div class="modal-actions">
@@ -582,64 +646,57 @@ body{background:var(--bg);color:var(--text);font-family:'Instrument Sans',sans-s
 
 <script>
 // ── Content Types ──────────────────────────────────────────────
+// Each category defines: which checks start TICKED (everything except defaultOff),
+// which are flagged Required, and the publish gates. There are NO pillar weights —
+// the four scored pillars are averaged equally. `defaultOff` only sets the starting
+// tick state; the editor can tick any of them, and nothing is excluded at analysis.
 const CONTENT_TYPES = {
   general: {
     label:'General / Informational', icon:'📄', desc:'Blogs, guides, how-tos',
-    weights:{e:20,x:20,a:20,t:20,o:20}, isYMYL:false,
-    required:[], notApplicable:[],
+    isYMYL:false,
+    required:[],
+    // A purely informational blog isn't a business track-record piece, so these
+    // experience/commercial checks start unticked (the editor can tick any that fit).
+    defaultOff:['first_person_narrative','quantified_business_volume','quantified_time_in_operation','specific_customer_case_story','outcome_data_from_own_work','real_client_concern_quoted','location_or_regional_specificity','seasonal_or_cyclical_pattern','age_demographic_or_cohort'],
     gates:{minWords:300,trustThreshold:null,requireDisclaimer:false,requireAccuracy:false}
   },
   health: {
     label:'Health / Medical', icon:'🏥', desc:'Medical, wellness — YMYL',
-    weights:{e:15,x:25,a:20,t:35,o:5}, isYMYL:true,
+    isYMYL:true,
     required:['disclaimer_for_sensitive_topics','no_factual_errors_or_outdated_info','evidence_based_claims_framed','cites_external_authoritative_source','mechanism_explanation','content_freshness_current_data'],
-    notApplicable:['quantified_business_volume','quantified_time_in_operation','seasonal_or_cyclical_pattern'],
+    defaultOff:['quantified_business_volume','quantified_time_in_operation','seasonal_or_cyclical_pattern','outcome_data_from_own_work'],
     gates:{minWords:600,trustThreshold:75,requireDisclaimer:true,requireAccuracy:true}
   },
   finance: {
     label:'Finance', icon:'💰', desc:'Banking, investing — YMYL',
-    weights:{e:15,x:25,a:20,t:35,o:5}, isYMYL:true,
+    isYMYL:true,
     required:['disclaimer_for_sensitive_topics','no_factual_errors_or_outdated_info','evidence_based_claims_framed','industry_benchmarks_cited_correctly','specific_measurements_thresholds','content_freshness_current_data'],
-    notApplicable:['seasonal_or_cyclical_pattern','location_or_regional_specificity'],
+    defaultOff:['seasonal_or_cyclical_pattern','location_or_regional_specificity'],
     gates:{minWords:500,trustThreshold:75,requireDisclaimer:true,requireAccuracy:true}
   },
   legal: {
     label:'Legal', icon:'⚖️', desc:'Legal advice, compliance — YMYL',
-    weights:{e:10,x:25,a:30,t:30,o:5}, isYMYL:true,
+    isYMYL:true,
     required:['disclaimer_for_sensitive_topics','no_factual_errors_or_outdated_info','certification_or_credential_mentioned','cites_external_authoritative_source','professional_association_referenced'],
-    notApplicable:['seasonal_or_cyclical_pattern','outcome_data_from_own_work','age_demographic_or_cohort'],
+    defaultOff:['seasonal_or_cyclical_pattern','outcome_data_from_own_work','age_demographic_or_cohort'],
     gates:{minWords:500,trustThreshold:75,requireDisclaimer:true,requireAccuracy:true}
   },
   product: {
     label:'Product / Review', icon:'🛍️', desc:'Products, services, comparisons',
-    weights:{e:30,x:15,a:15,t:25,o:15}, isYMYL:false,
+    isYMYL:false,
     required:['no_misleading_title_or_clickbait','informative_tone_not_sales_pitch','specific_customer_case_story','outcome_data_from_own_work'],
-    notApplicable:['professional_association_referenced','evidence_based_claims_framed'],
+    defaultOff:['professional_association_referenced','evidence_based_claims_framed'],
     gates:{minWords:300,trustThreshold:null,requireDisclaimer:false,requireAccuracy:false}
   },
   technical: {
     label:'Technical / How-To', icon:'⚙️', desc:'Dev guides, tutorials',
-    weights:{e:20,x:35,a:15,t:15,o:15}, isYMYL:false,
+    isYMYL:false,
     required:['step_level_process_breakdown','mechanism_explanation','correct_technical_terminology','specific_measurements_thresholds','tradeoffs_and_limitations'],
-    notApplicable:['disclaimer_for_sensitive_topics','age_demographic_or_cohort','seasonal_or_cyclical_pattern'],
+    defaultOff:['disclaimer_for_sensitive_topics','age_demographic_or_cohort','seasonal_or_cyclical_pattern'],
     gates:{minWords:400,trustThreshold:null,requireDisclaimer:false,requireAccuracy:false}
   }
 };
 let selectedCT = 'general';
-
-// ── AI Signals ─────────────────────────────────────────────────
-const AI_SIGNALS = [
-  {k:'ai_generic_opener',       n:'Generic Scene-Setting Opener',    hint:'Opens with "In today\'s world…" instead of addressing topic directly'},
-  {k:'ai_filler_vocab',         n:'AI Filler Vocabulary',            hint:'Overuses: comprehensive, crucial, delve, robust, paramount, leverage, utilize'},
-  {k:'ai_transition_overuse',   n:'Transition Word Overuse',         hint:'Excessive Furthermore / Moreover / Additionally / In conclusion'},
-  {k:'ai_vague_claims',         n:'Vague / Unverifiable Claims',     hint:'Assertions without specific numbers, names, dates, or cited sources'},
-  {k:'ai_hollow_expertise',     n:'Surface-Level Expertise',         hint:'Topic coverage at Wikipedia-summary level — no practitioner depth'},
-  {k:'ai_uniform_structure',    n:'Mechanical Paragraph Structure',  hint:'Every section: intro → bullet list → wrap-up — identical formula'},
-  {k:'ai_hedged_language',      n:'Over-Hedged Language',            hint:'Excessive hedges: "may help", "could potentially", "it is important to"'},
-  {k:'ai_generic_examples',     n:'Hypothetical / Generic Examples', hint:'"Imagine a user who…" instead of real named case studies'},
-  {k:'ai_thin_conclusion',      n:'Conclusion Restates Body',        hint:'Conclusion only summarises body — no new synthesis or next step'},
-  {k:'ai_no_voice',             n:'No Authorial Voice / Stance',     hint:'Completely neutral — no opinion, no personality, reads like a template'},
-];
 
 // ── Pillars ────────────────────────────────────────────────────
 const PILLARS=[
@@ -692,8 +749,8 @@ const PILLARS=[
     {k:'no_factual_errors_or_outdated_info',n:'No Factual Errors or Outdated Information',num:'P41'},
     {k:'formatting_serves_reader_not_seo',n:'Formatting Serves Reader, Not SEO',num:'P42'},
   ]},
-  {key:'aeo',label:'AEO / SEO',emoji:'🔍',color:'var(--aeo)',sk:'aeo_score',wk:'o',
-   desc:'Does the content perform for search and AI overviews?',ic:'rgba(232,210,74,.12)',sc:'rgba(232,210,74,.12)',scolor:'var(--aeo)',
+  {key:'aeo',label:'AEO / SEO',emoji:'🔍',color:'var(--aeo)',sk:'aeo_score',wk:'o',gateOnly:true,
+   desc:'Search & AI-overview readiness — checked as gate rules, not scored into the Content Score.',ic:'rgba(232,210,74,.12)',sc:'rgba(232,210,74,.12)',scolor:'var(--aeo)',
    params:[
     {k:'covers_topic_completely',n:'Covers the Topic Completely',num:'P43'},
     {k:'original_point_of_view',n:'Contains an Original Point of View',num:'P44'},
@@ -706,18 +763,15 @@ const PILLARS=[
 ];
 
 // ── Persistence layer (localStorage) ──────────────────────────
-const LS={cats:'jw_eeat_custom_cats',params:'jw_eeat_custom_params',clients:'jw_eeat_clients',lastClient:'jw_eeat_last_client',autoNA:'jw_eeat_auto_na'};
+const LS={cats:'jw_eeat_custom_cats',params:'jw_eeat_custom_params',clients:'jw_eeat_clients',lastClient:'jw_eeat_last_client'};
 function lsLoad(k,def){try{const v=localStorage.getItem(k);return v?JSON.parse(v):def;}catch(e){return def;}}
 function lsSave(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
 
 let customCats   = lsLoad(LS.cats,{});      // {key:{...same shape as CONTENT_TYPES}}
 let customParams = lsLoad(LS.params,[]);    // [{k,n,num,pillar,def}]
 let clients      = lsLoad(LS.clients,[]);   // [{id,name,industry,catKey,notes}]
-// When TRUE the model may exclude a checked parameter from scoring by returning
-// status "na" (lenient: a check that doesn't fit the topic neither helps nor hurts).
-// When FALSE (default) the checkbox is the contract — every checked parameter is
-// scored, and any model "na" is treated as a real (0-credit) verdict. Editor-toggled.
-let allowAutoNA  = lsLoad(LS.autoNA,false);
+// The ticked checkboxes are the contract: exactly the selected parameters are
+// scored, always. Nothing is excluded automatically — no auto-N/A, no model "na".
 let currentClient= null;
 let ALLCATS      = {};
 
@@ -759,13 +813,6 @@ function selectCT(key){
     b.className='ct-btn'+(k===key?' active':'')+(getCT(k).isYMYL?' is-ymyl':'')+(isCustomCat(k)?' is-custom':'');
   });
   document.getElementById('ctLabel').textContent=ct.label;
-  const w=ct.weights;
-  document.getElementById('wE').value=w.e;
-  document.getElementById('wX').value=w.x;
-  document.getElementById('wA').value=w.a;
-  document.getElementById('wT').value=w.t;
-  document.getElementById('wO').value=w.o;
-  syncW();
   buildCheckboxes();
 }
 
@@ -773,7 +820,7 @@ function selectCT(key){
 function buildCheckboxes(){
   const ct=getCT(selectedCT);
   const required=new Set(ct.required);
-  const notApplicable=new Set(ct.notApplicable);
+  const defaultOff=new Set(ct.defaultOff||[]);
   const container=document.getElementById('paramCheckboxes');
   container.innerHTML='';
   PILLARS.forEach(pl=>{
@@ -781,21 +828,20 @@ function buildCheckboxes(){
     sec.className='pillar-check-section';
     const head=document.createElement('div');
     head.className='pillar-check-head';
-    head.innerHTML=`<span class="wdot" style="background:${pl.color}"></span><span class="ph-label" style="color:${pl.color}">${pl.emoji} ${pl.label}</span><button class="pillar-toggle-all" onclick="togglePillarAll('${pl.key}',this)">all off</button>`;
+    // AEO checks are gate rules, not scored pillars — label them so it's clear.
+    const plLabel = pl.gateOnly ? `${pl.emoji} ${pl.label} <span style="font-weight:400;color:var(--t3);text-transform:none;letter-spacing:0">— gate checks</span>` : `${pl.emoji} ${pl.label}`;
+    head.innerHTML=`<span class="wdot" style="background:${pl.color}"></span><span class="ph-label" style="color:${pl.color}">${plLabel}</span><button class="pillar-toggle-all" onclick="togglePillarAll('${pl.key}',this)">all off</button>`;
     sec.appendChild(head);
     pl.params.forEach(param=>{
       const isReq=required.has(param.k);
-      const isNA=notApplicable.has(param.k);
       const row=document.createElement('div');
-      row.className='param-check-row'+(isNA?' row-na':'');
+      row.className='param-check-row';
       const cbId=`cb_${param.k}`;
-      // Required params are still ticked by default, but editors CAN untick them
-      // (e.g. when a "required" check doesn't fit a particular client's blog).
-      const cbClass='param-cb'+(isNA?' cb-na':'');
-      const checked=isNA?'':' checked';
-      const disabled=isNA?' disabled':'';
-      const tag=isReq?`<span class="req-tag">Required</span>`:isNA?`<span class="na-tag">N/A</span>`:'';
-      row.innerHTML=`<span class="pnum">${param.num}</span><input type="checkbox" class="${cbClass}" id="${cbId}" data-pillar="${pl.key}" data-key="${param.k}"${checked}${disabled} onchange="updateCbCount()"><label for="${cbId}">${param.n}</label>${tag}`;
+      // Every check is fully toggleable. defaultOff only sets the STARTING tick
+      // state for this category — the editor can tick or untick any of them.
+      const checked=defaultOff.has(param.k)?'':' checked';
+      const tag=isReq?`<span class="req-tag">Required</span>`:'';
+      row.innerHTML=`<span class="pnum">${param.num}</span><input type="checkbox" class="param-cb" id="${cbId}" data-pillar="${pl.key}" data-key="${param.k}"${checked} onchange="updateCbCount()"><label for="${cbId}">${param.n}</label>${tag}`;
       sec.appendChild(row);
     });
     container.appendChild(sec);
@@ -804,12 +850,9 @@ function buildCheckboxes(){
 }
 
 function togglePillarAll(pillarKey,btn){
-  const ct=getCT(selectedCT);
-  const notApplicable=new Set(ct.notApplicable);
-  const required=new Set(ct.required);
-  const cbs=[...document.querySelectorAll(`input[data-pillar="${pillarKey}"]`)].filter(c=>!c.disabled);
+  const cbs=[...document.querySelectorAll(`input[data-pillar="${pillarKey}"]`)];
   const allChecked=cbs.every(c=>c.checked);
-  cbs.forEach(c=>{if(!notApplicable.has(c.dataset.key)) c.checked=!allChecked;});
+  cbs.forEach(c=>{ c.checked=!allChecked; });
   updateCbCount();
 }
 
@@ -818,7 +861,7 @@ function updateCbCount(){
   const checked=document.querySelectorAll('.param-cb:checked').length;
   document.getElementById('cbCount').textContent=`${checked} of ${total} selected`;
   PILLARS.forEach(pl=>{
-    const cbs=[...document.querySelectorAll(`input[data-pillar="${pl.key}"]`)].filter(c=>!c.disabled);
+    const cbs=[...document.querySelectorAll(`input[data-pillar="${pl.key}"]`)];
     const btn=document.querySelector(`button[onclick="togglePillarAll('${pl.key}',this)"]`);
     if(btn) btn.textContent=cbs.every(c=>c.checked)?'all off':'all on';
   });
@@ -830,51 +873,18 @@ function getEnabledParams(){
   return enabled;
 }
 
-// Holds the last raw analysis so the auto-NA toggle can re-score without a new
-// LLM call. Note: the prompt also changes with the toggle, so a fresh Analyze is
-// still recommended for the model to re-judge — but the displayed report and
-// score update immediately from the cached verdicts.
-let lastAnalysis = null;
-function setAutoNA(on){
-  allowAutoNA = !!on;
-  lsSave(LS.autoNA, allowAutoNA);
-  if (lastAnalysis) recomputeAndRender();
-}
-function recomputeAndRender(){
-  const L = lastAnalysis; if (!L) return;
-  const { merged, w, enabledParams, ct, wordCount, metrics } = L;
-  // Re-derive pillar + overall scores under the current auto-NA setting.
-  PILLARS.forEach(pl => { merged[pl.sk] = pillarCredit(merged, pl, enabledParams).credit; });
-  merged.overall_score = computeScore(merged, w, enabledParams);
-  const gates = computeGates(merged, ct, wordCount, enabledParams, metrics);
-  render(merged, w, enabledParams, gates);
-}
-
-// ── Weights ────────────────────────────────────────────────────
-function getW(){
-  return{e:+document.getElementById('wE').value,x:+document.getElementById('wX').value,a:+document.getElementById('wA').value,t:+document.getElementById('wT').value,o:+document.getElementById('wO').value};
-}
-function syncW(){
-  const w=getW();
-  const keys={e:'wEv',x:'wXv',a:'wAv',t:'wTv',o:'wOv'};
-  Object.entries(keys).forEach(([k,id])=>document.getElementById(id).textContent=w[k]+'%');
-  const total=w.e+w.x+w.a+w.t+w.o;
-  const el=document.getElementById('wTotal');
-  if(total===100){el.className='wt wt-ok';el.textContent='✓ Weights sum to 100% — ready to analyze';}
-  else{el.className='wt wt-err';el.textContent=`⚠ Weights sum to ${total}% — must equal 100%`;}
-}
 document.getElementById('content').addEventListener('input',function(){
   const t=this.value.trim();
   const wc=t?t.split(/\s+/).length:0;
   document.getElementById('wc').textContent=wc;
   document.getElementById('cc').textContent=this.value.length;
-  // Show token warning banner for large articles
-  document.getElementById('tokenBanner').classList.toggle('show', wc > 1200);
+  // Show token warning banner only for genuinely long articles that may be sampled.
+  // The 70B model comfortably handles ~2,000+ words, so don't alarm people early.
+  document.getElementById('tokenBanner').classList.toggle('show', wc > 2200);
 });
 
-// ── EEAT System Prompt (Call 1) ────────────────────────────────
-// Deliberately leaner — no AI signal definitions here, just EEAT params
-function buildEEATSys(w, enabledParams, contentType){
+// ── Content-Score System Prompt ────────────────────────────────
+function buildEEATSys(enabledParams, contentType){
   const ct = getCT(contentType);
   const required = new Set(ct.required);
 
@@ -883,7 +893,7 @@ function buildEEATSys(w, enabledParams, contentType){
     quantified_business_volume:`P2: A specific count of clients/cases/installs when the piece speaks to the business's own track record. Mark "na" if the article is purely educational and makes no track-record claim.`,
     quantified_time_in_operation:`P3: States how long the business has operated (e.g. a founding year or "for over X years"). Mark "na" for purely educational pieces that make no such claim.`,
     specific_customer_case_story:`P4: A real scenario — who, the specific problem, and the outcome. A hypothetical "imagine a customer" is "partial" at best.`,
-    outcome_data_from_own_work:`P5: A measurable result from the business's own work — before/after, %, success rates. Mark "na" if the piece isn't about the business's own results.`,
+    outcome_data_from_own_work:`P5: A measurable, FIRST-PARTY result from the business's OWN work — its own before/after figures, %, success or recovery rates it achieved. Data from third-party studies, journals or other organisations does NOT satisfy this (that belongs under Authority / external citations). Vague durability or longevity claims with no measured figure (e.g. "a treated tooth can last many years") do NOT count. Mark "na" if the piece isn't about the business's own results.`,
     location_or_regional_specificity:`P6: Experience grounded in a real place ONLY when the topic is genuinely place-specific. If the subject is not regional (most general, medical, or how-to topics), mark this "na" — do NOT mark it "missing".`,
     seasonal_or_cyclical_pattern:`P8: Time/seasonal patterns a practitioner would notice. If the topic is evergreen and not time-dependent, mark this "na".`,
     real_client_concern_quoted:`P10: A genuine customer question or concern in the customer's own words (or closely paraphrased). Mark "na" if the format isn't suited to this.`,
@@ -903,13 +913,13 @@ function buildEEATSys(w, enabledParams, contentType){
     third_party_expert_quote:`P31: Direct quote from a named subject matter expert or institution.`,
     professional_association_referenced:`P32: References a relevant professional body.`,
     certification_or_credential_mentioned:`P33: Business certification/licence/accreditation mentioned.`,
-    topic_cluster_internal_links:`P34: Internal links proportionate to article length, contextually appropriate.`,
-    publish_or_updated_date_visible:`P35: Article displays a publish date; for YMYL also a last-updated date.`,
+    topic_cluster_internal_links:`P34: References or links to the site's OWN related articles, proportionate to length. Pasted text may strip hyperlink markup — if the writing clearly points to another of the brand's articles/resources by name or anchor phrase, count it; do NOT mark "missing" merely because the raw URL isn't visible. If the format genuinely calls for no internal links, mark "na".`,
+    publish_or_updated_date_visible:`P35: An actual date is written IN THE SUPPLIED TEXT (e.g. "Published 12 March 2025", "Updated: …"). Pasted article bodies usually omit the CMS date — if no date string actually appears in the text, this is "missing". Never assume a date exists just because it is a blog; quote the date in "evidence" or mark it missing.`,
     content_freshness_current_data:`P36: Facts, rates, regulations cited are current.`,
     no_misleading_title_or_clickbait:`P37: Title is literal and proportionate — no superlatives or manufactured urgency.`,
     informative_tone_not_sales_pitch:`P38: Genuinely helps the reader. Not primarily selling the business's services.`,
-    descriptive_anchor_text:`P39: Internal links use contextual descriptive anchor text, not "click here".`,
-    disclaimer_for_sensitive_topics:`P40: Clear disclaimer advising professional consultation is present.`,
+    descriptive_anchor_text:`P39: Where internal links exist, the anchor phrasing is descriptive, not "click here". Pasted text may not show URLs — judge from the visible anchor wording. If there are clearly no internal references and the format doesn't call for any, mark "na" rather than "missing".`,
+    disclaimer_for_sensitive_topics:`P40: An EXPLICIT disclaimer is actually written in the text (e.g. "This article is for informational purposes only and is not a substitute for professional medical/legal/financial advice."). Quote it verbatim in "evidence". A passing "talk to your doctor" aside is NOT a disclaimer. If no explicit disclaimer sentence appears, this is "missing" — never infer one.`,
     no_factual_errors_or_outdated_info:`P41: All claims are accurate and current.`,
     formatting_serves_reader_not_seo:`P42: Headings/lists/tables used to help reader navigate, not keyword-stuffed.`,
     covers_topic_completely:`P43: Main question plus natural follow-up questions answered. No major subtopic gaps.`,
@@ -927,7 +937,8 @@ function buildEEATSys(w, enabledParams, contentType){
   PILLARS.forEach(pl => {
     const active = pl.params.filter(p => enabledParams[p.k]);
     if (!active.length) return;
-    paramDefs += `\n${pl.label.toUpperCase()} (pillar weight: ${w[pl.wk]}%):\n`;
+    const groupLabel = pl.gateOnly ? `${pl.label.toUpperCase()} (gate checks — search/AEO readiness)` : `${pl.label.toUpperCase()} (scored pillar)`;
+    paramDefs += `\n${groupLabel}:\n`;
     active.forEach(p => {
       const isReq = required.has(p.k);
       paramDefs += '• ' + (DEFS[p.k] || `${p.num}: ${p.n}`) + (isReq ? '  [REQUIRED — cannot be "strong" unless clearly and fully met]' : '') + '\n';
@@ -938,52 +949,35 @@ function buildEEATSys(w, enabledParams, contentType){
     `"${k}":{"status":"missing","evidence":"","priority":"medium","area":"","suggestion":"","example":""}`
   ).join(',');
 
-  return `You are a senior EEAT content analyst at Justwords, a professional content agency. Your reports are read by editors who produce content on behalf of many different companies across many industries. Evaluate the supplied "${ct.label}" article${ct.isYMYL ? ' — this is YMYL content, so apply stricter Trust and accuracy standards' : ''}. Judge the MEANING and INTENT of the writing, not the presence of specific keywords. Be fair and experienced, like a real editor who understands the "feel" of a piece.
+  return `You are a senior content-quality analyst at Justwords, a professional content agency. Your reports are read by editors who produce content for many companies across many industries. Evaluate the supplied "${ct.label}" article${ct.isYMYL ? ' — this is YMYL content, so apply stricter Trust and accuracy standards' : ''}. Judge the MEANING and INTENT of the writing, not the presence of specific keywords. Be fair and experienced, like a real editor who understands the "feel" of a piece.
 
-HOW TO SCORE EACH PARAMETER — this is a PRESENCE / PASS-FAIL check, NOT a depth or maturity ranking. The question is only "is the thing this parameter asks for present?" — not "could the writer add even more of it?". The moment the requirement is reasonably met, it PASSES as "strong". Choose exactly one status:
-- "strong"  = the requirement is met. What the parameter asks for is present in the text (in any wording, implied by context, or spread across sections). It is "strong" even if it is brief, even if it appears only once, and even if you can imagine richer or more detailed versions. Once it is present, it passes — full stop.
-- "partial" = use SPARINGLY. Only when the writer clearly gestures at the requirement but it does not actually qualify yet — i.e. it is so vague, generic, or hedged that a fair reader could NOT conclude the requirement is genuinely met. "It's present but could be expanded / could add more examples / could go deeper" is NOT partial — that is "strong".
-- "missing" = the requirement is genuinely absent — no reasonable reader would find it in the text.
-${allowAutoNA ? `- "na"      = the requirement does not apply to THIS article's topic. Use this instead of penalising the piece for something its subject never called for (e.g. location/region for a topic that isn't place-specific, a seasonal pattern for an evergreen topic, a demographic cohort for general-audience advice, business-volume numbers for a purely educational explainer). "na" parameters are excluded from the score entirely — they neither help nor hurt.` : `STRICT MODE — DO NOT use a "na" / "not_applicable" status. The editor has explicitly selected every parameter below, so each one MUST be scored as "strong", "partial", or "missing". If a requirement genuinely is not relevant to this topic, that means the article does not satisfy it, so return "missing" (not "na"). Ignore any "Mark na if…" guidance in the parameter definitions below — it does not apply in this mode.`}
+HOW TO SCORE EACH PARAMETER — a PRESENCE / PASS-FAIL check. The question is "is what this parameter asks for genuinely present, and can I point to it?". Choose exactly one status:
+- "strong"  = the requirement is met AND you can cite the specific text that proves it. You MUST quote or closely paraphrase the exact words / number / section in the "evidence" field. It counts even if brief or stated only once — but if you cannot point to concrete supporting text, it is NOT "strong". Never infer presence from the topic alone, from what the piece "probably" contains, or from page furniture (author box, publish date, hyperlinks) that is not actually in the supplied text.
+- "partial" = the writer gestures at the requirement but it is too vague, generic, or hedged for a fair reader to be sure it is met, OR only part of what the parameter asks for is present.
+- "missing" = the requirement is genuinely absent — no reasonable reader would find it in the text. Also use "missing" (never "strong") when the check depends on markup or metadata that is simply not present in the pasted text.
+DO NOT use a "na" / "not_applicable" status. The editor has deliberately selected every parameter below, so each MUST be scored "strong", "partial", or "missing". If a requirement is genuinely not relevant to this topic, that means the article does not satisfy it → return "missing", and say so plainly in the evidence. Ignore any "Mark na if…" wording in the definitions below.
 
-JUDGEMENT PRINCIPLES (important — earlier versions of this tool were far too strict; correct that):
-- Once a requirement is present, mark it "strong" and move on. NEVER return "partial" or "missing" whose only complaint or suggestion is to "add more" of something that is already there. If it is present, it is "strong" — even a single clear instance is enough. (Example: "Our specialists have supported mothers across the Twin Cities…" fully satisfies First-Person Narrative — that is "strong", not "partial pending more anecdotes".)
-- Reward substance over vocabulary. A point made well in plain language is "strong" even if it avoids the textbook term. Never fail or downgrade a parameter just because one expected word, number, or formatting element is missing while the substance is present.
-- First-person experience counts whether the author writes "I", "my", "we", "our" or "us". For a company or brand, "we/our" IS the normal and correct voice — treat it as fully equivalent to "I", and never mark it merely "partial" because it says "we" instead of "I".
-- A conclusion, takeaway, or wrap-up does NOT need a "Conclusion" heading or the words "in conclusion". Any closing passage that synthesises, gives a recommendation, or points to a next step satisfies a conclusion requirement, in whatever phrasing the writer chose.
-- When in genuine doubt between two statuses, do not default to the harsher one — pick the status a fair human editor would defend.
+JUDGEMENT PRINCIPLES (balanced — neither inflate nor nitpick):
+- If the requirement is genuinely present with citable evidence, mark it "strong" and move on — do not withhold "strong" merely because the writer "could add more". A single clear, evidenced instance is enough.
+- But do NOT award "strong" on vibes. No quotable evidence = not strong. This keeps the score honest and stops false "all strong" reports.
+- Reward substance over vocabulary. A point made well in plain language is "strong" even if it avoids the textbook term.
+- First-person experience counts whether the author writes "I", "my", "we", "our" or "us". For a brand, "we/our" IS the normal voice — treat it as fully equivalent to "I".
+- A conclusion/takeaway does NOT need a "Conclusion" heading or the words "in conclusion"; any closing passage that synthesises, recommends, or points to a next step satisfies it.
 
 EVIDENCE RULES:
-- "evidence" should quote or closely paraphrase the specific text (a phrase, sentence, number, or section — or a clearly paraphrased idea) that justifies the status. Never invent quotes. If you truly cannot find supporting text or substance, the status is "missing".
-- A required parameter that is genuinely "partial" or "missing" must use priority "high".${allowAutoNA ? ' If a required parameter genuinely does not apply to the topic, you may still use "na".' : ''}
+- "evidence" must quote or closely paraphrase the specific text that justifies the status. Never invent quotes. If you cannot find supporting text, the status is "missing".
+- A required parameter that is "partial" or "missing" must use priority "high".
 - For every "partial" or "missing", give a concrete "area" (what is weak) plus a "suggestion" and a short "example" edit the writer can apply.
 
-PILLAR SCORE FIELDS (experience_score etc.): these are recomputed by our system from your per-parameter statuses, so just return them as 0 — your per-parameter accuracy is what matters.
+PILLAR SCORE FIELDS (experience_score etc.): recomputed by our system from your per-parameter statuses — just return them as 0.
 
-VERDICT THRESHOLDS (overall 0–100): "Excellent"≥85 | "Good"≥65 | "Needs Work"≥40 | "Poor"<40. Estimate verdict from how many parameters are strong vs partial/missing, weighted by pillar.
-
-PARAMETERS TO EVALUATE:
+PARAMETERS TO EVALUATE (the four scored pillars feed the Content Score; the AEO group is reported as gate rules, not scored):
 ${paramDefs}
 Also write: a 1–2 sentence "summary" of overall quality, an "editor_note" with the single most important fix, three "top_wins" (genuine strengths), and three "top_gaps" (highest-impact fixes).
 
 ──────────────────────────────────────────────
-PART 2 — AI-WRITING DETECTION ("ai_detection")
-For each of these 10 signals return found (true/false), evidence (a quote/observation), severity ("low"/"medium"/"high"):
-1. ai_generic_opener: Opens with broad preamble ("In today's world…") instead of the topic. HIGH if the whole first paragraph is scene-setting.
-2. ai_filler_vocab: Counts: comprehensive, crucial, essential, delve, robust, paramount, pivotal, leverage, utilize, noteworthy, "it is important to note". HIGH≥5, MEDIUM 3–4, LOW 1–2.
-3. ai_transition_overuse: Furthermore, Moreover, Additionally, In conclusion, In summary. HIGH≥4, MEDIUM 2–3.
-4. ai_vague_claims: Core claims with no numbers, named studies, dates, sources. HIGH if most claims lack citations.
-5. ai_hollow_expertise: No deeper than a Wikipedia summary. HIGH if the whole article is surface-level.
-6. ai_uniform_structure: Every section uses the same intro→bullets→wrap-up formula. HIGH if 3+ identical.
-7. ai_hedged_language: Every claim hedged without backing ("may help", "could potentially"). HIGH if pervasive.
-8. ai_generic_examples: All examples hypothetical ("Imagine a user who…"), no real named cases. HIGH if all hypothetical.
-9. ai_thin_conclusion: The ending merely repeats the body with no new synthesis, recommendation, or next step. Do NOT flag simply because there is no "Conclusion" heading or the phrase "in conclusion" — judge only whether the closing actually adds anything. HIGH only if the ending is a near-verbatim summary.
-10. ai_no_voice: No authorial stance or opinion anywhere. HIGH if no perspective exists.
-risk_score = (high×3 + medium×2 + low×1) / 30 × 100, rounded. overall_risk: "low"≤25, "medium" 26–55, "high"≥56.
-rewrite_recommendations: 3 specific fixes to make the content more human and credible.
-
-──────────────────────────────────────────────
-PART 3 — PUBLISH GATE CHECKS ("gate_checks") — be strict and literal:
+PART 2 — PUBLISH GATE CHECKS ("gate_checks") — be strict and literal:
+- structure: subheading_count = how many distinct section subheadings/headers the article uses to organise itself. IMPORTANT: the text is often PASTED and may have lost its heading formatting (no #, no <h2>), so do NOT judge structure from markup — count every short standalone header-like line AND every clear new-section topic transition as a subheading. has_sections=true when the piece is organised into clear sections rather than one undifferentiated block. Be generous: a genuinely structured article must not be reported as 0 subheadings just because the tags were stripped on paste.
 - unsourced_stats: Find every numeric or percentage claim that does NOT have a citation/source within the same or next sentence. Return count and up to 3 verbatim "examples". Round/common-knowledge numbers (e.g. "3 steps") don't count.
 - citation_tier: Count external sources cited. total_citations = how many. tier1_2_count = how many are Tier 1–2 (primary research, .gov, .edu, peer-reviewed journals, official statistics, reputable named journalism). tier1_2_pct = round(tier1_2_count/total_citations*100) or 0 if none.
 - ymyl_author_bio: present=true ONLY if a named author with relevant professional credentials/qualifications is shown. Put the credentials in "credentials" and the supporting text in "evidence".
@@ -991,7 +985,7 @@ PART 3 — PUBLISH GATE CHECKS ("gate_checks") — be strict and literal:
 - contradictions: found=true if any statement contradicts an earlier one (numbers, recommendations, claims). List up to 3 verbatim "items".
 
 Return ONLY this JSON (no markdown, no backticks). Keep evidence/suggestion strings short:
-{"overall_score":0,"verdict":"Poor","summary":"","editor_note":"","top_wins":["","",""],"top_gaps":["","",""],"experience_score":0,"expertise_score":0,"authority_score":0,"trust_score":0,"aeo_score":0,"params":{${paramKeys}},"ai_detection":{"overall_risk":"low","risk_score":0,"signals":{"ai_generic_opener":{"found":false,"evidence":"","severity":"low"},"ai_filler_vocab":{"found":false,"evidence":"","severity":"low"},"ai_transition_overuse":{"found":false,"evidence":"","severity":"low"},"ai_vague_claims":{"found":false,"evidence":"","severity":"low"},"ai_hollow_expertise":{"found":false,"evidence":"","severity":"low"},"ai_uniform_structure":{"found":false,"evidence":"","severity":"low"},"ai_hedged_language":{"found":false,"evidence":"","severity":"low"},"ai_generic_examples":{"found":false,"evidence":"","severity":"low"},"ai_thin_conclusion":{"found":false,"evidence":"","severity":"low"},"ai_no_voice":{"found":false,"evidence":"","severity":"low"}},"rewrite_recommendations":["","",""]},"gate_checks":{"unsourced_stats":{"count":0,"examples":[]},"citation_tier":{"total_citations":0,"tier1_2_count":0,"tier1_2_pct":0},"ymyl_author_bio":{"present":false,"credentials":"","evidence":""},"title_promise":{"delivered":true,"note":""},"contradictions":{"found":false,"items":[]}}}`;
+{"overall_score":0,"verdict":"Poor","summary":"","editor_note":"","top_wins":["","",""],"top_gaps":["","",""],"experience_score":0,"expertise_score":0,"authority_score":0,"trust_score":0,"aeo_score":0,"params":{${paramKeys}},"gate_checks":{"structure":{"subheading_count":0,"has_sections":false},"unsourced_stats":{"count":0,"examples":[]},"citation_tier":{"total_citations":0,"tier1_2_count":0,"tier1_2_pct":0},"ymyl_author_bio":{"present":false,"credentials":"","evidence":""},"title_promise":{"delivered":true,"note":""},"contradictions":{"found":false,"items":[]}}}`;
 }
 
 // ── Groq API call helper ───────────────────────────────────────
@@ -1064,31 +1058,29 @@ function paramCredit(d){
 // Pillar credit is DERIVED from the per-parameter statuses the user can see —
 // never trusts the model's self-reported pillar totals. This is what makes the
 // headline number match the evidence below it.
-// A parameter the model judged "na" (doesn't apply to this article's topic) is
-// dropped from BOTH the credit and the denominator, so it can't drag a score down.
-function isModelNA(d){ if(!allowAutoNA) return false; const s = d && d.status; return s === 'na' || s === 'not_applicable'; }
 function pillarCredit(r, pl, enabledParams){
   const active = pl.params.filter(p => enabledParams[p.k]);
   let credit = 0, n = 0;
   active.forEach(p => {
     const d = (r.params || {})[p.k];
-    if (isModelNA(d)) return;
     n++;
     credit += paramCredit(d);
   });
   return { credit, n };
 }
-function computeScore(r, w, enabledParams){
-  let total = 0, wsum = 0;
-  PILLARS.forEach(pl => {
+// Scored pillars = the four E-E-A-T pillars (AEO is gate-only). No weights: each
+// scored pillar with at least one selected check contributes EQUALLY, and the
+// overall Content Score is the plain average of those pillars' pass-rates.
+function scoredPillars(){ return PILLARS.filter(pl => !pl.gateOnly); }
+function computeScore(r, enabledParams){
+  let sum = 0, count = 0;
+  scoredPillars().forEach(pl => {
     const { credit, n } = pillarCredit(r, pl, enabledParams);
-    if (!n) return;                       // no scorable params (all N/A or none enabled)
-    total += credit / n * w[pl.wk];
-    wsum  += w[pl.wk];
+    if (!n) return;                       // no selected checks in this pillar
+    sum += credit / n;                    // pillar pass-rate 0..1
+    count++;
   });
-  // Rescale by the weight that actually applied, so a fully-N/A pillar doesn't
-  // cap the achievable score below 100.
-  return wsum > 0 ? Math.round(total / wsum * 100) : 0;
+  return count > 0 ? Math.round(sum / count * 100) : 0;
 }
 // Send the whole article when short; otherwise head + tail so conclusion-related
 // parameters are actually evaluated (the old version cut the conclusion off).
@@ -1131,27 +1123,6 @@ function clientSideMetrics(text){
   return { words, fillerCount: filler, fillerPer1000, headingCount, wordsPerHeading: headingCount ? Math.round(words/headingCount) : null, externalLinks, introPct };
 }
 
-// ── Deterministic AI-risk score ────────────────────────────────
-// The model used to self-report risk_score with a formula, which made it flip
-// (pass one run, fail the next, even on identical text). We instead compute it
-// ourselves from the signals it returned, so the same signals always give the
-// same score and the same pass/fail.
-
-
-function computeAIRisk(aiData){
-  const sev = { high:3, medium:2, low:1 };
-  let sum = 0;
-  Object.values((aiData && aiData.signals) || {}).forEach(d => {
-    const found = d && (d.found === true || d.found === 'true');
-    if (found) sum += sev[d.severity] || 1;
-  });
-  const score = Math.round(sum / 30 * 100);
-  const risk = score <= 25 ? 'low' : score <= 55 ? 'medium' : 'high';
-  return { score, risk };
-}
-
-
-
 // ── Compute gates ──────────────────────────────────────────────
 function computeGates(result, contentType, wordCount, enabledParams, metrics){
   const ct = getCT(contentType);
@@ -1167,18 +1138,18 @@ function computeGates(result, contentType, wordCount, enabledParams, metrics){
   metrics = metrics || {};
   const gates = [];
 
-  // 0) EEAT QUALITY FLOOR — fixes "score 0 but says ready to publish"
+  // 0) CONTENT SCORE FLOOR — stops a low score being marked "ready to publish"
   const eScore = result.overall_score ?? 0;
-  gates.push({ id:'eeat_quality', label:'EEAT Quality Floor',
+  gates.push({ id:'eeat_quality', label:'Content Score Floor',
     type: eScore < 40 ? 'hard' : 'soft',
     passed: eScore >= minEEAT, warning: eScore >= 40 && eScore < minEEAT, na:false,
     detail: eScore < 40 ? `Score ${eScore}/100 — far below standard, major rework before publish`
           : eScore < minEEAT ? `Score ${eScore}/100 — below the ${minEEAT} bar, editor review required`
-          : `Score ${eScore}/100 — meets the quality bar` });
+          : `Score ${eScore}/100 — meets the quality bar (min ${minEEAT})` });
 
   const minW = ct.gates.minWords;
   gates.push({ id:'word_count', label:'Minimum Word Count', passed: wordCount >= minW, type:'hard',
-    detail:`${wordCount} words — minimum: ${minW}`, na:false });
+    detail:`${wordCount} words vs the ${minW}-word minimum set for ${ct.label} content (editable in Manage Categories)`, na:false });
 
   if (ct.gates.trustThreshold) {
     const trustPl = PILLARS.find(p => p.key === 'trust');
@@ -1205,18 +1176,10 @@ function computeGates(result, contentType, wordCount, enabledParams, metrics){
     gates.push({ id:'factual_accuracy', label:'Factual Accuracy Gate', passed: ok, type:'hard',
       detail: ok ? 'No factual errors detected' : 'Factual errors or outdated info detected — REQUIRED for ' + ct.label, na:false });
   } else {
-    gates.push({ id:'factual_accuracy', label:'Factual Accuracy', passed:true, type:'hard', detail:'Standard check — not a hard gate for this type', na:true });
+    gates.push({ id:'factual_accuracy', label:'Factual Accuracy', passed:true, type:'hard', detail:'Not a hard gate for this content type — accuracy is still reviewed inside the Trust pillar below (P41)', na:true });
   }
 
-  const aiRisk = (result.ai_detection?.overall_risk) || 'unknown';
-  const aiScore = result.ai_detection?.risk_score ?? 0;
-  gates.push({ id:'ai_risk', label:'AI Content Risk Gate', passed: aiRisk === 'low', warning: aiRisk === 'medium',
-    type: aiRisk === 'high' ? 'hard' : 'soft', na:false,
-    detail: aiRisk === 'high' ? `Score ${aiScore}/100 — Full human rewrite required before publishing`
-           : aiRisk === 'medium' ? `Score ${aiScore}/100 — Flagged for targeted human edits`
-           : `Score ${aiScore}/100 — Passes AI content detection` });
-
-  // ─── The 10 proposed publish gate rules ───────────────────────
+  // ─── Publish gate rules ───────────────────────────────────────
   // #1 Zero unsourced statistics (HARD)
   // Soft (review) not hard-block: LLM stat detection over-flags common knowledge,
   // so this should prompt an editor check, not auto-block an otherwise good piece.
@@ -1226,21 +1189,23 @@ function computeGates(result, contentType, wordCount, enabledParams, metrics){
     detail:(us.count||0)===0 ? 'Every numeric claim is sourced'
       : `${us.count} stat${us.count>1?'s':''} to verify${us.examples&&us.examples.length?' — e.g. "'+us.examples[0]+'"':''}` });
 
-  // #2 External links resolve — advisory: a browser can't check cross-site 404s,
-  // so this is a manual checklist item (low) rather than an auto-block.
+  // #2 External links — ADVISORY ONLY. A browser can't check cross-site 404s, and
+  // there is NO required number of external links. Purely an informational note,
+  // never a warning or a block (info:true keeps it out of the review/fail tallies).
   const links = metrics.externalLinks || [];
-  gates.push({ id:'links_resolve', label:'External Links Resolve (manual)', type:'soft', low:true, na: links.length===0,
-    passed:false, warning: links.length>0,
-    detail: links.length===0 ? 'No external links found'
-      : `${links.length} external link${links.length>1?'s':''} — manually verify none are 404 (browser can't auto-check)` });
+  gates.push({ id:'links_resolve', label:'External Links (optional spot-check)', type:'soft', low:true, info:true, na:false,
+    passed:true, warning:false,
+    detail: links.length===0
+      ? 'No external links in the pasted text — nothing to verify. External links are optional; there is no required number.'
+      : `${links.length} external link${links.length>1?'s':''} present — optional: spot-check they still resolve. There is no required link count, and this never blocks publishing.` });
 
   // #3 YMYL credentialed author bio (HARD, YMYL only)
   if (ct.isYMYL){
     const bio = gc.ymyl_author_bio || {present:false};
-    gates.push({ id:'ymyl_author_bio', label:'Credentialed Author Bio (YMYL)', type:'hard', na:false,
-      passed: bio.present===true,
+    gates.push({ id:'ymyl_author_bio', label:'Credentialed Author Bio (YMYL)', type:'soft', na:false,
+      passed: bio.present===true, warning: bio.present!==true,
       detail: bio.present===true ? `Credentialed author present${bio.credentials?': '+bio.credentials:''}`
-        : 'No credentialed author bio — Google requires this on YMYL content' });
+        : 'No credentialed author bio in the pasted text. Google recommends one on YMYL content — confirm the byline/bio exists on the live page (it usually lives in the CMS template, not the body you paste).' });
   } else {
     gates.push({ id:'ymyl_author_bio', label:'Credentialed Author Bio', type:'hard', na:true, passed:true, detail:'Only required for YMYL content' });
   }
@@ -1275,16 +1240,24 @@ function computeGates(result, contentType, wordCount, enabledParams, metrics){
   const ip = metrics.introPct;
   gates.push({ id:'intro_length', label:'Lean Intro (≤'+introMaxPct+'%)', type:'soft',
     na: ip==null, passed: ip!=null && ip<=introMaxPct, warning: ip!=null && ip>introMaxPct,
-    detail: ip==null ? 'No headings detected — add ## headings to enable this check'
+    detail: ip==null ? 'Skipped — the first-subheading position can\'t be located in pasted plain text (this measures how much of the article runs before the first subheading)'
       : `Intro is ${ip}% of the article — max ${introMaxPct}%` });
 
   // #8 Structural minimum — 1 subheading per 400 words (NICE-TO-HAVE / soft, low)
-  const wph = metrics.wordsPerHeading;
+  // Pasted text usually loses heading markup, so trust the model's SEMANTIC
+  // subheading count when it perceives more structure than the raw-text scan did.
+  const llmSub   = Math.max(0, +((gc.structure||{}).subheading_count) || 0);
+  const headCount = Math.max(metrics.headingCount||0, llmSub);
+  const wph = headCount>0 ? Math.round(wordCount/headCount) : null;
+  const structOk = headCount>0 && wph!=null && wph<=minWordsPerHd;
   gates.push({ id:'subheadings', label:'Structure (1 subhead / '+minWordsPerHd+'w)', type:'soft', low:true,
-    na:false, passed: (metrics.headingCount||0)>0 && wph!=null && wph<=minWordsPerHd,
-    warning: !((metrics.headingCount||0)>0 && wph!=null && wph<=minWordsPerHd) && wordCount>minWordsPerHd,
-    detail:(metrics.headingCount||0)===0 ? (wordCount>minWordsPerHd?`Wall of text — 0 subheadings in ${wordCount} words`:'Short enough to skip subheadings')
-      : `${metrics.headingCount} subheading${metrics.headingCount>1?'s':''} — ~1 per ${wph} words` });
+    na:false, passed: structOk,
+    warning: !structOk && wordCount>minWordsPerHd,
+    detail: headCount===0
+      ? (wordCount>minWordsPerHd
+          ? `No subheadings detected in ${wordCount} words. If the article IS structured, its heading tags were stripped on paste — paste as HTML or markdown so the tool can see them.`
+          : 'Short enough to skip subheadings')
+      : `${headCount} subheading${headCount>1?'s':''} detected — ~1 per ${wph} words` });
 
   // #9 Title-promise check (SOFT)
   const tp = gc.title_promise || {delivered:true};
@@ -1297,6 +1270,22 @@ function computeGates(result, contentType, wordCount, enabledParams, metrics){
   gates.push({ id:'contradictions', label:'No Internal Contradictions', type:'soft', na:false,
     passed: con.found!==true, warning: con.found===true,
     detail: con.found===true ? `Contradiction flagged${con.items&&con.items.length?': "'+con.items[0]+'"':''}` : 'No contradictions detected' });
+
+  // ─── AEO / SEO readiness — moved out of scoring, checked as gate rules ──
+  // Each SELECTED AEO parameter becomes a soft gate: strong = pass, otherwise a
+  // review flag. These never hard-block and don't affect the Content Score.
+  const aeoPl = PILLARS.find(p => p.gateOnly);
+  if (aeoPl){
+    aeoPl.params.filter(p => enabledParams[p.k]).forEach(p => {
+      const d = (result.params||{})[p.k] || {};
+      const st = d.status==='good' ? 'strong' : d.status;
+      const ok = st==='strong';
+      gates.push({ id:'aeo_'+p.k, label:'AEO · '+p.n, type:'soft', low:true, na:false,
+        passed: ok, warning: !ok,
+        detail: ok ? (d.evidence ? '✓ '+d.evidence : 'Present')
+          : (d.suggestion || d.evidence || 'Not clearly present — improves search / AI-overview pickup') });
+    });
+  }
 
   return gates;
 }
@@ -1312,13 +1301,12 @@ async function analyze(){
   const text = document.getElementById('content').value.trim();
   if (!key)  { alert('Please enter your Groq API key.\nGet one free at console.groq.com/keys'); return; }
   if (text.length < 80) { alert('Please paste your blog content first.'); return; }
-  const w = getW();
-  if (w.e + w.x + w.a + w.t + w.o !== 100) { alert('Pillar weights must sum to 100% before analyzing.'); return; }
   const enabledParams = getEnabledParams();
   if (!Object.keys(enabledParams).length) { alert('Please select at least one parameter to evaluate.'); return; }
   const wordCount = text.split(/\s+/).length;
 
   // UI — loading state
+  switchTab('score');
   const btn = document.getElementById('analyzeBtn');
   btn.disabled = true;
   document.getElementById('btnSpin').style.display = 'block';
@@ -1332,27 +1320,44 @@ async function analyze(){
 
 
   try {
-    // ── SINGLE LLM CALL: EEAT + AI detection + gate checks ─────
-    // One call instead of two halves the article tokens sent per analysis —
-    // the main lever on Groq's daily token limit.
-    updateLoadText('Analysing EEAT, AI signals & gate checks…');
+    // ── SINGLE LLM CALL: content quality + gate checks ─────────
+    updateLoadText('Analysing content quality & gate checks…');
     stepActive('sd1');
-    const sysPrompt = buildEEATSys(w, enabledParams, selectedCT);
+    const sysPrompt = buildEEATSys(enabledParams, selectedCT);
     const numParams = Object.keys(enabledParams).length;
     const plan = planRequest(sysPrompt, `Analyze this ${getCT(selectedCT).label} article. Title is the first line. Full text:\n\n`, text, numParams);
     const merged = await callGroq(key, sysPrompt, plan.userMsg, plan.maxTokens);
     stepDone('sd1'); stepActive('sd2');
 
+    // ── Guard against hallucinated "present" verdicts ──────────────
+    // A few checks are prone to false positives — the model assumes a blog has a
+    // disclaimer, a publish date, or an author bio even when the pasted text shows
+    // none. Require real supporting evidence: a "strong" with no quotable text is
+    // downgraded to "missing", so the tool never green-lights something absent.
+    if (merged.params) {
+      ['disclaimer_for_sensitive_topics','publish_or_updated_date_visible'].forEach(k => {
+        const d = merged.params[k]; if (!d) return;
+        const st = d.status === 'good' ? 'strong' : d.status;
+        const ev = (d.evidence || '').trim();
+        if (st === 'strong' && ev.length < 8) {
+          d.status = 'missing';
+          d.evidence = 'Reported as present but with no quotable supporting text in the article — scored as missing to avoid a false pass.';
+          d.area = d.area || 'Not actually found in the supplied text';
+        }
+      });
+    }
+    // Same evidence requirement for the YMYL author-bio gate-check.
+    if (merged.gate_checks && merged.gate_checks.ymyl_author_bio) {
+      const b = merged.gate_checks.ymyl_author_bio;
+      const ev = (b.evidence || '').trim(), cr = (b.credentials || '').trim();
+      if (b.present === true && ev.length < 6 && cr.length < 3) b.present = false;
+    }
+
     // Derive pillar scores from the per-parameter verdicts so the headline
     // score always matches the evidence shown to the editor.
     PILLARS.forEach(pl => { merged[pl.sk] = pillarCredit(merged, pl, enabledParams).credit; });
-    merged.overall_score = computeScore(merged, w, enabledParams);
-    if (!merged.ai_detection) merged.ai_detection = { overall_risk:'unknown', risk_score:0, signals:{}, rewrite_recommendations:[] };
+    merged.overall_score = computeScore(merged, enabledParams);
     if (!merged.gate_checks)  merged.gate_checks  = {};
-    // Recompute AI risk deterministically from the signals so it never flip-flops.
-    const aiR = computeAIRisk(merged.ai_detection);
-    merged.ai_detection.risk_score   = aiR.score;
-    merged.ai_detection.overall_risk = aiR.risk;
     stepDone('sd2'); stepActive('sd3');
 
     updateLoadText('Running gate-rule checks…');
@@ -1363,10 +1368,7 @@ async function analyze(){
     const gates = computeGates(merged, selectedCT, wordCount, enabledParams, metrics);
     stepDone('sd4');
 
-    // Cache the raw model result so toggling auto-NA can re-score + re-render
-    // without spending another LLM call.
-    lastAnalysis = { merged, w, enabledParams, ct: selectedCT, wordCount, metrics };
-    render(merged, w, enabledParams, gates);
+    render(merged, enabledParams, gates);
 
   } catch(err){
     document.getElementById('loading').style.display = 'none';
@@ -1399,7 +1401,7 @@ async function analyze(){
   } finally {
     btn.disabled = false;
     document.getElementById('btnSpin').style.display = 'none';
-    document.getElementById('btnTxt').textContent = '⚡ Analyze EEAT + AI Content';
+    document.getElementById('btnTxt').textContent = '⚡ Analyze Content Score';
     document.getElementById('loading').style.display = 'none';
   }
 }
@@ -1414,25 +1416,19 @@ function vc(s){
 }
 
 
-// Three independent layer scores, each with its own Good / Not-Good verdict.
+function fmt1(n){ return Number.isInteger(n) ? n : n.toFixed(1); }
+
+// Two layer scores: the Content Score (the E-E-A-T pillar average) and Gate
+// Compliance (the publish checks). Each has its own verdict.
 function renderScorecard(r, gates, cntStrong, cntPartial, cntMissing){
   const colors={good:'var(--tru)',warn:'var(--improve)',fail:'#d83a3a'};
 
-  // 1) EEAT quality (the weighted parameter score)
   const eScore=r.overall_score ?? 0;
   const eStat=eScore>=65?'good':eScore>=40?'warn':'fail';
-  const eVerd=eScore>=65?'GOOD':eScore>=40?'NEEDS WORK':'POOR';
+  const eVerd=eScore>=85?'EXCELLENT':eScore>=65?'GOOD':eScore>=40?'NEEDS WORK':'POOR';
 
-  // 2) AI authenticity (inverted risk — higher = more human)
-  const ai=r.ai_detection||{};
-  const risk=ai.overall_risk||'unknown';
-  const authScore=Math.max(0,100-(ai.risk_score ?? 0));
-  const aStat=risk==='low'?'good':risk==='medium'?'warn':'fail';
-  const aVerd=risk==='low'?'GOOD':risk==='medium'?'CAUTION':'NOT GOOD';
-  const aSub=risk==='low'?'Reads human-written':risk==='medium'?'Some AI signals — needs edits':'Strong AI signals — rewrite';
-
-  // 3) Gate compliance ("low" = nice-to-have, never blocks the decision)
-  const applicable=gates.filter(g=>!g.na);
+  // Gate compliance ("low" = nice-to-have, never blocks; "info" = advisory, excluded)
+  const applicable=gates.filter(g=>!g.na && !g.info);
   const hardFails=applicable.filter(g=>!g.passed && g.type==='hard');
   const softWarns=applicable.filter(g=>!g.low && ((!g.passed && g.type==='soft')||g.warning));
   const passed=applicable.filter(g=>g.passed && !g.warning).length;
@@ -1448,16 +1444,15 @@ function renderScorecard(r, gates, cntStrong, cntPartial, cntMissing){
     <div class="sc-sub">${sub}</div>
   </div>`;
 
-  return `<div class="scorecard">
-    ${card(eStat,'🎯 EEAT Quality',eVerd,eScore,'/100',`${cntStrong} strong · ${cntPartial} partial · ${cntMissing} missing`)}
-    ${card(aStat,'🤖 AI Authenticity',aVerd,authScore,'/100',`${aSub} · risk ${ai.risk_score ?? 0}/100`)}
+  return `<div class="scorecard scorecard-2">
+    ${card(eStat,'🎯 Content Score',eVerd,eScore,'/100',`${cntStrong} strong · ${cntPartial} partial · ${cntMissing} missing`)}
     ${card(gStat,'🔒 Gate Compliance',gVerd,gScore,'%',gSub)}
   </div>`;
 }
 
 function renderPubStatus(gates){
-  const hardFails = gates.filter(g => !g.na && !g.passed && g.type === 'hard');
-  const softWarns = gates.filter(g => !g.na && !g.low && ((!g.passed && g.type === 'soft') || g.warning));
+  const hardFails = gates.filter(g => !g.na && !g.info && !g.passed && g.type === 'hard');
+  const softWarns = gates.filter(g => !g.na && !g.info && !g.low && ((!g.passed && g.type === 'soft') || g.warning));
   if (hardFails.length) {
     const tags = hardFails.map(g => `<span class="pub-fail-tag">${g.label}</span>`).join('');
     return `<div class="pub-status pub-blocked"><div class="pub-icon">🚫</div><div class="pub-info"><div class="pub-title">BLOCKED — Do Not Publish</div><div class="pub-detail">${hardFails.length} critical gate${hardFails.length > 1 ? 's' : ''} failed. Fix all blocked items before going live.</div><div class="pub-tags">${tags}</div></div></div>`;
@@ -1471,117 +1466,106 @@ function renderPubStatus(gates){
 
 function renderGates(gates){
   const items = gates.map(g => {
-    const cls = g.na ? 'gate-na' : g.passed ? 'gate-pass' : g.warning ? 'gate-warn' : 'gate-fail';
-    const badge = g.na ? `<span class="gate-badge gb-na">N/A</span>` : g.passed ? `<span class="gate-badge gb-pass">PASS</span>` : g.warning ? `<span class="gate-badge gb-warn">WARN</span>` : `<span class="gate-badge gb-fail">FAIL</span>`;
-    const typetag = !g.na ? `<span class="gate-type ${g.type === 'hard' ? 'gtype-hard' : 'gtype-soft'}">${g.type}</span>` : '';
+    const cls = g.info ? 'gate-info' : g.na ? 'gate-na' : g.passed ? 'gate-pass' : g.warning ? 'gate-warn' : 'gate-fail';
+    const badge = g.info ? `<span class="gate-badge gb-info">INFO</span>` : g.na ? `<span class="gate-badge gb-na">N/A</span>` : g.passed ? `<span class="gate-badge gb-pass">PASS</span>` : g.warning ? `<span class="gate-badge gb-warn">WARN</span>` : `<span class="gate-badge gb-fail">FAIL</span>`;
+    const typetag = (g.na || g.info) ? '' : `<span class="gate-type ${g.type === 'hard' ? 'gtype-hard' : 'gtype-soft'}">${g.type}</span>`;
     return `<div class="gate-item ${cls}">${badge}${typetag}<div class="gate-name">${g.label}</div><div class="gate-detail">${g.detail}</div></div>`;
   }).join('');
   return `<div class="gates-panel"><div class="gates-title">🔒 Gate Rules</div><div class="gate-list">${items}</div></div>`;
 }
 
 
-function renderAIDetection(aiData){
-  if (!aiData) return '';
-  const risk = aiData.overall_risk || 'unknown';
-  const score = aiData.risk_score ?? 0;
-  const scoreClass = risk === 'high' ? 'ai-score-high' : risk === 'medium' ? 'ai-score-medium' : 'ai-score-low';
-  const badgeCls = risk === 'high' ? 'arb-high' : risk === 'medium' ? 'arb-medium' : 'arb-low';
-  const riskLabel = risk === 'high' ? 'HIGH RISK — Rewrite Required' : risk === 'medium' ? 'MEDIUM RISK — Review Flagged' : 'LOW RISK — Passes Detection';
+// WHY the Content Score is what it is: shows the equal-weight pillar average,
+// the literal arithmetic, and the grade band the number falls into.
+function renderScoreExplanation(r, enabledParams){
+  const rows = scoredPillars().map(pl => {
+    const { credit, n } = pillarCredit(r, pl, enabledParams);
+    return { pl, credit, n, pct: n ? Math.round(credit / n * 100) : null };
+  });
+  const active = rows.filter(x => x.n > 0);
+  const overall = r.overall_score ?? 0;
+  const v = vc(overall);
+  const bars = active.map(x => `<div class="pbar-card"><div class="pbc-top"><div class="pbc-name"><span class="wdot" style="background:${x.pl.color}"></span>${x.pl.emoji} ${x.pl.label}</div><div class="pbc-score" style="color:${x.pl.color}">${x.pct}%</div></div><div class="pbc-bar"><div class="pbc-fill" style="width:${x.pct}%;background:${x.pl.color}"></div></div><div class="pbc-count">${fmt1(x.credit)}/${x.n} check${x.n===1?'':'s'} passed</div></div>`).join('');
+  const parts = active.map(x => `${x.pct}%`).join(' + ');
+  const formula = active.length ? `(${parts}) ÷ ${active.length} = <strong>${overall}%</strong>` : 'No checks selected.';
+  return `<div class="explain">
+    <div class="explain-title">🧮 Why the score is ${overall}/100</div>
+    <div class="exp-formula">Each scored pillar = the share of its ticked checks that passed (a <strong>partial</strong> counts as ½). The Content Score is their <strong>plain average — every pillar counts equally, no weighting</strong>:<br>${formula}</div>
+    <div class="pillar-bars">${bars}</div>
+    <div class="explain-basis">Grade bands: <strong style="color:var(--tru)">Excellent</strong> 85–100 · <strong style="color:var(--aut)">Good</strong> 65–84 · <strong style="color:var(--aeo)">Needs Work</strong> 40–64 · <strong style="color:#d83a3a">Poor</strong> 0–39. This article scored <strong>${overall}</strong> → <span class="score-verdict ${v.cls}">${v.label}</span></div>
+  </div>`;
+}
 
-  const signals = AI_SIGNALS.map(sig => {
-    const d = (aiData.signals || {})[sig.k] || { found:false, evidence:sig.hint, severity:'low' };
-    const found = d.found === true || d.found === 'true';
-    const sev = d.severity || 'low';
-    const cardCls = !found ? 'ais-clear' : sev === 'high' ? 'ais-high' : sev === 'medium' ? 'ais-med' : 'ais-low';
-    const dotCls = !found ? 'asd-clear' : sev === 'high' ? 'asd-high' : sev === 'medium' ? 'asd-med' : 'asd-low';
-    const sevTag = found ? `<span class="ai-sev-tag ast-${sev}">${sev}</span>` : '';
-    return `<div class="ai-sig ${cardCls}"><div class="ai-sig-head"><span class="ai-sig-dot ${dotCls}"></span><span class="ai-sig-name">${sig.n}</span>${sevTag}</div><div class="ai-sig-ev">${d.evidence || sig.hint}</div></div>`;
-  }).join('');
-
-  const rewrites = (aiData.rewrite_recommendations || []).map(r => `<li>${r}</li>`).join('');
-  return `<div class="ai-panel">
-    <div class="ai-panel-top">
-      <div><div class="ai-panel-title">🤖 AI Content Detection</div><div class="ai-panel-sub">10-signal analysis for human authenticity and editorial voice</div></div>
-      <div class="ai-score-block"><div class="ai-score-num ${scoreClass}">${score}</div><div class="ai-risk-badge ${badgeCls}">${riskLabel}</div></div>
-    </div>
-    <div class="ai-signals-grid">${signals}</div>
-    ${rewrites ? `<div class="ai-rewrites"><div class="airt">✏ Rewrite Recommendations</div><ul class="air-list">${rewrites}</ul></div>` : ''}
+// Ranked list of what to fix, most impactful first. Ranking basis:
+// (1) blocking hard-gate fails & Required checks, (2) missing checks & soft-gate
+// warnings, (3) partials & nice-to-have (AEO / structure) items.
+function renderRankedFixes(r, enabledParams, gates){
+  const p = r.params || {};
+  const required = new Set(getCT(selectedCT).required);
+  const norm = s => (s === 'good' ? 'strong' : s === 'needs_improvement' ? 'missing' : s);
+  const items = [];
+  scoredPillars().forEach(pl => {
+    pl.params.filter(pm => enabledParams[pm.k]).forEach(pm => {
+      const d = p[pm.k] || {}; const st = norm(d.status || 'missing');
+      if (st === 'strong') return;
+      const isReq = required.has(pm.k);
+      const rank = isReq ? 1 : st === 'missing' ? 2 : 3;
+      const why = d.suggestion || d.area || d.evidence || 'Not present — add content that satisfies this check.';
+      items.push({ rank, tag: isReq ? 'Required' : st === 'missing' ? 'Missing' : 'Partial', name: `${pm.n} · ${pl.label}`, why });
+    });
+  });
+  gates.forEach(g => {
+    if (g.na || g.info || g.passed) return;
+    const rank = g.type === 'hard' ? 1 : g.low ? 3 : 2;
+    items.push({ rank, tag: g.type === 'hard' ? 'Gate — blocks publish' : 'Gate', name: g.label, why: g.detail });
+  });
+  items.sort((a, b) => a.rank - b.rank);
+  if (!items.length) return `<div class="fixes"><div class="explain-title">✅ Priority Fixes</div><div class="exp-formula">Nothing outstanding — every selected check passed and no gate is failing.</div></div>`;
+  const rows = items.slice(0, 12).map((it, i) => `<div class="fixrow p${it.rank}"><div class="fixrank">${i + 1}</div><div class="fixbody"><div class="fixname">${it.name} <span class="fixtag t${it.rank}">${it.tag}</span></div><div class="fixwhy">${it.why}</div></div></div>`).join('');
+  return `<div class="fixes">
+    <div class="explain-title">🎯 Priority Fixes <span style="font-weight:400;color:var(--t3);font-size:11px">— ranked by impact: blocking gates &amp; required checks first, then missing, then partial / nice-to-have</span></div>
+    <div class="fixlist">${rows}</div>
   </div>`;
 }
 
 
 // ── Main Render ────────────────────────────────────────────────
-function render(r, w, enabledParams, gates){
+function render(r, enabledParams, gates){
   const p = r.params || {};
   const ct = getCT(selectedCT);
   const required = new Set(ct.required);
-  const naSet = new Set(ct.notApplicable);
-  const enabledList = Object.keys(enabledParams);
-  const statusOf = k => (p[k] && p[k].status) || 'missing';
   const norm = s => (s === 'good' ? 'strong' : s === 'needs_improvement' ? 'missing' : s);
-  // A param the model marked "na" (doesn't apply to this article) is excluded from
-  // all scoring and the strong/partial/missing tallies.
-  const naStatus = k => { if(!allowAutoNA) return false; const s = norm(statusOf(k)); return s === 'na' || s === 'not_applicable'; };
-  const scoredList = enabledList.filter(k => !naStatus(k));
-  const naCount = enabledList.length - scoredList.length;
-  const cntStrong = scoredList.filter(k => norm(statusOf(k)) === 'strong').length;
-  const cntPartial = scoredList.filter(k => norm(statusOf(k)) === 'partial').length;
-  const cntMissing = scoredList.length - cntStrong - cntPartial;
+  const statusOf = k => norm((p[k] && p[k].status) || 'missing');
   const verdict = vc(r.overall_score);
 
-  const fmt = n => (Number.isInteger(n) ? n : n.toFixed(1));
-  const pbarsHTML = PILLARS.map(pl => {
-    const active = pl.params.filter(pm => enabledParams[pm.k]);
-    const scored = active.filter(pm => !naStatus(pm.k));
-    if (!scored.length) return `<div class="pbar-card" style="opacity:.3"><div class="pbc-top"><div class="pbc-name"><span class="wdot" style="background:${pl.color}"></span>${pl.emoji} ${pl.label}</div><div class="pbc-score" style="color:var(--t3)">N/A</div></div><div class="pbc-bar"><div class="pbc-fill" style="width:0%"></div></div><div class="pbc-count">${active.length?'all N/A for this article':'0 selected'}</div></div>`;
-    const s = Math.max(0, Math.min(scored.length, r[pl.sk] ?? 0));
-    const pct = Math.round(s / scored.length * 100);
-    return `<div class="pbar-card"><div class="pbc-top"><div class="pbc-name"><span class="wdot" style="background:${pl.color}"></span>${pl.emoji} ${pl.label}</div><div class="pbc-score" style="color:${pl.color}">${fmt(s)}/${scored.length}</div></div><div class="pbc-bar"><div class="pbc-fill" style="width:${pct}%;background:${pl.color}"></div></div><div class="pbc-count">${pct}% · wt ${w[pl.wk]}%</div></div>`;
-  }).join('');
+  // Tallies cover ONLY the selected checks in the four scored pillars (AEO is a gate).
+  let cntStrong = 0, cntPartial = 0, cntMissing = 0, scoredCount = 0, pillarsUsed = 0;
+  scoredPillars().forEach(pl => {
+    let used = 0;
+    pl.params.filter(pm => enabledParams[pm.k]).forEach(pm => {
+      used++; scoredCount++;
+      const st = statusOf(pm.k);
+      if (st === 'strong') cntStrong++; else if (st === 'partial') cntPartial++; else cntMissing++;
+    });
+    if (used) pillarsUsed++;
+  });
 
-
-  const wins = (r.top_wins || []).slice(0, 3);
-  const gaps = (r.top_gaps || []).slice(0, 3);
-  const editorReport = `<div class="editor-report">
-    <div class="er-title">📋 Editor's Brief — Action Summary</div>
-    <div class="er-grid">
-      <div class="er-card"><div class="er-card-title" style="color:var(--tru)">✓ What's Working</div><ul class="er-list wins">${wins.map(x => `<li>${x}</li>`).join('') || '<li style="color:var(--t3)">None identified.</li>'}</ul></div>
-      <div class="er-card"><div class="er-card-title" style="color:var(--improve)">! Top Gaps to Fix</div><ul class="er-list gaps">${gaps.map(x => `<li>${x}</li>`).join('') || '<li style="color:var(--t3)">None identified.</li>'}</ul></div>
-    </div>
-    <div class="er-overall"><strong>Editor note:</strong> ${r.editor_note || r.summary || ''}</div>
-  </div>`;
-
-
-
-  const secHTML = PILLARS.map((pl, i) => {
+  // Per-pillar detail sections — scored pillars only. Unticked checks show as "not selected".
+  const secHTML = scoredPillars().map((pl, i) => {
     const activeParams = pl.params.filter(pm => enabledParams[pm.k]);
-    const skippedParams = pl.params.filter(pm => !enabledParams[pm.k] && !naSet.has(pm.k));
-    const naParams = pl.params.filter(pm => naSet.has(pm.k));
-    if (!activeParams.length && !skippedParams.length && !naParams.length) return '';
-    const scoredParams = activeParams.filter(pm => !naStatus(pm.k));
-    const s = Math.max(0, Math.min(scoredParams.length, r[pl.sk] ?? 0));
+    const skippedParams = pl.params.filter(pm => !enabledParams[pm.k]);
+    if (!activeParams.length && !skippedParams.length) return '';
+    const { credit, n } = pillarCredit(r, pl, enabledParams);
 
     const cards = [
       ...activeParams.map(param => {
-        let d = p[param.k] || {};
-        let st = norm(d.status || 'missing');             // strong | partial | missing | na
-        // Model judged this parameter doesn't apply to the article's topic.
-        if (st === 'na' || st === 'not_applicable') {
-          if (allowAutoNA) {
-            // Lenient mode: excluded from the score, neither helps nor hurts.
-            return `<div class="param skipped"><div class="param-head"><div class="param-icon pi-skip">–</div><div style="flex:1"><div class="param-title" style="color:var(--t3)">${param.n}</div><div class="param-num">${param.num}&nbsp;<span style="color:var(--t3);font-size:9px;">N/A — not relevant to this topic</span></div></div><div class="param-badge pb-skip">N/A</div></div><div class="evidence" style="color:var(--t3)">${d.evidence || "The analyst judged this parameter does not apply to this article's topic, so it does not affect the score."}</div></div>`;
-          }
-          // Strict mode: the editor opted this parameter in, so a "doesn't apply"
-          // verdict is scored as MISSING rather than silently dropped.
-          st = 'missing';
-          d = { ...d, evidence: d.evidence ? `Analyst flagged this as not relevant to the topic — counted as missing because the parameter is selected. ${d.evidence}` : 'The analyst judged this parameter does not apply to this topic. It is selected, so it is scored as missing — deselect it (or mark it N/A for this category) if it should not count.', area: d.area || 'Parameter not addressed for this topic', suggestion: d.suggestion || 'Add content that satisfies this check, or deselect the parameter if it genuinely does not apply.' };
-        }
+        const d = p[param.k] || {};
+        const st = norm(d.status || 'missing');           // strong | partial | missing
         const good = st === 'strong';
         const isReq = required.has(param.k);
         const reqFail = isReq && !good;
         const priority = d.priority || (reqFail ? 'high' : 'medium');
         const prioCls = priority === 'high' ? 'prio-high' : priority === 'low' ? 'prio-low' : 'prio-med';
-        // visual class: required-fail (red) > partial (blue) > strong (green) > missing (amber)
         const paramCls = reqFail ? 'req-fail' : good ? 'good' : st === 'partial' ? 'partial' : 'improve';
         const iconCls  = reqFail ? 'pi-reqfail' : good ? 'pi-good' : st === 'partial' ? 'pi-partial' : 'pi-improve';
         const badgeCls = reqFail ? 'pb-reqfail' : good ? 'pb-good' : st === 'partial' ? 'pb-partial' : 'pb-improve';
@@ -1605,48 +1589,46 @@ function render(r, w, enabledParams, gates){
           </div>` : ''}
         </div>`;
       }),
-      ...skippedParams.map(param => `<div class="param skipped"><div class="param-head"><div class="param-icon pi-skip">–</div><div style="flex:1"><div class="param-title" style="color:var(--t3)">${param.n}</div><div class="param-num">${param.num}</div></div><div class="param-badge pb-skip">SKIPPED</div></div><div class="evidence" style="color:var(--t3)">Not selected for this evaluation.</div></div>`),
-      ...naParams.map(param => `<div class="param skipped"><div class="param-head"><div class="param-icon pi-skip">–</div><div style="flex:1"><div class="param-title" style="color:var(--t3)">${param.n}</div><div class="param-num">${param.num}&nbsp;<span style="color:var(--t3);font-size:9px;">N/A for ${ct.label}</span></div></div><div class="param-badge pb-skip">N/A</div></div><div class="evidence" style="color:var(--t3)">Not applicable for ${ct.label} content.</div></div>`)
+      ...skippedParams.map(param => `<div class="param skipped"><div class="param-head"><div class="param-icon pi-skip">–</div><div style="flex:1"><div class="param-title" style="color:var(--t3)">${param.n}</div><div class="param-num">${param.num}</div></div><div class="param-badge pb-skip">NOT SELECTED</div></div><div class="evidence" style="color:var(--t3)">Unticked for this analysis — tick it in the left panel to score it.</div></div>`)
     ].join('');
 
     return `${i > 0 ? '<hr class="divider">' : ''}<div class="section">
       <div class="section-head">
         <div class="section-icon" style="background:${pl.ic}">${pl.emoji}</div>
         <div style="flex:1"><div class="section-title" style="color:${pl.color}">${pl.label}</div><div class="section-desc">${pl.desc}</div></div>
-        <div class="section-score" style="background:${pl.sc};color:${pl.scolor}">${scoredParams.length > 0 ? s + '/' + scoredParams.length : 'N/A'}</div>
+        <div class="section-score" style="background:${pl.sc};color:${pl.scolor}">${n > 0 ? fmt1(credit) + '/' + n : 'none ticked'}</div>
       </div>
       ${cards}
     </div>`;
   }).join('');
+
+  const heroMeta = `<div>${currentClient ? `<span class="client-stamp">👤 ${currentClient.name}${currentClient.industry ? ' · ' + currentClient.industry : ''}</span>` : ''}<span class="score-ct-badge">${ct.icon} ${ct.label}${ct.isYMYL ? ' · YMYL' : ''}</span><span class="score-verdict ${verdict.cls}">${verdict.label}</span></div>
+          <div class="score-summary">${r.summary || ''}</div>
+          <div style="margin-top:8px;font-size:10px;color:var(--t3)">${cntStrong} strong · ${cntPartial} partial · ${cntMissing} missing — across ${scoredCount} scored check${scoredCount===1?'':'s'} in ${pillarsUsed} pillar${pillarsUsed===1?'':'s'}</div>
+          ${currentClient && currentClient.notes ? `<div style="margin-top:8px;font-size:11px;color:var(--t2);padding:8px 10px;background:var(--s2);border:1px solid var(--border);border-radius:8px;line-height:1.55"><strong style="color:var(--aut)">Client brief:</strong> ${currentClient.notes}</div>` : ''}`;
 
   document.getElementById('results').innerHTML = `
     <div class="report-toolbar no-print">
       <button class="btn-pdf" onclick="downloadPDF()">⬇ Download PDF</button>
     </div>
     <div class="print-head">
-      <div class="ph-t">EEAT + AI Content Report</div>
-      <div class="ph-s">${currentClient ? `${currentClient.name}${currentClient.industry ? ' · ' + currentClient.industry : ''} · ` : ''}${ct.icon} ${ct.label}${ct.isYMYL ? ' · YMYL' : ''} · Overall ${r.overall_score}% · ${new Date().toLocaleDateString()}</div>
+      <div class="ph-t">Content Quality Report</div>
+      <div class="ph-s">${currentClient ? `${currentClient.name}${currentClient.industry ? ' · ' + currentClient.industry : ''} · ` : ''}${ct.icon} ${ct.label}${ct.isYMYL ? ' · YMYL' : ''} · Content Score ${r.overall_score}% · ${new Date().toLocaleDateString()}</div>
     </div>
     ${renderPubStatus(gates)}
     ${renderScorecard(r, gates, cntStrong, cntPartial, cntMissing)}
-    ${renderGates(gates)}
     <div class="score-hero">
       <div class="score-top">
         <div class="score-big">${r.overall_score}<span class="score-pct">%</span></div>
-        <div class="score-meta">
-          <div>${currentClient ? `<span class="client-stamp">👤 ${currentClient.name}${currentClient.industry ? ' · ' + currentClient.industry : ''}</span>` : ''}<span class="score-ct-badge">${ct.icon} ${ct.label}${ct.isYMYL ? ' · YMYL' : ''}</span><span class="score-verdict ${verdict.cls}">${verdict.label}</span></div>
-          <div class="score-summary">${r.summary || ''}</div>
-          <div style="margin-top:8px;font-size:10px;color:var(--t3)">${cntStrong} strong · ${cntPartial} partial · ${cntMissing} missing — of ${scoredList.length} scored parameter${scoredList.length===1?'':'s'}${naCount>0?` · ${naCount} N/A (excluded)`:''}</div>
-          ${currentClient && currentClient.notes ? `<div style="margin-top:8px;font-size:11px;color:var(--t2);padding:8px 10px;background:var(--s2);border:1px solid var(--border);border-radius:8px;line-height:1.55"><strong style="color:var(--aut)">Client brief:</strong> ${currentClient.notes}</div>` : ''}
-        </div>
+        <div class="score-meta">${heroMeta}</div>
       </div>
-      <div class="pillar-bars">${pbarsHTML}</div>
     </div>
-    ${renderAIDetection(r.ai_detection)}
-    ${editorReport}
+    ${renderScoreExplanation(r, enabledParams)}
+    ${renderRankedFixes(r, enabledParams, gates)}
+    ${renderGates(gates)}
     ${secHTML}`;
   document.getElementById('results').style.display = 'block';
-  document.getElementById('rightPanel').scrollTop = 0;
+  document.getElementById('paneScore').scrollTop = 0;
 }
 
 // Export the on-screen report to PDF via the browser's print engine
@@ -1665,6 +1647,218 @@ function downloadPDF(){
 
 
 // ═══════════════════════════════════════════════════════════════
+// CONTENT ANALYSIS TAB — competitive comparison vs top Google results
+// ═══════════════════════════════════════════════════════════════
+function switchTab(name){
+  document.getElementById('tabBtnScore').classList.toggle('active', name==='score');
+  document.getElementById('tabBtnAnalysis').classList.toggle('active', name==='analysis');
+  document.getElementById('paneScore').classList.toggle('active', name==='score');
+  document.getElementById('paneAnalysis').classList.toggle('active', name==='analysis');
+}
+
+// Google search via Serper.dev (browser-callable, returns organic results as JSON).
+async function serperSearch(key, query){
+  const res = await fetch('https://google.serper.dev/search', {
+    method:'POST',
+    headers:{ 'X-API-KEY':key, 'Content-Type':'application/json' },
+    body: JSON.stringify({ q: query, num: 10 })
+  });
+  if(!res.ok){
+    if(res.status===403 || res.status===401) throw new Error('Serper key rejected (401/403) — check the key on serper.dev.');
+    throw new Error('Google search failed (HTTP '+res.status+').');
+  }
+  const data = await res.json();
+  const organic = (data.organic||[]).filter(o=>o && o.link).map(o=>({ title:o.title||o.link, link:o.link, snippet:o.snippet||'' }));
+  const paa = (data.peopleAlsoAsk||[]).map(q=>q.question).filter(Boolean);
+  return { organic, paa };
+}
+
+// Read a competitor page as clean text via Jina Reader (CORS-friendly, no proxy).
+async function fetchReadable(url){
+  try{
+    const res = await fetch('https://r.jina.ai/'+url, { headers:{ 'X-Return-Format':'text' } });
+    if(!res.ok) return { url, text:'', ok:false };
+    const t = (await res.text()||'').replace(/\n{3,}/g,'\n\n').trim();
+    return { url, text:t, ok:t.length>200 };
+  }catch(e){ return { url, text:'', ok:false }; }
+}
+
+function buildCompareSys(topic){
+  return `You are a senior SEO content strategist at Justwords. Your job: compare OUR article against the blogs that currently rank on Google page 1 for the target topic, and produce a concrete plan to outrank them. Target topic: "${topic}".
+
+Be specific and evidence-based — judge the actual text provided, never invent facts about a competitor you were not given. If a competitor's body text is missing, reason only from its title/snippet and say the analysis for it is limited.
+
+Return ONLY this JSON (no markdown, no backticks), competitors in the SAME ORDER they were given:
+{"verdict":"one sentence: can we realistically outrank these, and the single biggest lever","our_word_estimate":0,"our_advantages":["what OUR article already does better — max 4"],"competitors":[{"word_estimate":0,"strengths":["what this competitor does well — max 3"],"unique_angle":"the one thing it covers that we should note"}],"missing_subtopics":["subtopics/sections the competitors cover that OUR article lacks — max 6"],"keywords_they_have_we_miss":["specific terms/entities the top results use that we omit — max 8"],"suggested_headings":["exact H2/H3 headings to ADD to our article to close the gaps — max 6"],"questions_to_answer":["reader questions (incl. People-Also-Ask) our article should answer — max 6"],"recommendations":[{"action":"a concrete edit to make","why":"how it helps us rank higher","priority":"high|medium|low"}]}`;
+}
+
+function buildCompareUser(topic, ourText, comps, paa){
+  let msg = `TARGET TOPIC: ${topic}\n\n===== OUR ARTICLE =====\n${ourText.slice(0,5000)}\n`;
+  comps.forEach((c,i)=>{
+    msg += `\n===== COMPETITOR ${i+1} (currently ranking) =====\nTitle: ${c.title}\nURL: ${c.link}\n`;
+    msg += c.text && c.text.length>200
+      ? `Content:\n${c.text.slice(0,3500)}\n`
+      : `Content: [could not fetch full text — use this snippet only] ${c.snippet||'(none)'}\n`;
+  });
+  if(paa && paa.length) msg += `\n===== PEOPLE ALSO ASK (Google) =====\n- ${paa.slice(0,6).join('\n- ')}\n`;
+  msg += `\nCompare and return the JSON plan.`;
+  return msg;
+}
+
+async function runCompetitiveAnalysis(){
+  const groqKey  = document.getElementById('groqKey').value.trim();
+  const serperKey= document.getElementById('serperKey').value.trim();
+  const topic    = document.getElementById('topicInput').value.trim();
+  const ourText  = document.getElementById('content').value.trim();
+  const u1 = document.getElementById('compUrl1').value.trim();
+  const u2 = document.getElementById('compUrl2').value.trim();
+  const manualUrls = [u1,u2].filter(Boolean);
+
+  if(!groqKey){ alert('Enter your Groq API key on the left first.'); return; }
+  if(ourText.length<80){ alert('Paste your article in the Blog Content box on the left first.'); return; }
+  if(!topic && !manualUrls.length){ alert('Enter a topic/keyword (or paste competitor URLs) to compare against.'); return; }
+  if(!manualUrls.length && !serperKey){ alert('Enter a Serper.dev key (left panel) to auto-search Google — or paste 2 competitor URLs to skip search.\nGet a free key at serper.dev/api-key'); return; }
+
+  const btn = document.getElementById('analysisBtn');
+  btn.disabled = true;
+  document.getElementById('anaSpin').style.display='block';
+  document.getElementById('anaBtnTxt').textContent='Analyzing…';
+  document.getElementById('analysisEmpty').style.display='none';
+  document.getElementById('analysisResults').style.display='none';
+  document.getElementById('analysisLoading').style.display='flex';
+  ['ad1','ad2','ad3','ad4'].forEach(id=>document.getElementById(id).className='step-dot');
+  stepActive('ad1');
+
+  try{
+    let picks, paa=[];
+    if(manualUrls.length){
+      stepActive('ad1');
+      picks = manualUrls.map(link=>({ title:link, link, snippet:'' }));
+      stepDone('ad1');
+    } else {
+      updateAnaText('Searching Google for "'+topic+'"…');
+      const search = await serperSearch(serperKey, topic);
+      paa = search.paa;
+      if(!search.organic.length) throw new Error('No Google results found for that topic.');
+      picks = search.organic.slice(0,2);
+      stepDone('ad1');
+    }
+
+
+
+    stepActive('ad2');
+    updateAnaText('Reading the top-ranking blogs…');
+    const fetched = await Promise.all(picks.map(p=>fetchReadable(p.link)));
+    const comps = picks.map((p,i)=>({ ...p, text:fetched[i].text, fetchedOk:fetched[i].ok }));
+    stepDone('ad2');
+
+    stepActive('ad3');
+    updateAnaText('Comparing against your article…');
+    const sys = buildCompareSys(topic || picks[0].title);
+    const user = buildCompareUser(topic || picks[0].title, ourText, comps, paa);
+    const data = await callGroq(groqKey, sys, user, 3000);
+    stepDone('ad3'); stepActive('ad4');
+
+    updateAnaText('Building the ranking action plan…');
+    renderAnalysis(data, topic || picks[0].title, comps);
+    stepDone('ad4');
+  }catch(err){
+    document.getElementById('analysisLoading').style.display='none';
+    document.getElementById('analysisEmpty').style.display='flex';
+    const msg = typeof err.message==='string'?err.message:'';
+    const nice = msg.startsWith('RATE_LIMIT::')
+      ? 'Groq daily token limit reached — switch the model dropdown to Llama 3.1 8B and retry.'
+      : msg || 'Analysis failed.';
+    alert('Content Analysis failed:\n\n'+nice);
+  }finally{
+    btn.disabled=false;
+    document.getElementById('anaSpin').style.display='none';
+    document.getElementById('anaBtnTxt').textContent='🔎 Search Google & Compare';
+    document.getElementById('analysisLoading').style.display='none';
+  }
+}
+function updateAnaText(t){ document.getElementById('anaLoadText').textContent=t; }
+
+function renderAnalysis(d, topic, comps){
+  d = d || {};
+  const prioRank = {high:1,medium:2,low:3};
+  const recs = (d.recommendations||[]).slice().sort((a,b)=>(prioRank[a.priority]||2)-(prioRank[b.priority]||2));
+
+  const compCards = comps.map((c,i)=>{
+    const info = (d.competitors||[])[i] || {};
+    const strengths = (info.strengths||[]).map(s=>`<li>${s}</li>`).join('');
+    return `<div class="comp-card">
+      <div class="comp-rank">#${i+1} on Google</div>
+      <div class="comp-title">${c.title}</div>
+      <a class="comp-url" href="${c.link}" target="_blank">${c.link}</a>
+      <div class="comp-meta">${info.word_estimate?`<span>~${info.word_estimate} words</span>`:''}${c.fetchedOk?'<span>✓ full text read</span>':'<span style="color:var(--improve)">⚠ text blocked — snippet only</span>'}</div>
+      ${strengths?`<ul class="comp-strengths">${strengths}</ul>`:''}
+      ${info.unique_angle?`<div class="comp-strengths"><strong>Unique angle:</strong> ${info.unique_angle}</div>`:''}
+    </div>`;
+  }).join('');
+
+
+
+  const chips = (arr,cls)=> (arr||[]).map(k=>`<span class="kwchip ${cls||''}">${k}</span>`).join('');
+  const list = (arr)=> (arr||[]).map(x=>`<li>${x}</li>`).join('') || '<li style="color:var(--t3)">None identified.</li>';
+
+  const recRows = recs.map((r,i)=>{
+    const rk = prioRank[r.priority]||2;
+    return `<div class="fixrow p${rk}"><div class="fixrank">${i+1}</div><div class="fixbody"><div class="fixname">${r.action||''} <span class="fixtag t${rk}">${(r.priority||'medium').toUpperCase()}</span></div><div class="fixwhy">${r.why||''}</div></div></div>`;
+  }).join('') || '<div class="fixrow p3"><div class="fixbody"><div class="fixwhy">No recommendations returned.</div></div></div>';
+
+  document.getElementById('analysisResults').innerHTML = `
+    <div style="padding:22px 24px">
+      <div class="report-toolbar no-print"><button class="btn-pdf" onclick="downloadAnalysisPDF()">⬇ Download PDF</button></div>
+      <div class="print-head"><div class="ph-t">Competitive Content Analysis</div><div class="ph-s">Topic: ${topic} · vs top ${comps.length} Google results · ${new Date().toLocaleDateString()}</div></div>
+
+      <div class="verdict-banner">
+        <div class="vb-pos">🏁 ${topic}</div>
+        <div class="vb-text">${d.verdict||''}</div>
+        ${d.our_word_estimate?`<div class="comp-meta" style="margin-top:8px"><span>Your article: ~${d.our_word_estimate} words</span></div>`:''}
+      </div>
+
+      <div class="section"><div class="section-head"><div class="section-icon" style="background:rgba(232,210,74,.12)">📊</div><div style="flex:1"><div class="section-title" style="color:var(--aeo)">Who You're Up Against</div><div class="section-desc">The blogs currently ranking for this topic</div></div></div>${compCards}</div>
+
+      <div class="explain">
+        <div class="explain-title">✅ What Your Article Already Does Better</div>
+        <ul class="er-list wins" style="list-style:none">${list(d.our_advantages)}</ul>
+      </div>
+
+      <div class="explain">
+        <div class="explain-title">🕳️ Content Gaps — What They Cover That You Don't</div>
+        <div class="suggest-area" style="margin-bottom:6px"><strong>Missing subtopics:</strong></div>
+        <ul class="er-list gaps" style="list-style:none">${list(d.missing_subtopics)}</ul>
+        ${(d.keywords_they_have_we_miss||[]).length?`<div class="suggest-area" style="margin:10px 0 6px"><strong>Keywords / entities to add:</strong></div><div class="chiprow">${chips(d.keywords_they_have_we_miss)}</div>`:''}
+      </div>
+
+      ${(d.suggested_headings||[]).length?`<div class="explain"><div class="explain-title">🧱 Headings to Add</div><div class="chiprow">${chips(d.suggested_headings,'have')}</div></div>`:''}
+
+      ${(d.questions_to_answer||[]).length?`<div class="explain"><div class="explain-title">❓ Questions to Answer (incl. People Also Ask)</div><ul class="er-list" style="list-style:none">${list(d.questions_to_answer)}</ul></div>`:''}
+
+      <div class="fixes">
+        <div class="explain-title">🎯 Action Plan to Rank Higher <span style="font-weight:400;color:var(--t3);font-size:11px">— ranked by priority</span></div>
+        <div class="fixlist">${recRows}</div>
+      </div>
+    </div>`;
+  document.getElementById('analysisResults').style.display='block';
+  document.getElementById('paneAnalysis').scrollTop=0;
+}
+
+
+
+function downloadAnalysisPDF(){
+  if(document.getElementById('analysisResults').style.display!=='block') return;
+  const prev=document.title;
+  const date=new Date().toISOString().slice(0,10);
+  document.title=`Content-Analysis-${date}`;
+  const restore=()=>{ document.title=prev; window.removeEventListener('afterprint',restore); };
+  window.addEventListener('afterprint',restore);
+  window.print();
+}
+
+
+// ═══════════════════════════════════════════════════════════════
 // CUSTOM CATEGORIES · CUSTOM PARAMETERS · CLIENT DATABASE
 // ═══════════════════════════════════════════════════════════════
 function openModal(id){ document.getElementById(id).classList.add('show'); }
@@ -1675,27 +1869,19 @@ function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(
 
 // ── Custom categories ──────────────────────────────────────────
 let editingCatKey = null;
-function catWsum(){
-  const t=['catwE','catwX','catwA','catwT','catwO'].reduce((a,id)=>a+(+document.getElementById(id).value||0),0);
-  const note=document.getElementById('catWsumNote');
-  note.textContent=`Total: ${t}%`;
-  note.className='wsum '+(t===100?'wsum-ok':'wsum-err');
-  return t;
-}
 
-
-function buildCatParamPick(reqSet,naSet){
+function buildCatParamPick(reqSet,offSet){
   const c=document.getElementById('catParamPick'); c.innerHTML='';
   PILLARS.forEach(pl=>{
-    const h=document.createElement('div'); h.className='pp-pl'; h.style.color=pl.color; h.textContent=`${pl.emoji} ${pl.label}`; c.appendChild(h);
+    const h=document.createElement('div'); h.className='pp-pl'; h.style.color=pl.color; h.textContent=`${pl.emoji} ${pl.label}${pl.gateOnly?' (gate checks)':''}`; c.appendChild(h);
     pl.params.forEach(param=>{
-      const sel=reqSet.has(param.k)?'required':naSet.has(param.k)?'na':'default';
+      const sel=reqSet.has(param.k)?'required':offSet.has(param.k)?'off':'default';
       const row=document.createElement('div'); row.className='pp-row';
       row.innerHTML=`<span class="pp-name">${param.n} <span style="color:var(--t3)">${param.num}</span></span>
         <select data-key="${param.k}">
           <option value="default"${sel==='default'?' selected':''}>Default</option>
           <option value="required"${sel==='required'?' selected':''}>Required</option>
-          <option value="na"${sel==='na'?' selected':''}>N/A</option>
+          <option value="off"${sel==='off'?' selected':''}>Off</option>
         </select>`;
       c.appendChild(row);
     });
@@ -1712,17 +1898,12 @@ function openCatModal(editKey){
   document.getElementById('catIcon').value = ct ? ct.icon : '🧩';
   document.getElementById('catDesc').value = ct ? ct.desc : '';
   document.getElementById('catYMYL').checked = ct ? !!ct.isYMYL : false;
-  const w = ct ? ct.weights : {e:20,x:20,a:20,t:20,o:20};
-  document.getElementById('catwE').value=w.e; document.getElementById('catwX').value=w.x;
-  document.getElementById('catwA').value=w.a; document.getElementById('catwT').value=w.t;
-  document.getElementById('catwO').value=w.o;
   const g = ct ? ct.gates : {minWords:300,trustThreshold:null,requireDisclaimer:false,requireAccuracy:false};
   document.getElementById('catMinWords').value=g.minWords;
   document.getElementById('catTrust').value=g.trustThreshold==null?'':g.trustThreshold;
   document.getElementById('catReqDisc').checked=!!g.requireDisclaimer;
   document.getElementById('catReqAcc').checked=!!g.requireAccuracy;
-  buildCatParamPick(new Set(ct?ct.required:[]), new Set(ct?ct.notApplicable:[]));
-  catWsum();
+  buildCatParamPick(new Set(ct?ct.required:[]), new Set(ct?(ct.defaultOff||ct.notApplicable||[]):[]));
   openModal('catModal');
 }
 
@@ -1730,11 +1911,10 @@ function openCatModal(editKey){
 function saveCat(){
   const name=document.getElementById('catName').value.trim();
   if(!name){ alert('Please enter a category name.'); return; }
-  if(catWsum()!==100){ alert('Pillar weights must total exactly 100%.'); return; }
-  const required=[], notApplicable=[];
+  const required=[], defaultOff=[];
   document.querySelectorAll('#catParamPick select').forEach(s=>{
     if(s.value==='required') required.push(s.dataset.key);
-    else if(s.value==='na') notApplicable.push(s.dataset.key);
+    else if(s.value==='off') defaultOff.push(s.dataset.key);
   });
   const trustRaw=document.getElementById('catTrust').value.trim();
   const obj={
@@ -1742,11 +1922,12 @@ function saveCat(){
     icon:document.getElementById('catIcon').value.trim()||'🧩',
     desc:document.getElementById('catDesc').value.trim()||'Custom category',
     isYMYL:document.getElementById('catYMYL').checked,
-    weights:{e:+document.getElementById('catwE').value,x:+document.getElementById('catwX').value,a:+document.getElementById('catwA').value,t:+document.getElementById('catwT').value,o:+document.getElementById('catwO').value},
-    required, notApplicable,
+    required, defaultOff,
     gates:{minWords:+document.getElementById('catMinWords').value||0,trustThreshold:trustRaw===''?null:+trustRaw,requireDisclaimer:document.getElementById('catReqDisc').checked,requireAccuracy:document.getElementById('catReqAcc').checked},
     custom:true
   };
+
+
   let key=editingCatKey;
   if(!key){ key='c_'+slugify(name); while(ALLCATS[key]&&!customCats[key]) key='c_'+slugify(name)+'_'+uid().slice(0,3); }
   customCats[key]=obj;
@@ -1788,7 +1969,8 @@ function openCatManager(){
   Object.entries(ALLCATS).forEach(([key,ct])=>{
     const custom=isCustomCat(key);
     const row=document.createElement('div'); row.className='list-row';
-    row.innerHTML=`<div style="flex:1"><div class="lr-name">${ct.icon} ${ct.label} ${ct.isYMYL?'<span class="chip">YMYL</span>':''} ${custom?'<span class="chip" style="color:var(--aut)">custom</span>':'<span class="chip">preset</span>'}</div><div class="lr-sub">${ct.desc} · ${ct.required.length} required · ${ct.notApplicable.length} N/A</div></div>`;
+    const offN=(ct.defaultOff||ct.notApplicable||[]).length;
+    row.innerHTML=`<div style="flex:1"><div class="lr-name">${ct.icon} ${ct.label} ${ct.isYMYL?'<span class="chip">YMYL</span>':''} ${custom?'<span class="chip" style="color:var(--aut)">custom</span>':'<span class="chip">preset</span>'}</div><div class="lr-sub">${ct.desc} · ${(ct.required||[]).length} required · ${offN} off by default</div></div>`;
     const btns=document.createElement('div'); btns.style.display='flex'; btns.style.gap='6px';
     if(custom){
       btns.innerHTML=`<button class="btn btn-sm" onclick="closeModal('catMgrModal');openCatModal('${key}')">Edit</button>`;
@@ -1837,6 +2019,7 @@ function deleteCustomParam(k){
   buildCheckboxes();
   renderCustomParamList();
 }
+
 
 
 // ── Client database ────────────────────────────────────────────
@@ -1929,12 +2112,10 @@ buildCTSelector();
 buildCheckboxes();
 buildClientSelect();
 buildClCatSelect();
-(function initAutoNA(){ const t=document.getElementById('autoNAToggle'); if(t) t.checked=allowAutoNA; })();
 (function restoreClient(){
   const last=lsLoad(LS.lastClient,'');
   if(last && clients.find(c=>c.id===last)){ document.getElementById('clientSelect').value=last; applyClient(); }
 })();
-syncW();
 
 
 </script>
