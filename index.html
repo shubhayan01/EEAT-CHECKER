@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Content Score + Gate Checker</title>
+<title>Content Score + Gate Checker — Justwords</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -70,23 +70,17 @@ body{background:var(--bg);color:var(--text);font-family:'Instrument Sans',sans-s
 .wt-ok{background:rgba(74,232,160,.08);border:1px solid rgba(74,232,160,.25);color:var(--tru);}
 .wt-err{background:rgba(232,91,91,.08);border:1px solid rgba(232,91,91,.25);color:#d83a3a;}
 
-.param-cb{appearance:none;-webkit-appearance:none;width:14px;height:14px;border-radius:3px;border:1.5px solid var(--border2);background:var(--s3);cursor:pointer;flex-shrink:0;position:relative;transition:all .15s;}
-.param-cb:checked{background:var(--aut);border-color:var(--aut);}
-.param-cb:checked::after{content:'✓';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:8px;color:#fff;font-weight:700;}
-.param-cb.cb-locked{background:rgba(74,232,160,.15);border-color:var(--tru);cursor:not-allowed;}
-.param-cb.cb-locked:checked{background:var(--tru);}
-.param-cb.cb-na{opacity:.25;cursor:not-allowed;}
+.param-on{width:14px;height:14px;border-radius:3px;background:var(--tru);color:#fff;font-size:8px;font-weight:700;flex-shrink:0;display:flex;align-items:center;justify-content:center;}
 .param-check-row{display:flex;align-items:center;gap:6px;padding:5px 0;border-bottom:1px solid var(--border);}
 .param-check-row:last-child{border-bottom:none;}
-.param-check-row.row-na{opacity:.3;}
-.param-check-row label{font-size:11px;color:var(--t2);cursor:pointer;flex:1;line-height:1.3;}
+.param-name{font-size:11px;color:var(--t2);flex:1;line-height:1.3;}
 .param-check-row .pnum{font-size:10px;color:var(--t3);font-weight:600;width:24px;flex-shrink:0;}
 .req-tag{font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.3px;padding:1px 5px;border-radius:100px;background:rgba(74,232,160,.12);color:var(--tru);flex-shrink:0;white-space:nowrap;}
 .na-tag{font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.3px;padding:1px 5px;border-radius:100px;background:rgba(82,90,114,.1);color:var(--t3);flex-shrink:0;}
 .pillar-check-section{margin-bottom:8px;}
 .pillar-check-head{display:flex;align-items:center;gap:7px;margin-bottom:5px;}
 .pillar-check-head .ph-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;flex:1;}
-.pillar-toggle-all{font-size:10px;cursor:pointer;text-decoration:underline;background:none;border:none;color:var(--aut);font-family:inherit;}
+.pillar-count{font-size:10px;color:var(--t3);font-weight:600;}
 
 .btn-analyze{width:100%;padding:13px 20px;background:linear-gradient(135deg,#7a5cf5,#5b4fd4);border:none;border-radius:var(--r);color:#fff;font-family:'Syne',sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:9px;letter-spacing:.2px;}
 .btn-analyze:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 8px 24px rgba(122,92,245,.35);}
@@ -169,7 +163,7 @@ body{background:var(--bg);color:var(--text);font-family:'Instrument Sans',sans-s
 .scorecard-2{grid-template-columns:repeat(2,1fr);}
 @media(max-width:900px){.scorecard,.scorecard-2{grid-template-columns:1fr;}}
 
-/* Score explanation + priority fixes */
+/* Score explanation + ranked result rows */
 .explain,.fixes{background:var(--s2);border:1px solid var(--border);border-radius:var(--r2);padding:16px 18px;margin-bottom:18px;}
 .explain-title{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;margin-bottom:9px;display:flex;align-items:center;gap:7px;flex-wrap:wrap;}
 .exp-formula{font-size:12px;color:var(--t2);background:var(--s3);border:1px solid var(--border);border-radius:8px;padding:10px 12px;line-height:1.7;margin-bottom:12px;}
@@ -188,6 +182,18 @@ body{background:var(--bg);color:var(--text);font-family:'Instrument Sans',sans-s
 .fixtag.t1{background:rgba(232,91,91,.12);color:#d83a3a;}
 .fixtag.t2{background:rgba(240,180,41,.14);color:var(--improve);}
 .fixtag.t3{background:rgba(74,181,232,.14);color:var(--xpt);}
+.fixrow.pg{border-left-color:var(--tru);}
+.fixtag.tg{background:rgba(74,232,160,.14);color:var(--tru);}
+.fixpill{font-size:9px;color:var(--t3);font-weight:500;}
+.fixwhy em{color:var(--t3);font-style:italic;}
+
+/* Editor remark tab — one per good/bad result, no separate review section */
+.rmk-tab{flex-shrink:0;font-size:10px;font-weight:600;font-family:inherit;padding:4px 9px;border-radius:100px;border:1px solid var(--border2);background:var(--s2);color:var(--t3);cursor:pointer;white-space:nowrap;transition:all .12s;}
+.rmk-tab:hover{background:var(--s3);color:var(--text);}
+.rmk-tab.active{border-color:var(--aut);color:var(--aut);background:rgba(155,110,243,.08);}
+.rmk-tab.filled{border-color:var(--tru);color:var(--tru);background:rgba(74,232,160,.08);}
+.rmk-box{display:none;align-items:center;gap:6px;margin-top:9px;padding-top:9px;border-top:1px dashed var(--border2);flex-wrap:wrap;}
+.rmk-box.open{display:flex;}
 
 .gates-panel{background:var(--s2);border:1px solid var(--border);border-radius:var(--r2);padding:16px 18px;margin-bottom:18px;}
 .gates-title{font-family:'Syne',sans-serif;font-size:11px;font-weight:700;margin-bottom:10px;display:flex;align-items:center;gap:6px;color:var(--t2);text-transform:uppercase;letter-spacing:.5px;}
@@ -276,59 +282,10 @@ body{background:var(--bg);color:var(--text);font-family:'Instrument Sans',sans-s
 .section-score{font-family:'Syne',sans-serif;font-size:11px;font-weight:700;padding:3px 10px;border-radius:100px;}
 .section-desc{font-size:11px;color:var(--t3);margin-top:1px;font-style:italic;}
 
-.param{background:var(--s2);border:1px solid var(--border);border-radius:var(--r);padding:12px 14px;margin-bottom:7px;border-left:3px solid transparent;}
-.param.good{border-left-color:var(--tru);}
-.param.improve{border-left-color:var(--improve);}
-.param.req-fail{border-left-color:#d83a3a;}
-.param.skipped{border-left-color:var(--border);opacity:.4;}
-.param-head{display:flex;align-items:flex-start;gap:8px;margin-bottom:7px;}
-.param-icon{width:22px;height:22px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;margin-top:1px;}
-.pi-good{background:rgba(74,232,160,.12);color:var(--tru);}
-.pi-improve{background:rgba(240,180,41,.12);color:var(--improve);}
-.pi-reqfail{background:rgba(232,91,91,.12);color:#d83a3a;}
-.pi-skip{background:rgba(82,90,114,.12);color:var(--t3);}
-.param-title{font-size:12px;font-weight:600;color:var(--text);flex:1;line-height:1.4;}
-.param-num{font-size:10px;color:var(--t3);font-weight:500;margin-top:1px;display:flex;align-items:center;gap:5px;}
-.req-star{color:var(--tru);font-size:10px;}
-.param-badge{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;padding:2px 8px;border-radius:100px;white-space:nowrap;flex-shrink:0;margin-top:1px;}
-.pb-good{background:rgba(74,232,160,.12);color:var(--tru);}
-.pb-improve{background:rgba(240,180,41,.12);color:var(--improve);}
-.pb-reqfail{background:rgba(232,91,91,.12);color:#d83a3a;}
-.pb-skip{background:rgba(82,90,114,.12);color:var(--t3);}
-.evidence{font-size:12px;color:var(--t2);padding:7px 10px;background:rgba(0,0,0,.03);border-radius:7px;line-height:1.65;}
-.suggest-block{margin-top:7px;padding:11px 13px;background:rgba(240,180,41,.04);border:1px solid rgba(240,180,41,.2);border-radius:8px;}
-.suggest-header{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--improve);margin-bottom:7px;}
-.suggest-area{font-size:11px;color:var(--t2);margin-bottom:5px;line-height:1.5;}
-.suggest-area strong{color:var(--text);font-weight:600;}
-.suggest-solution{font-size:11px;color:var(--t2);line-height:1.65;padding:7px 10px;background:rgba(0,0,0,.03);border-radius:6px;border-left:2px solid rgba(240,180,41,.4);}
-.suggest-solution strong{color:var(--aeo);font-weight:600;}
-.priority-badge{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;padding:2px 6px;border-radius:100px;margin-left:5px;}
-.prio-high{background:rgba(232,91,91,.15);color:#d83a3a;}
-.prio-med{background:rgba(240,180,41,.15);color:var(--improve);}
-.prio-low{background:rgba(74,181,232,.15);color:var(--xpt);}
-
-.editor-report{background:linear-gradient(135deg,rgba(74,181,232,.04),rgba(155,110,243,.04));border:1px solid var(--border2);border-radius:var(--r2);padding:18px;margin-bottom:18px;}
-.er-title{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;margin-bottom:12px;display:flex;align-items:center;gap:7px;color:var(--xpt);}
-.er-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:12px;}
-.er-card{background:var(--s2);border:1px solid var(--border);border-radius:var(--r);padding:11px 13px;}
-.er-card-title{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--t3);margin-bottom:7px;}
-.er-list{list-style:none;display:flex;flex-direction:column;gap:4px;}
-.er-list li{font-size:11px;color:var(--t2);display:flex;align-items:flex-start;gap:5px;line-height:1.5;}
-.er-list li::before{content:'→';color:var(--xpt);flex-shrink:0;font-size:10px;margin-top:2px;}
-.er-list.wins li::before{content:'✓';color:var(--tru);}
-.er-list.gaps li::before{content:'!';color:var(--improve);}
-.er-overall{font-size:11px;color:var(--t2);padding:10px 12px;background:var(--s2);border-radius:var(--r);border:1px solid var(--border);line-height:1.7;}
-.er-overall strong{color:var(--text);}
-
 /* Token limit warning banner */
 .token-banner{background:rgba(232,210,74,.06);border:1px solid rgba(232,210,74,.3);border-radius:var(--r);padding:8px 12px;margin-top:8px;font-size:11px;color:var(--aeo);display:none;line-height:1.5;}
 .token-banner.show{display:block;}
 .token-banner strong{color:var(--text);}
-
-/* Partial-credit param badges */
-.param.partial{border-left-color:var(--xpt);}
-.pi-partial{background:rgba(74,181,232,.12);color:var(--xpt);}
-.pb-partial{background:rgba(74,181,232,.12);color:var(--xpt);}
 
 /* Client bar */
 .client-bar{display:flex;gap:7px;align-items:center;}
@@ -400,6 +357,61 @@ body{background:var(--bg);color:var(--text);font-family:'Instrument Sans',sans-s
 .btn-pdf:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(122,92,245,.3);}
 .print-head{display:none;}
 
+/* ── 5-section report scaffold ─────────────────────────────── */
+.rsec{margin-bottom:20px;border:1px solid var(--border);border-radius:var(--r2);background:var(--s2);overflow:hidden;}
+.rsec-head{display:flex;align-items:center;gap:12px;padding:13px 18px;background:linear-gradient(135deg,rgba(155,110,243,.06),rgba(74,181,232,.04));border-bottom:1px solid var(--border);}
+.rsec-num{width:26px;height:26px;flex-shrink:0;border-radius:8px;background:linear-gradient(135deg,#7a5cf5,#5b4fd4);color:#fff;font-family:'Syne',sans-serif;font-weight:800;font-size:14px;display:flex;align-items:center;justify-content:center;}
+.rsec-title{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;line-height:1.2;}
+.rsec-sub{font-size:11px;color:var(--t3);margin-top:1px;}
+.rsec-body{padding:16px 18px;}
+.rsec-body>.section:first-child{margin-top:0;}
+.rsec-body>*:last-child{margin-bottom:0;}
+.rsec-empty{font-size:12px;color:var(--t3);padding:6px 2px;line-height:1.6;}
+.rsec-note{font-size:11px;color:var(--t2);background:rgba(74,181,232,.06);border:1px solid rgba(74,181,232,.2);border-radius:8px;padding:8px 11px;margin-bottom:12px;line-height:1.55;}
+.rsec-note strong{color:var(--xpt);}
+
+/* Content-look view */
+.cview-note{font-size:12px;color:var(--t2);margin-bottom:9px;line-height:1.55;}
+.cview-legend{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:12px;}
+.cvl{display:inline-flex;align-items:center;gap:5px;font-size:10px;color:var(--t2);}
+.cvl i.hl{display:inline-block;width:13px;height:13px;border-radius:3px;padding:0;}
+.cview{white-space:pre-wrap;word-break:break-word;font-size:13px;line-height:1.85;color:var(--text);background:var(--s1);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;max-height:520px;overflow-y:auto;}
+mark.hl{padding:1px 1px;border-radius:3px;cursor:help;position:relative;border-bottom:2px solid transparent;color:inherit;}
+.hl-bad{background:rgba(232,91,91,.18);border-bottom-color:#d83a3a;}
+.hl-good{background:rgba(74,232,160,.20);border-bottom-color:var(--tru);}
+mark.hl:hover::after{content:attr(data-tip);position:absolute;left:0;bottom:calc(100% + 6px);z-index:40;width:max-content;max-width:280px;background:#1b1e28;color:#fff;font-size:11px;line-height:1.5;font-weight:500;padding:7px 10px;border-radius:8px;box-shadow:0 8px 22px rgba(20,24,40,.28);white-space:normal;pointer-events:none;}
+mark.hl:hover::before{content:'';position:absolute;left:10px;bottom:calc(100% + 1px);z-index:40;border:5px solid transparent;border-top-color:#1b1e28;pointer-events:none;}
+
+/* Advanced Analysis toggle-button */
+.eng-row{display:flex;align-items:center;gap:9px;padding:9px 11px;background:var(--s2);border:1px solid var(--border);border-radius:var(--r);cursor:pointer;position:relative;transition:all .15s;}
+.eng-row input{position:absolute;opacity:0;pointer-events:none;}
+.eng-row .eng-switch{width:38px;height:22px;border-radius:100px;background:var(--border2);flex-shrink:0;position:relative;transition:background .18s;}
+.eng-row .eng-switch::after{content:'';position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:transform .18s;}
+.eng-row.on{border-color:var(--aut);background:rgba(155,110,243,.07);}
+.eng-row.on .eng-switch{background:var(--aut);}
+.eng-row.on .eng-switch::after{transform:translateX(16px);}
+.eng-row .eng-txt{font-size:12px;font-weight:600;color:var(--text);}
+.eng-row .eng-sub{font-size:10px;color:var(--t3);margin-top:1px;line-height:1.4;}
+.eng-status{font-size:11px;margin-top:8px;padding:6px 10px;border-radius:8px;line-height:1.5;}
+.eng-claude{background:rgba(155,110,243,.08);border:1px solid rgba(155,110,243,.25);color:var(--aut);}
+.eng-groq{background:var(--s3);border:1px solid var(--border);color:var(--t2);}
+.eng-badge{display:inline-flex;align-items:center;gap:4px;font-size:10px;padding:2px 9px;border-radius:100px;margin-bottom:7px;margin-right:6px;}
+.eng-badge.b-claude{background:rgba(155,110,243,.12);border:1px solid rgba(155,110,243,.3);color:var(--aut);}
+.eng-badge.b-groq{background:var(--s3);border:1px solid var(--border);color:var(--t2);}
+
+/* Editor remark controls (inside each result row) + toolbar counter */
+.rev-count{font-size:11px;color:var(--t2);}
+.rev-count strong{color:var(--aut);}
+.rev-pill{font-size:11px;font-weight:700;padding:6px 12px;border-radius:var(--r);border:1px solid var(--border2);background:var(--s2);color:var(--text);cursor:pointer;font-family:'Syne',sans-serif;}
+.rev-pill:hover{background:var(--s3);}
+.rev-btn{font-size:11px;font-weight:600;padding:5px 11px;border-radius:100px;border:1px solid var(--border2);background:var(--s1);color:var(--t2);cursor:pointer;font-family:inherit;transition:all .12s;}
+.rev-btn:hover{background:var(--s3);}
+.rev-btn.agree.active{background:rgba(74,232,160,.14);border-color:rgba(74,232,160,.4);color:var(--tru);}
+.rev-btn.disagree.active{background:rgba(232,91,91,.12);border-color:rgba(232,91,91,.4);color:#d83a3a;}
+.rev-note{flex:1;min-width:180px;background:var(--s1);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'Instrument Sans',sans-serif;font-size:12px;padding:6px 10px;outline:none;transition:border-color .15s;}
+.rev-note:focus{border-color:var(--aut);}
+.rev-note::placeholder{color:var(--t3);}
+
 /* Print / Save-as-PDF: isolate the report */
 @media print{
   @page{margin:14mm;}
@@ -414,8 +426,12 @@ body{background:var(--bg);color:var(--text);font-family:'Instrument Sans',sans-s
   .print-head{display:block!important;margin-bottom:16px;padding-bottom:12px;border-bottom:2px solid var(--border);}
   .print-head .ph-t{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--text);}
   .print-head .ph-s{font-size:11px;color:var(--t2);margin-top:3px;}
-  .section,.param,.sc-card,.gate-item,.ai-sig,.pbar-card,.er-card,.pub-status,.gates-panel,.score-hero,.ai-panel,.editor-report,.comp-card,.verdict-banner,.explain,.fixes{break-inside:avoid;}
-  .scorecard,.pillar-bars,.ai-signals-grid,.er-grid{break-inside:avoid;}
+  .section,.sc-card,.gate-item,.ai-sig,.pbar-card,.pub-status,.gates-panel,.score-hero,.ai-panel,.comp-card,.verdict-banner,.explain,.fixes,.fixrow,.rsec-head{break-inside:avoid;}
+  .scorecard,.pillar-bars,.ai-signals-grid{break-inside:avoid;}
+  .rmk-tab{display:none!important;}
+  .rsec{break-inside:auto;border:none;margin-bottom:14px;}
+  .cview{max-height:none;overflow:visible;}
+  mark.hl:hover::after,mark.hl:hover::before{display:none;}
 }
 </style>
 </head>
@@ -439,7 +455,13 @@ body{background:var(--bg);color:var(--text);font-family:'Instrument Sans',sans-s
 <div class="app">
   <div class="left">
 
-   
+    <div class="ls">
+      <div class="lbl">Client <span class="hdr-actions"><button class="mini-link" onclick="openClientMgr()">Manage clients →</button></span></div>
+      <div class="client-bar">
+        <select class="key-input" id="clientSelect" onchange="applyClient()"></select>
+      </div>
+      <div class="meta" id="clientMeta"></div>
+    </div>
 
     <div class="ls">
       <label class="lbl">Groq API Key <a href="https://console.groq.com/keys" target="_blank">→ Get free key</a></label>
@@ -453,6 +475,19 @@ body{background:var(--bg);color:var(--text);font-family:'Instrument Sans',sans-s
       <label class="lbl" style="margin-top:10px">Google Search Key <span style="color:var(--t3);text-transform:none;letter-spacing:0;font-weight:400">(Serper.dev — Content Analysis tab only)</span> <a href="https://serper.dev/api-key" target="_blank">→ Get free key</a></label>
       <input type="password" class="key-input" id="serperKey" placeholder="Serper.dev API key (optional)"/>
       <div class="help">Only needed for the <strong>Content Analysis</strong> tab, which searches Google for your topic and compares the top-ranking blogs against yours. The Content Score tab doesn't use it.</div>
+    </div>
+
+    <div class="ls">
+      <div class="lbl">Analysis Engine</div>
+      <label class="eng-row" id="advRow">
+        <input type="checkbox" id="advClaude" onchange="updateEngineStatus()">
+        <span class="eng-switch"></span>
+        <span><span class="eng-txt">⚡ Advanced Analysis (Claude)</span><span class="eng-sub">Toggle ON to run this article on Claude instead of Groq.</span></span>
+      </label>
+      <label class="lbl" style="margin-top:10px">Claude API Key <span style="color:var(--t3);text-transform:none;letter-spacing:0;font-weight:400">— required for advanced / YMYL analysis</span> <a href="https://console.anthropic.com/settings/keys" target="_blank">→ Get key</a></label>
+      <input type="password" class="key-input" id="claudeKey" placeholder="sk-ant-…" oninput="updateEngineStatus()"/>
+      <div class="help">Claude runs <strong>only on YMYL categories</strong> (Health, Finance, Legal…) <em>or</em> when Advanced Analysis is ON. Every other article runs on Groq — keeping the higher-cost engine for sensitive content.</div>
+      <div class="eng-status eng-groq" id="engStatus">Standard engine: <strong>Groq</strong> — pick a YMYL category or turn on Advanced Analysis to route this article to Claude.</div>
     </div>
 
     <div class="ls" style="flex:1;display:flex;flex-direction:column;gap:6px;">
@@ -473,12 +508,12 @@ body{background:var(--bg);color:var(--text);font-family:'Instrument Sans',sans-s
       <div class="help">Each category sets pillar weights, required &amp; N/A parameters, and gate thresholds. Create your own for niches the presets don't cover.</div>
     </div>
 
-    <div class="ls" id="paramCheckboxSection">
-      <div class="lbl">Parameters to Evaluate
-        <span class="hdr-actions"><button class="mini-link" onclick="openParamModal()">+ Add parameter</button><span id="cbCount" style="color:var(--t3)">40 selected</span></span>
+    <div class="ls" id="paramSummarySection">
+      <div class="lbl">Parameters Evaluated
+        <span class="hdr-actions"><button class="mini-link" onclick="openParamModal()">+ Add parameter</button><span id="cbCount" style="color:var(--t3)">40 checks</span></span>
       </div>
-      <div class="help" style="margin:0 0 9px">Exactly the ticked checks are scored — nothing is excluded automatically. Each category starts you with the checks that fit it; tick or untick any to match this article.</div>
-      <div id="paramCheckboxes"></div>
+      <div class="help" style="margin:0 0 9px">Every parameter below is scored on every article, in every category — none can be switched off. The category only decides which checks are flagged <strong>Required</strong> and where the publish gates sit.</div>
+      <div id="paramSummary"></div>
     </div>
 
     <div class="ls">
@@ -571,7 +606,7 @@ body{background:var(--bg);color:var(--text);font-family:'Instrument Sans',sans-s
     <label class="fld-check"><input type="checkbox" id="catReqDisc"> Require disclaimer (hard gate)</label>
     <label class="fld-check"><input type="checkbox" id="catReqAcc"> Require factual-accuracy pass (hard gate)</label>
     <div class="fld" style="margin-top:13px"><label>Parameter Rules</label>
-      <div class="help" style="margin-top:0;margin-bottom:6px">For each parameter choose: <strong>Default</strong> (ticked &amp; scored), <strong>Required</strong> (ticked, flagged as must-pass), or <strong>Off</strong> (starts unticked — the editor can still tick it per article). Nothing is ever excluded automatically at analysis time.</div>
+      <div class="help" style="margin-top:0;margin-bottom:6px">Every parameter is scored on every article — no category can switch one off. The only choice here is <strong>Scored</strong> (counts toward the Content Score) or <strong>Required</strong> (also flagged as must-pass, and blocks a clean result when it fails).</div>
       <div class="param-pick" id="catParamPick"></div>
     </div>
     <div class="modal-actions">
@@ -640,53 +675,45 @@ body{background:var(--bg);color:var(--text);font-family:'Instrument Sans',sans-s
 
 <script>
 // ── Content Types ──────────────────────────────────────────────
-// Each category defines: which checks start TICKED (everything except defaultOff),
-// which are flagged Required, and the publish gates. There are NO pillar weights —
-// the four scored pillars are averaged equally. `defaultOff` only sets the starting
-// tick state; the editor can tick any of them, and nothing is excluded at analysis.
+// EVERY parameter is scored on EVERY article, in every category — a category can
+// never switch a check off. A category only defines which checks carry the
+// Required flag and where the publish gates sit. There are NO pillar weights —
+// the four scored pillars are averaged equally.
 const CONTENT_TYPES = {
   general: {
     label:'General / Informational', icon:'📄', desc:'Blogs, guides, how-tos',
     isYMYL:false,
     required:[],
-    // A purely informational blog isn't a business track-record piece, so these
-    // experience/commercial checks start unticked (the editor can tick any that fit).
-    defaultOff:['first_person_narrative','quantified_business_volume','quantified_time_in_operation','specific_customer_case_story','outcome_data_from_own_work','real_client_concern_quoted','location_or_regional_specificity','seasonal_or_cyclical_pattern','age_demographic_or_cohort'],
     gates:{minWords:300,trustThreshold:null,requireDisclaimer:false,requireAccuracy:false}
   },
   health: {
     label:'Health / Medical', icon:'🏥', desc:'Medical, wellness — YMYL',
     isYMYL:true,
     required:['disclaimer_for_sensitive_topics','no_factual_errors_or_outdated_info','evidence_based_claims_framed','cites_external_authoritative_source','mechanism_explanation','content_freshness_current_data'],
-    defaultOff:['quantified_business_volume','quantified_time_in_operation','seasonal_or_cyclical_pattern','outcome_data_from_own_work'],
     gates:{minWords:600,trustThreshold:75,requireDisclaimer:true,requireAccuracy:true}
   },
   finance: {
     label:'Finance', icon:'💰', desc:'Banking, investing — YMYL',
     isYMYL:true,
     required:['disclaimer_for_sensitive_topics','no_factual_errors_or_outdated_info','evidence_based_claims_framed','industry_benchmarks_cited_correctly','specific_measurements_thresholds','content_freshness_current_data'],
-    defaultOff:['seasonal_or_cyclical_pattern','location_or_regional_specificity'],
     gates:{minWords:500,trustThreshold:75,requireDisclaimer:true,requireAccuracy:true}
   },
   legal: {
     label:'Legal', icon:'⚖️', desc:'Legal advice, compliance — YMYL',
     isYMYL:true,
     required:['disclaimer_for_sensitive_topics','no_factual_errors_or_outdated_info','certification_or_credential_mentioned','cites_external_authoritative_source','professional_association_referenced'],
-    defaultOff:['seasonal_or_cyclical_pattern','outcome_data_from_own_work','age_demographic_or_cohort'],
     gates:{minWords:500,trustThreshold:75,requireDisclaimer:true,requireAccuracy:true}
   },
   product: {
     label:'Product / Review', icon:'🛍️', desc:'Products, services, comparisons',
     isYMYL:false,
     required:['no_misleading_title_or_clickbait','informative_tone_not_sales_pitch','specific_customer_case_story','outcome_data_from_own_work'],
-    defaultOff:['professional_association_referenced','evidence_based_claims_framed'],
     gates:{minWords:300,trustThreshold:null,requireDisclaimer:false,requireAccuracy:false}
   },
   technical: {
     label:'Technical / How-To', icon:'⚙️', desc:'Dev guides, tutorials',
     isYMYL:false,
     required:['step_level_process_breakdown','mechanism_explanation','correct_technical_terminology','specific_measurements_thresholds','tradeoffs_and_limitations'],
-    defaultOff:['disclaimer_for_sensitive_topics','age_demographic_or_cohort','seasonal_or_cyclical_pattern'],
     gates:{minWords:400,trustThreshold:null,requireDisclaimer:false,requireAccuracy:false}
   }
 };
@@ -807,15 +834,17 @@ function selectCT(key){
     b.className='ct-btn'+(k===key?' active':'')+(getCT(k).isYMYL?' is-ymyl':'')+(isCustomCat(k)?' is-custom':'');
   });
   document.getElementById('ctLabel').textContent=ct.label;
-  buildCheckboxes();
+  buildParamSummary();
+  updateEngineStatus();
 }
 
-// ── Build Checkboxes ───────────────────────────────────────────
-function buildCheckboxes(){
+// ── Parameter list (read-only) ─────────────────────────────────
+// Every parameter is always evaluated. This panel is a manifest, not a picker:
+// the only per-category difference is which checks carry the Required flag.
+function buildParamSummary(){
   const ct=getCT(selectedCT);
   const required=new Set(ct.required);
-  const defaultOff=new Set(ct.defaultOff||[]);
-  const container=document.getElementById('paramCheckboxes');
+  const container=document.getElementById('paramSummary');
   container.innerHTML='';
   PILLARS.forEach(pl=>{
     const sec=document.createElement('div');
@@ -824,46 +853,26 @@ function buildCheckboxes(){
     head.className='pillar-check-head';
     // AEO checks are gate rules, not scored pillars — label them so it's clear.
     const plLabel = pl.gateOnly ? `${pl.emoji} ${pl.label} <span style="font-weight:400;color:var(--t3);text-transform:none;letter-spacing:0">— gate checks</span>` : `${pl.emoji} ${pl.label}`;
-    head.innerHTML=`<span class="wdot" style="background:${pl.color}"></span><span class="ph-label" style="color:${pl.color}">${plLabel}</span><button class="pillar-toggle-all" onclick="togglePillarAll('${pl.key}',this)">all off</button>`;
+    head.innerHTML=`<span class="wdot" style="background:${pl.color}"></span><span class="ph-label" style="color:${pl.color}">${plLabel}</span><span class="pillar-count">${pl.params.length}</span>`;
     sec.appendChild(head);
     pl.params.forEach(param=>{
-      const isReq=required.has(param.k);
       const row=document.createElement('div');
       row.className='param-check-row';
-      const cbId=`cb_${param.k}`;
-      // Every check is fully toggleable. defaultOff only sets the STARTING tick
-      // state for this category — the editor can tick or untick any of them.
-      const checked=defaultOff.has(param.k)?'':' checked';
-      const tag=isReq?`<span class="req-tag">Required</span>`:'';
-      row.innerHTML=`<span class="pnum">${param.num}</span><input type="checkbox" class="param-cb" id="${cbId}" data-pillar="${pl.key}" data-key="${param.k}"${checked} onchange="updateCbCount()"><label for="${cbId}">${param.n}</label>${tag}`;
+      const tag=required.has(param.k)?`<span class="req-tag">Required</span>`:'';
+      row.innerHTML=`<span class="pnum">${param.num}</span><span class="param-on" title="Always evaluated">✓</span><span class="param-name">${param.n}</span>${tag}`;
       sec.appendChild(row);
     });
     container.appendChild(sec);
   });
-  updateCbCount();
+  const total=PILLARS.reduce((n,pl)=>n+pl.params.length,0);
+  const reqN=PILLARS.reduce((n,pl)=>n+pl.params.filter(p=>required.has(p.k)).length,0);
+  document.getElementById('cbCount').textContent=`${total} checks${reqN?` · ${reqN} required`:''}`;
 }
 
-function togglePillarAll(pillarKey,btn){
-  const cbs=[...document.querySelectorAll(`input[data-pillar="${pillarKey}"]`)];
-  const allChecked=cbs.every(c=>c.checked);
-  cbs.forEach(c=>{ c.checked=!allChecked; });
-  updateCbCount();
-}
-
-function updateCbCount(){
-  const total=document.querySelectorAll('.param-cb').length;
-  const checked=document.querySelectorAll('.param-cb:checked').length;
-  document.getElementById('cbCount').textContent=`${checked} of ${total} selected`;
-  PILLARS.forEach(pl=>{
-    const cbs=[...document.querySelectorAll(`input[data-pillar="${pl.key}"]`)];
-    const btn=document.querySelector(`button[onclick="togglePillarAll('${pl.key}',this)"]`);
-    if(btn) btn.textContent=cbs.every(c=>c.checked)?'all off':'all on';
-  });
-}
-
+// Every parameter, always. Nothing is excluded at analysis time.
 function getEnabledParams(){
   const enabled={};
-  document.querySelectorAll('.param-cb:checked').forEach(cb=>{enabled[cb.dataset.key]=true;});
+  PILLARS.forEach(pl=>pl.params.forEach(p=>{ enabled[p.k]=true; }));
   return enabled;
 }
 
@@ -940,7 +949,7 @@ function buildEEATSys(enabledParams, contentType){
   });
 
   const paramKeys = Object.keys(enabledParams).map(k =>
-    `"${k}":{"status":"missing","evidence":"","priority":"medium","area":"","suggestion":"","example":""}`
+    `"${k}":{"status":"missing","evidence":"","quote":"","priority":"medium","area":"","suggestion":"","example":""}`
   ).join(',');
 
   return `You are a senior content-quality analyst at Justwords, a professional content agency. Your reports are read by editors who produce content for many companies across many industries. Evaluate the supplied "${ct.label}" article${ct.isYMYL ? ' — this is YMYL content, so apply stricter Trust and accuracy standards' : ''}. Judge the MEANING and INTENT of the writing, not the presence of specific keywords. Be fair and experienced, like a real editor who understands the "feel" of a piece.
@@ -949,7 +958,7 @@ HOW TO SCORE EACH PARAMETER — a PRESENCE / PASS-FAIL check. The question is "i
 - "strong"  = the requirement is met AND you can cite the specific text that proves it. You MUST quote or closely paraphrase the exact words / number / section in the "evidence" field. It counts even if brief or stated only once — but if you cannot point to concrete supporting text, it is NOT "strong". Never infer presence from the topic alone, from what the piece "probably" contains, or from page furniture (author box, publish date, hyperlinks) that is not actually in the supplied text.
 - "partial" = the writer gestures at the requirement but it is too vague, generic, or hedged for a fair reader to be sure it is met, OR only part of what the parameter asks for is present.
 - "missing" = the requirement is genuinely absent — no reasonable reader would find it in the text. Also use "missing" (never "strong") when the check depends on markup or metadata that is simply not present in the pasted text.
-DO NOT use a "na" / "not_applicable" status. The editor has deliberately selected every parameter below, so each MUST be scored "strong", "partial", or "missing". If a requirement is genuinely not relevant to this topic, that means the article does not satisfy it → return "missing", and say so plainly in the evidence. Ignore any "Mark na if…" wording in the definitions below.
+DO NOT use a "na" / "not_applicable" status. Every parameter below is always evaluated, so each MUST be scored "strong", "partial", or "missing". If a requirement is genuinely not relevant to this topic, that means the article does not satisfy it → return "missing", and say so plainly in the evidence. Ignore any "Mark na if…" wording in the definitions below.
 
 JUDGEMENT PRINCIPLES (balanced — neither inflate nor nitpick):
 - If the requirement is genuinely present with citable evidence, mark it "strong" and move on — do not withhold "strong" merely because the writer "could add more". A single clear, evidenced instance is enough.
@@ -960,6 +969,7 @@ JUDGEMENT PRINCIPLES (balanced — neither inflate nor nitpick):
 
 EVIDENCE RULES:
 - "evidence" must quote or closely paraphrase the specific text that justifies the status. Never invent quotes. If you cannot find supporting text, the status is "missing".
+- "quote" is DIFFERENT from "evidence" and is used to highlight the article for the editor: copy a span of 10–200 characters VERBATIM, character-for-character, out of the supplied article — no paraphrase, no ellipsis, no quotation marks around it, nothing added or corrected. For "strong", quote the passage that proves the check passed. For "partial", quote the weak passage that needs strengthening. For "missing", return "" (there is nothing to point at). If you cannot copy an exact span, return "" rather than approximating — a wrong quote highlights the wrong text.
 - A required parameter that is "partial" or "missing" must use priority "high".
 - For every "partial" or "missing", give a concrete "area" (what is weak) plus a "suggestion" and a short "example" edit the writer can apply.
 
@@ -1008,6 +1018,71 @@ async function callGroq(key, sysPrompt, userMsg, maxTokens = 6000){
   const data = await res.json();
   const raw = data.choices?.[0]?.message?.content || '';
   if (!raw) throw new Error('Empty response from Groq API.');
+  return JSON.parse(raw);
+}
+
+// ── Claude (Anthropic) engine — YMYL / advanced only ───────────
+// GUARD: Claude is used ONLY when the selected category is YMYL, OR the editor
+// has turned on "Advanced Analysis". Everything else stays on Groq — this keeps
+// the higher-cost engine reserved for sensitive (Your-Money-Your-Life) content.
+const CLAUDE_MODEL = 'claude-opus-4-8';
+function advancedEnabled(){ const el=document.getElementById('advClaude'); return !!(el && el.checked); }
+function claudeEligible(){ return getCT(selectedCT).isYMYL || advancedEnabled(); }
+function resolveEngine(){
+  const key = (document.getElementById('claudeKey')||{}).value || '';
+  return (claudeEligible() && key.trim()) ? 'claude' : 'groq';
+}
+function updateEngineStatus(){
+  const row = document.getElementById('advRow');
+  if(row) row.classList.toggle('on', advancedEnabled());
+  const box = document.getElementById('engStatus'); if(!box) return;
+  const hasKey = ((document.getElementById('claudeKey')||{}).value||'').trim();
+  const ct = getCT(selectedCT);
+  const reason = ct.isYMYL ? `${ct.label} is YMYL content` : advancedEnabled() ? 'Advanced Analysis is ON' : '';
+  if(claudeEligible() && hasKey){
+    box.className='eng-status eng-claude';
+    box.innerHTML=`Engine: <strong>Claude (${CLAUDE_MODEL})</strong> — ${reason}, so this article will be analysed by Claude.`;
+  } else if(claudeEligible() && !hasKey){
+    box.className='eng-status eng-groq';
+    box.innerHTML=`<strong>Claude eligible</strong> (${reason}) but no Claude key entered${advancedEnabled()?' — add a key, or turn Advanced Analysis off to run on Groq.':' — add a Claude key above, or this runs on Groq.'}`;
+  } else {
+    box.className='eng-status eng-groq';
+    box.innerHTML='Standard engine: <strong>Groq</strong> — pick a YMYL category or turn on Advanced Analysis to route this article to Claude.';
+  }
+}
+
+// Anthropic Messages API from the browser. Mirrors callGroq's contract: returns
+// the parsed JSON the prompt asks for. Opus 4.8 rejects `temperature`, so it is
+// omitted; the model returns JSON as text which we parse (stripping ``` fences).
+async function callClaude(key, sysPrompt, userMsg, maxTokens = 4096){
+  const res = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': key,
+      'anthropic-version': '2023-06-01',
+      'anthropic-dangerous-direct-browser-access': 'true'
+    },
+    body: JSON.stringify({
+      model: CLAUDE_MODEL,
+      max_tokens: maxTokens,
+      system: sysPrompt + '\n\nReturn ONLY the JSON object described above — no prose, no markdown code fences.',
+      messages: [{ role: 'user', content: userMsg }]
+    })
+  });
+  if (!res.ok) {
+    const e = await res.json().catch(() => ({}));
+    const msg = e?.error?.message || `Claude API error ${res.status}`;
+    if (res.status === 429) throw new Error('RATE_LIMIT::' + msg);
+    if (res.status === 401) throw new Error('Claude key rejected (401) — check the key in the left panel.');
+    throw new Error(msg);
+  }
+  const data = await res.json();
+  let raw = (data.content || []).filter(b => b.type === 'text').map(b => b.text).join('').trim();
+  if (!raw) throw new Error('Empty response from Claude API.');
+  raw = raw.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim();
+  const s = raw.indexOf('{'), eIdx = raw.lastIndexOf('}');
+  if (s > 0 || eIdx < raw.length - 1) raw = raw.slice(s, eIdx + 1);
   return JSON.parse(raw);
 }
 
@@ -1291,12 +1366,23 @@ function updateLoadText(t){ document.getElementById('loadText').textContent = t;
 
 // ── Main Analyze ───────────────────────────────────────────────
 async function analyze(){
-  const key  = document.getElementById('groqKey').value.trim();
+  const key       = document.getElementById('groqKey').value.trim();
+  const claudeKey = document.getElementById('claudeKey').value.trim();
   const text = document.getElementById('content').value.trim();
-  if (!key)  { alert('Please enter your Groq API key.\nGet one free at console.groq.com/keys'); return; }
+  // ── Engine guard: Claude only for YMYL categories or Advanced Analysis ──
+  const engine = resolveEngine();
+  if (claudeEligible() && advancedEnabled() && !claudeKey) {
+    alert('Advanced Analysis (Claude) is ON but no Claude API key is set.\n\nAdd your Claude key in the left panel, or turn Advanced Analysis off to run this article on Groq.');
+    return;
+  }
+  if (engine === 'groq' && !key) {
+    const note = claudeEligible()
+      ? 'This is YMYL content — add a Claude API key to use the advanced engine, or a Groq key to run the standard engine.'
+      : 'Please enter your Groq API key.\nGet one free at console.groq.com/keys';
+    alert(note); return;
+  }
   if (text.length < 80) { alert('Please paste your blog content first.'); return; }
   const enabledParams = getEnabledParams();
-  if (!Object.keys(enabledParams).length) { alert('Please select at least one parameter to evaluate.'); return; }
   const wordCount = text.split(/\s+/).length;
 
   // UI — loading state
@@ -1319,8 +1405,18 @@ async function analyze(){
     stepActive('sd1');
     const sysPrompt = buildEEATSys(enabledParams, selectedCT);
     const numParams = Object.keys(enabledParams).length;
-    const plan = planRequest(sysPrompt, `Analyze this ${getCT(selectedCT).label} article. Title is the first line. Full text:\n\n`, text, numParams);
-    const merged = await callGroq(key, sysPrompt, plan.userMsg, plan.maxTokens);
+    const userPrefix = `Analyze this ${getCT(selectedCT).label} article. Title is the first line. Full text:\n\n`;
+    let merged;
+    if (engine === 'claude') {
+      // Claude has a large context window — send the article near-whole and
+      // reserve plenty of output; no Groq TPM juggling needed here.
+      updateLoadText('Analysing with Claude (advanced engine)…');
+      merged = await callClaude(claudeKey, sysPrompt, userPrefix + sampleArticle(text, 120000), 8000);
+    } else {
+      const plan = planRequest(sysPrompt, userPrefix, text, numParams);
+      merged = await callGroq(key, sysPrompt, plan.userMsg, plan.maxTokens);
+    }
+    merged._engine = engine;
     stepDone('sd1'); stepActive('sd2');
 
     // ── Guard against hallucinated "present" verdicts ──────────────
@@ -1362,7 +1458,7 @@ async function analyze(){
     const gates = computeGates(merged, selectedCT, wordCount, enabledParams, metrics);
     stepDone('sd4');
 
-    render(merged, enabledParams, gates);
+    render(merged, enabledParams, gates, text, metrics);
 
   } catch(err){
     document.getElementById('loading').style.display = 'none';
@@ -1490,49 +1586,271 @@ function renderScoreExplanation(r, enabledParams){
   </div>`;
 }
 
-// Ranked list of what to fix, most impactful first. Ranking basis:
-// (1) blocking hard-gate fails & Required checks, (2) missing checks & soft-gate
+// ── Ranked results (sections 2 & 3) ────────────────────────────
+// Both the problems and the strengths are ranked, concise, one row each.
+// Every row carries its own editor-remark tab — there is no separate review
+// section; remarks live next to the finding they are about.
+const clip = (s, n = 190) => { s = String(s == null ? '' : s).trim().replace(/\s+/g, ' '); return s.length > n ? s.slice(0, n - 1).trimEnd() + '…' : s; };
+
+// Everything that did not fully pass, most impactful first:
+// (1) blocking hard gates & Required checks, (2) missing checks & soft-gate
 // warnings, (3) partials & nice-to-have (AEO / structure) items.
-function renderRankedFixes(r, enabledParams, gates){
+function rankedBad(r, enabledParams, gates){
   const p = r.params || {};
   const required = new Set(getCT(selectedCT).required);
-  const norm = s => (s === 'good' ? 'strong' : s === 'needs_improvement' ? 'missing' : s);
   const items = [];
   scoredPillars().forEach(pl => {
     pl.params.filter(pm => enabledParams[pm.k]).forEach(pm => {
-      const d = p[pm.k] || {}; const st = norm(d.status || 'missing');
+      const d = p[pm.k] || {}; const st = _normStatus(d.status || 'missing');
       if (st === 'strong') return;
       const isReq = required.has(pm.k);
       const rank = isReq ? 1 : st === 'missing' ? 2 : 3;
       const why = d.suggestion || d.area || d.evidence || 'Not present — add content that satisfies this check.';
-      items.push({ rank, tag: isReq ? 'Required' : st === 'missing' ? 'Missing' : 'Partial', name: `${pm.n} · ${pl.label}`, why });
+      items.push({
+        key: pm.k, rank,
+        tag: isReq ? 'Required' : st === 'missing' ? 'Missing' : 'Partial',
+        name: `${pm.num} · ${pm.n}`, pillar: pl.label,
+        why: clip(why) + (d.example ? ` <em>e.g. ${clip(d.example, 90)}</em>` : ''),
+        verdict: st.toUpperCase()
+      });
     });
   });
   gates.forEach(g => {
     if (g.na || g.info || g.passed) return;
     const rank = g.type === 'hard' ? 1 : g.low ? 3 : 2;
-    items.push({ rank, tag: g.type === 'hard' ? 'Gate — blocks publish' : 'Gate', name: g.label, why: g.detail });
+    items.push({
+      key: 'gate:' + (g.id || slugify(g.label)), rank,
+      tag: g.type === 'hard' ? 'Gate — blocks publish' : 'Gate',
+      name: g.label, pillar: 'Publish gate', why: clip(g.detail),
+      verdict: g.type === 'hard' ? 'GATE FAIL' : 'GATE WARN'
+    });
   });
-  items.sort((a, b) => a.rank - b.rank);
-  if (!items.length) return `<div class="fixes"><div class="explain-title">✅ Priority Fixes</div><div class="exp-formula">Nothing outstanding — every selected check passed and no gate is failing.</div></div>`;
-  const rows = items.slice(0, 12).map((it, i) => `<div class="fixrow p${it.rank}"><div class="fixrank">${i + 1}</div><div class="fixbody"><div class="fixname">${it.name} <span class="fixtag t${it.rank}">${it.tag}</span></div><div class="fixwhy">${it.why}</div></div></div>`).join('');
-  return `<div class="fixes">
-    <div class="explain-title">🎯 Priority Fixes <span style="font-weight:400;color:var(--t3);font-size:11px">— ranked by impact: blocking gates &amp; required checks first, then missing, then partial / nice-to-have</span></div>
-    <div class="fixlist">${rows}</div>
+  return items.sort((a, b) => a.rank - b.rank);
+}
+
+// Everything that passed, ranked by how much it is worth: a Required check the
+// article actually satisfies is the strongest signal it has, so it leads.
+function rankedGood(r, enabledParams){
+  const p = r.params || {};
+  const required = new Set(getCT(selectedCT).required);
+  const items = [];
+  scoredPillars().forEach(pl => {
+    pl.params.filter(pm => enabledParams[pm.k]).forEach(pm => {
+      const d = p[pm.k] || {};
+      if (_normStatus(d.status || 'missing') !== 'strong') return;
+      const isReq = required.has(pm.k);
+      items.push({
+        key: pm.k, rank: isReq ? 1 : 2,
+        tag: isReq ? 'Required · met' : 'Strong',
+        name: `${pm.num} · ${pm.n}`, pillar: pl.label,
+        why: clip(d.evidence) || 'Passed — no evidence quote returned.',
+        verdict: 'STRONG'
+      });
+    });
+  });
+  return items.sort((a, b) => a.rank - b.rank);
+}
+
+// One ranked row + its editor-remark tab. `good` picks the green treatment.
+function resultRowHTML(it, i, good){
+  _revMeta[it.key] = { name: it.name, verdict: it.verdict, pillar: it.pillar };
+  const kq = it.key.replace(/'/g, "\\'");
+  const rankCls = good ? 'pg' : 'p' + it.rank;
+  const tagCls  = good ? 'tg' : 't' + it.rank;
+  return `<div class="fixrow ${rankCls}">
+    <div class="fixrank">${i + 1}</div>
+    <div class="fixbody">
+      <div class="fixname">${escHtml(it.name)} <span class="fixtag ${tagCls}">${escHtml(it.tag)}</span> <span class="fixpill">${escHtml(it.pillar)}</span></div>
+      <div class="fixwhy">${it.why}</div>
+      <div class="rmk-box" id="rmk_${escHtml(it.key)}">
+        <button class="rev-btn agree" onclick="revFeedback('${kq}','agree',this)">👍 Agree</button>
+        <button class="rev-btn disagree" onclick="revFeedback('${kq}','disagree',this)">👎 Disagree</button>
+        <input class="rev-note" type="text" placeholder="Editor remark on this check…" oninput="revNote('${kq}',this.value)">
+      </div>
+    </div>
+    <button class="rmk-tab no-print" id="tab_${escHtml(it.key)}" onclick="toggleRemark('${kq}',this)" title="Add an editor remark on this check">💬 Remark</button>
   </div>`;
 }
 
+function renderRankedList(items, good, emptyMsg){
+  if (!items.length) return `<div class="rsec-empty">${emptyMsg}</div>`;
+  return `<div class="fixlist">${items.map((it, i) => resultRowHTML(it, i, good)).join('')}</div>`;
+}
 
-// ── Main Render ────────────────────────────────────────────────
-function render(r, enabledParams, gates){
+
+// ── Report helpers ─────────────────────────────────────────────
+function escHtml(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+const _normStatus = s => (s === 'good' ? 'strong' : s === 'needs_improvement' ? 'missing' : s);
+
+// ── SECTION 4 — the article, marked red (bad) and green (good) ──
+// Matching the model's quotes against the raw article is the whole game here: a
+// quote that doesn't match shows up as nothing at all. Two things break a naive
+// indexOf — the model re-wraps whitespace, and it wraps quotes in punctuation
+// the article doesn't have. So search a whitespace-collapsed copy of the text
+// and keep a map back to the original offsets.
+function buildMatchIndex(text){
+  const norm = []; const map = [];        // map[i] = offset in `text` of norm[i]
+  let lastWasSpace = true;
+  for (let i = 0; i < text.length; i++){
+    const ch = text[i];
+    if (/\s/.test(ch)){
+      if (lastWasSpace) continue;
+      norm.push(' '); map.push(i); lastWasSpace = true;
+    } else {
+      norm.push(ch.toLowerCase()); map.push(i); lastWasSpace = false;
+    }
+  }
+  map.push(text.length);                  // end sentinel for the last range
+  return { norm: norm.join(''), map };
+}
+// Strip the packaging the model puts around a quote: surrounding quote marks,
+// ellipses, and a trailing sentence of its own commentary after " — ".
+function cleanQuote(s){
+  let q = String(s == null ? '' : s).trim();
+  q = q.replace(/^["'“”‘’«»\s.…]+/, '').replace(/["'“”‘’«»\s.…]+$/, '');
+  return q.replace(/\s+/g, ' ').trim();
+}
+
+function renderContentView(text, r){
+  text = text || '';
+  const gc = r.gate_checks || {};
+  const { norm, map } = buildMatchIndex(text);
+  const ranges = [];
+  // Find `needle` in the normalised text and record the ORIGINAL-text range.
+  const addAll = (needle, tip, cls, cap = 200) => {
+    const n = cleanQuote(needle).toLowerCase();
+    if (n.length < 4) return 0;
+    let from = 0, idx, count = 0;
+    while ((idx = norm.indexOf(n, from)) !== -1){
+      ranges.push({ start: map[idx], end: map[idx + n.length - 1] + 1, tip, cls });
+      from = idx + n.length;
+      if (++count >= cap || ranges.length > 900) break;
+    }
+    return count;
+  };
+  // A paraphrased quote won't match whole. Fall back to the longest run the
+  // model put in quote marks, then to its longest clause — better a partial
+  // mark on the right sentence than silence.
+  const addFuzzy = (raw, tip, cls, cap = 4) => {
+    if (addAll(raw, tip, cls, cap)) return true;
+    const inner = String(raw || '').match(/["'“‘]([^"'”’]{12,220})["'”’]/);
+    if (inner && addAll(inner[1], tip, cls, cap)) return true;
+    const clauses = String(raw || '').split(/[—–,;:.]/).map(s => s.trim()).filter(s => s.length >= 18)
+      .sort((a, b) => b.length - a.length);
+    for (const c of clauses.slice(0, 3)) if (addAll(c, tip, cls, cap)) return true;
+    return false;
+  };
+
+  // ── RED: the problems ──
+  FILLER_PHRASES.forEach(ph => addAll(ph, `Filler / AI-sounding phrase — cut “${ph}” or replace it with something concrete.`, 'hl-bad', 60));
+  ((gc.unsourced_stats && gc.unsourced_stats.examples) || []).forEach(s => addFuzzy(s, 'Unsourced statistic — attribute it to a named, dated source.', 'hl-bad', 20));
+  ((gc.contradictions && gc.contradictions.items) || []).forEach(s => addFuzzy(s, 'Possible contradiction — reconcile this with the conflicting statement.', 'hl-bad', 20));
+
+  // ── RED / GREEN: per-parameter evidence ──
+  const byKey = {};
+  PILLARS.forEach(pl => pl.params.forEach(pm => { byKey[pm.k] = { pm, pl }; }));
+  Object.entries(r.params || {}).forEach(([k, d]) => {
+    const meta = byKey[k]; if (!meta || !d) return;
+    const st = _normStatus(d.status);
+    const snippet = d.quote || d.evidence;
+    if (!snippet) return;
+    if (st === 'strong'){
+      addFuzzy(snippet, `✓ ${meta.pm.num} ${meta.pm.n} (${meta.pl.label}) — this passage is why the check passed. Keep it.`, 'hl-good', 3);
+    } else if (st === 'partial'){
+      addFuzzy(snippet, `${meta.pm.num} ${meta.pm.n} — partially met. ${clip(d.suggestion || 'Strengthen this passage.', 150)}`, 'hl-bad', 3);
+    }
+  });
+
+  // Longest-wins on overlap: keep the first range at each position, drop any
+  // that starts before the previous one ended.
+  ranges.sort((a, b) => a.start - b.start || b.end - a.end);
+  const merged = []; let lastEnd = -1;
+  ranges.forEach(rg => { if (rg.start >= lastEnd && rg.end > rg.start) { merged.push(rg); lastEnd = rg.end; } });
+  let html = '', pos = 0;
+  merged.forEach(rg => {
+    html += escHtml(text.slice(pos, rg.start));
+    html += `<mark class="hl ${rg.cls}" data-tip="${escHtml(rg.tip).replace(/"/g, '&quot;')}">${escHtml(text.slice(rg.start, rg.end))}</mark>`;
+    pos = rg.end;
+  });
+  html += escHtml(text.slice(pos));
+
+  const nGood = merged.filter(m => m.cls === 'hl-good').length;
+  const nBad  = merged.length - nGood;
+  const legend = `<div class="cview-legend">
+    <span class="cvl"><i class="hl hl-good"></i>Working well — keep it</span>
+    <span class="cvl"><i class="hl hl-bad"></i>Needs fixing</span>
+    <span class="cvl" style="color:var(--t3)">Hover any highlight for the reason</span>
+  </div>`;
+  const note = merged.length
+    ? `<strong style="color:#d83a3a">${nBad} passage${nBad === 1 ? '' : 's'} to fix</strong> and <strong style="color:var(--tru)">${nGood} passage${nGood === 1 ? '' : 's'} working well</strong> marked below — hover any highlight to see why.`
+    : 'Nothing could be marked in the text. Highlights are driven by the exact passages the model quotes back, so a short article — or one it summarised rather than quoted — can come back unmarked. Sections 2 and 3 still list every finding.';
+  return `<div class="cview-note">${note}</div>${merged.length ? legend : ''}<div class="cview">${html}</div>`;
+}
+
+// ── Editor remarks ─────────────────────────────────────────────
+// There is no separate review section: every result in sections 2 and 3 owns a
+// remark tab, so the editor's Agree / Disagree / note sits on the finding it is
+// about. Remarks are held in memory and copied out for the team.
+let _editorFeedback = {};
+let _revMeta = {};
+function toggleRemark(key, btn){
+  const box = document.getElementById('rmk_' + key); if (!box) return;
+  const open = box.classList.toggle('open');
+  btn.classList.toggle('active', open);
+  if (open){ const inp = box.querySelector('.rev-note'); if (inp) inp.focus(); }
+}
+function revFeedback(key, verdict, btn){
+  const fb = _editorFeedback[key] = _editorFeedback[key] || {};
+  const already = fb.verdict === verdict;
+  btn.parentNode.querySelectorAll('.rev-btn').forEach(b => b.classList.remove('active'));
+  if (already) fb.verdict = null; else { fb.verdict = verdict; btn.classList.add('active'); }
+  revStatus(key);
+}
+function revNote(key, val){ (_editorFeedback[key] = _editorFeedback[key] || {}).note = val; revStatus(key); }
+// Keep the row's tab and the toolbar counter in step with what's been entered.
+function revStatus(key){
+  if (key){
+    const f = _editorFeedback[key] || {};
+    const has = !!(f.verdict || (f.note || '').trim());
+    const tab = document.getElementById('tab_' + key);
+    if (tab){ tab.classList.toggle('filled', has); tab.innerHTML = has ? '💬 Remark •' : '💬 Remark'; }
+  }
+  const el = document.getElementById('revCount'); if (!el) return;
+  let n = 0; Object.values(_editorFeedback).forEach(f => { if (f && (f.verdict || (f.note || '').trim())) n++; });
+  el.innerHTML = `<strong>${n}</strong> remark${n === 1 ? '' : 's'}`;
+}
+function copyReview(){
+  const lines = [];
+  Object.entries(_editorFeedback).forEach(([k, f]) => {
+    if (!f || (!f.verdict && !(f.note || '').trim())) return;
+    const m = _revMeta[k] || { name: k, verdict: '?' };
+    lines.push(`- ${m.name}  [AI verdict: ${m.verdict}]  → editor: ${f.verdict || '(no vote)'}${(f.note || '').trim() ? ' — ' + f.note.trim() : ''}`);
+  });
+  const out = lines.length
+    ? `Editor remarks — ${getCT(selectedCT).label}${currentClient ? ' · ' + currentClient.name : ''} · ${new Date().toLocaleDateString()}\n\n${lines.join('\n')}`
+    : 'No remarks entered yet — open the 💬 Remark tab on any result first.';
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(out).then(() => alert('Editor remarks copied to clipboard.'), () => window.prompt('Copy the remarks below:', out));
+  } else { window.prompt('Copy the remarks below:', out); }
+}
+
+// Wrap a section body with a numbered header.
+function reportSection(num, favicon, title, sub, body){
+  return `<div class="rsec">
+    <div class="rsec-head"><span class="rsec-num">${num}</span><div><div class="rsec-title">${favicon} ${title}</div><div class="rsec-sub">${sub}</div></div></div>
+    <div class="rsec-body">${body}</div>
+  </div>`;
+}
+
+// ── Main Render — 4 clear sections ─────────────────────────────
+function render(r, enabledParams, gates, articleText, metrics){
+  _editorFeedback = {}; _revMeta = {};
   const p = r.params || {};
   const ct = getCT(selectedCT);
-  const required = new Set(ct.required);
-  const norm = s => (s === 'good' ? 'strong' : s === 'needs_improvement' ? 'missing' : s);
-  const statusOf = k => norm((p[k] && p[k].status) || 'missing');
+  const statusOf = k => _normStatus((p[k] && p[k].status) || 'missing');
   const verdict = vc(r.overall_score);
+  const engine = r._engine || 'groq';
 
-  // Tallies cover ONLY the selected checks in the four scored pillars (AEO is a gate).
   let cntStrong = 0, cntPartial = 0, cntMissing = 0, scoredCount = 0, pillarsUsed = 0;
   scoredPillars().forEach(pl => {
     let used = 0;
@@ -1544,71 +1862,17 @@ function render(r, enabledParams, gates){
     if (used) pillarsUsed++;
   });
 
-  // Per-pillar detail sections — scored pillars only. Unticked checks show as "not selected".
-  const secHTML = scoredPillars().map((pl, i) => {
-    const activeParams = pl.params.filter(pm => enabledParams[pm.k]);
-    const skippedParams = pl.params.filter(pm => !enabledParams[pm.k]);
-    if (!activeParams.length && !skippedParams.length) return '';
-    const { credit, n } = pillarCredit(r, pl, enabledParams);
-
-    const cards = [
-      ...activeParams.map(param => {
-        const d = p[param.k] || {};
-        const st = norm(d.status || 'missing');           // strong | partial | missing
-        const good = st === 'strong';
-        const isReq = required.has(param.k);
-        const reqFail = isReq && !good;
-        const priority = d.priority || (reqFail ? 'high' : 'medium');
-        const prioCls = priority === 'high' ? 'prio-high' : priority === 'low' ? 'prio-low' : 'prio-med';
-        const paramCls = reqFail ? 'req-fail' : good ? 'good' : st === 'partial' ? 'partial' : 'improve';
-        const iconCls  = reqFail ? 'pi-reqfail' : good ? 'pi-good' : st === 'partial' ? 'pi-partial' : 'pi-improve';
-        const badgeCls = reqFail ? 'pb-reqfail' : good ? 'pb-good' : st === 'partial' ? 'pb-partial' : 'pb-improve';
-        const badgeTxt = reqFail ? 'REQ FAIL' : good ? 'STRONG' : st === 'partial' ? 'PARTIAL' : 'MISSING';
-        const icon = good ? '✓' : reqFail ? '✗' : st === 'partial' ? '◐' : '↑';
-        return `<div class="param ${paramCls}">
-          <div class="param-head">
-            <div class="param-icon ${iconCls}">${icon}</div>
-            <div style="flex:1">
-              <div class="param-title">${param.n}${param.custom ? ' <span class="chip" style="font-size:8px">custom</span>' : ''}</div>
-              <div class="param-num">${param.num}${isReq ? '&nbsp;<span class="req-star">★ Required</span>' : ''}</div>
-            </div>
-            <div class="param-badge ${badgeCls}">${badgeTxt}</div>
-            ${!good ? `<span class="priority-badge ${prioCls}">${priority.charAt(0).toUpperCase() + priority.slice(1)}</span>` : ''}
-          </div>
-          <div class="evidence">${d.evidence || '—'}</div>
-          ${!good && (d.area || d.suggestion) ? `<div class="suggest-block">
-            <div class="suggest-header">✏️ Editor Suggestion</div>
-            ${d.area ? `<div class="suggest-area"><strong>Area:</strong> ${d.area}</div>` : ''}
-            <div class="suggest-solution">${d.suggestion || ''}${d.example ? `<br><strong>Example:</strong> ${d.example}` : ''}</div>
-          </div>` : ''}
-        </div>`;
-      }),
-      ...skippedParams.map(param => `<div class="param skipped"><div class="param-head"><div class="param-icon pi-skip">–</div><div style="flex:1"><div class="param-title" style="color:var(--t3)">${param.n}</div><div class="param-num">${param.num}</div></div><div class="param-badge pb-skip">NOT SELECTED</div></div><div class="evidence" style="color:var(--t3)">Unticked for this analysis — tick it in the left panel to score it.</div></div>`)
-    ].join('');
-
-    return `${i > 0 ? '<hr class="divider">' : ''}<div class="section">
-      <div class="section-head">
-        <div class="section-icon" style="background:${pl.ic}">${pl.emoji}</div>
-        <div style="flex:1"><div class="section-title" style="color:${pl.color}">${pl.label}</div><div class="section-desc">${pl.desc}</div></div>
-        <div class="section-score" style="background:${pl.sc};color:${pl.scolor}">${n > 0 ? fmt1(credit) + '/' + n : 'none ticked'}</div>
-      </div>
-      ${cards}
-    </div>`;
-  }).join('');
-
-  const heroMeta = `<div>${currentClient ? `<span class="client-stamp">👤 ${currentClient.name}${currentClient.industry ? ' · ' + currentClient.industry : ''}</span>` : ''}<span class="score-ct-badge">${ct.icon} ${ct.label}${ct.isYMYL ? ' · YMYL' : ''}</span><span class="score-verdict ${verdict.cls}">${verdict.label}</span></div>
+  const engBadge = engine === 'claude'
+    ? `<span class="eng-badge b-claude">⚙ Claude · ${CLAUDE_MODEL}</span>`
+    : `<span class="eng-badge b-groq">⚙ Groq · ${(document.getElementById('modelSel')||{}).value||''}</span>`;
+  const heroMeta = `<div>${currentClient ? `<span class="client-stamp">👤 ${currentClient.name}${currentClient.industry ? ' · ' + currentClient.industry : ''}</span>` : ''}${engBadge}<span class="score-ct-badge">${ct.icon} ${ct.label}${ct.isYMYL ? ' · YMYL' : ''}</span><span class="score-verdict ${verdict.cls}">${verdict.label}</span></div>
           <div class="score-summary">${r.summary || ''}</div>
           <div style="margin-top:8px;font-size:10px;color:var(--t3)">${cntStrong} strong · ${cntPartial} partial · ${cntMissing} missing — across ${scoredCount} scored check${scoredCount===1?'':'s'} in ${pillarsUsed} pillar${pillarsUsed===1?'':'s'}</div>
           ${currentClient && currentClient.notes ? `<div style="margin-top:8px;font-size:11px;color:var(--t2);padding:8px 10px;background:var(--s2);border:1px solid var(--border);border-radius:8px;line-height:1.55"><strong style="color:var(--aut)">Client brief:</strong> ${currentClient.notes}</div>` : ''}`;
 
-  document.getElementById('results').innerHTML = `
-    <div class="report-toolbar no-print">
-      <button class="btn-pdf" onclick="downloadPDF()">⬇ Download PDF</button>
-    </div>
-    <div class="print-head">
-      <div class="ph-t">Content Quality Report</div>
-      <div class="ph-s">${currentClient ? `${currentClient.name}${currentClient.industry ? ' · ' + currentClient.industry : ''} · ` : ''}${ct.icon} ${ct.label}${ct.isYMYL ? ' · YMYL' : ''} · Content Score ${r.overall_score}% · ${new Date().toLocaleDateString()}</div>
-    </div>
+  // SECTION 1 — score, publish decision, gate rules
+  const editorNote = r.editor_note ? `<div class="rsec-note" style="margin-top:14px"><strong>Editor's key note:</strong> ${escHtml(r.editor_note)}</div>` : '';
+  const sec1 = `
     ${renderPubStatus(gates)}
     ${renderScorecard(r, gates, cntStrong, cntPartial, cntMissing)}
     <div class="score-hero">
@@ -1618,11 +1882,38 @@ function render(r, enabledParams, gates){
       </div>
     </div>
     ${renderScoreExplanation(r, enabledParams)}
-    ${renderRankedFixes(r, enabledParams, gates)}
     ${renderGates(gates)}
-    ${secHTML}`;
+    ${editorNote}`;
+
+  // SECTION 2 — what needs fixing, ranked
+  const badItems = rankedBad(r, enabledParams, gates);
+  const sec2 = renderRankedList(badItems, false, 'Every check passed and no gate is failing — nothing needs fixing. 🎉');
+
+  // SECTION 3 — what's good, ranked
+  const goodItems = rankedGood(r, enabledParams);
+  const sec3 = renderRankedList(goodItems, true, 'No check scored as fully strong yet — see section 2 for what to strengthen.');
+
+  // SECTION 4 — the content, marked red and green
+  const sec4 = renderContentView(articleText || (document.getElementById('content')||{}).value || '', r);
+
+  document.getElementById('results').innerHTML = `
+    <div class="report-toolbar no-print">
+      <span class="rev-count" id="revCount"><strong>0</strong> remarks</span>
+      <span style="flex:1"></span>
+      <button class="rev-pill" onclick="copyReview()">⧉ Copy editor remarks</button>
+      <button class="btn-pdf" onclick="downloadPDF()">⬇ Download PDF</button>
+    </div>
+    <div class="print-head">
+      <div class="ph-t">Content Quality Report</div>
+      <div class="ph-s">${currentClient ? `${currentClient.name}${currentClient.industry ? ' · ' + currentClient.industry : ''} · ` : ''}${ct.icon} ${ct.label}${ct.isYMYL ? ' · YMYL' : ''} · Content Score ${r.overall_score}% · ${engine === 'claude' ? 'Claude' : 'Groq'} · ${new Date().toLocaleDateString()}</div>
+    </div>
+    ${reportSection(1, '🎯', 'Score, Publish Decision &amp; Gate Rules', 'The headline number, the publish verdict, how the score was built, and every gate check.', sec1)}
+    ${reportSection(2, '🔧', 'What Needs Fixing', `${badItems.length} finding${badItems.length === 1 ? '' : 's'}, ranked by impact — blocking gates and required checks first. Add a remark on any row you disagree with.`, sec2)}
+    ${reportSection(3, '✅', "What's Good", `${goodItems.length} strength${goodItems.length === 1 ? '' : 's'}, ranked by value — required checks the article meets lead. Add a remark on any row you disagree with.`, sec3)}
+    ${reportSection(4, '🖍️', 'The Content, Marked Up', 'Your article with the weak passages in red and the strong ones in green — hover any highlight for the reason.', sec4)}`;
   document.getElementById('results').style.display = 'block';
   document.getElementById('paneScore').scrollTop = 0;
+  revStatus();
 }
 
 // Export the on-screen report to PDF via the browser's print engine
@@ -1864,18 +2155,17 @@ function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(
 // ── Custom categories ──────────────────────────────────────────
 let editingCatKey = null;
 
-function buildCatParamPick(reqSet,offSet){
+function buildCatParamPick(reqSet){
   const c=document.getElementById('catParamPick'); c.innerHTML='';
   PILLARS.forEach(pl=>{
     const h=document.createElement('div'); h.className='pp-pl'; h.style.color=pl.color; h.textContent=`${pl.emoji} ${pl.label}${pl.gateOnly?' (gate checks)':''}`; c.appendChild(h);
     pl.params.forEach(param=>{
-      const sel=reqSet.has(param.k)?'required':offSet.has(param.k)?'off':'default';
+      const sel=reqSet.has(param.k)?'required':'default';
       const row=document.createElement('div'); row.className='pp-row';
       row.innerHTML=`<span class="pp-name">${param.n} <span style="color:var(--t3)">${param.num}</span></span>
         <select data-key="${param.k}">
-          <option value="default"${sel==='default'?' selected':''}>Default</option>
+          <option value="default"${sel==='default'?' selected':''}>Scored</option>
           <option value="required"${sel==='required'?' selected':''}>Required</option>
-          <option value="off"${sel==='off'?' selected':''}>Off</option>
         </select>`;
       c.appendChild(row);
     });
@@ -1897,7 +2187,7 @@ function openCatModal(editKey){
   document.getElementById('catTrust').value=g.trustThreshold==null?'':g.trustThreshold;
   document.getElementById('catReqDisc').checked=!!g.requireDisclaimer;
   document.getElementById('catReqAcc').checked=!!g.requireAccuracy;
-  buildCatParamPick(new Set(ct?ct.required:[]), new Set(ct?(ct.defaultOff||ct.notApplicable||[]):[]));
+  buildCatParamPick(new Set(ct?ct.required:[]));
   openModal('catModal');
 }
 
@@ -1905,10 +2195,9 @@ function openCatModal(editKey){
 function saveCat(){
   const name=document.getElementById('catName').value.trim();
   if(!name){ alert('Please enter a category name.'); return; }
-  const required=[], defaultOff=[];
+  const required=[];
   document.querySelectorAll('#catParamPick select').forEach(s=>{
     if(s.value==='required') required.push(s.dataset.key);
-    else if(s.value==='off') defaultOff.push(s.dataset.key);
   });
   const trustRaw=document.getElementById('catTrust').value.trim();
   const obj={
@@ -1916,7 +2205,7 @@ function saveCat(){
     icon:document.getElementById('catIcon').value.trim()||'🧩',
     desc:document.getElementById('catDesc').value.trim()||'Custom category',
     isYMYL:document.getElementById('catYMYL').checked,
-    required, defaultOff,
+    required,
     gates:{minWords:+document.getElementById('catMinWords').value||0,trustThreshold:trustRaw===''?null:+trustRaw,requireDisclaimer:document.getElementById('catReqDisc').checked,requireAccuracy:document.getElementById('catReqAcc').checked},
     custom:true
   };
@@ -1963,8 +2252,8 @@ function openCatManager(){
   Object.entries(ALLCATS).forEach(([key,ct])=>{
     const custom=isCustomCat(key);
     const row=document.createElement('div'); row.className='list-row';
-    const offN=(ct.defaultOff||ct.notApplicable||[]).length;
-    row.innerHTML=`<div style="flex:1"><div class="lr-name">${ct.icon} ${ct.label} ${ct.isYMYL?'<span class="chip">YMYL</span>':''} ${custom?'<span class="chip" style="color:var(--aut)">custom</span>':'<span class="chip">preset</span>'}</div><div class="lr-sub">${ct.desc} · ${(ct.required||[]).length} required · ${offN} off by default</div></div>`;
+    const totalN=PILLARS.reduce((n,pl)=>n+pl.params.length,0);
+    row.innerHTML=`<div style="flex:1"><div class="lr-name">${ct.icon} ${ct.label} ${ct.isYMYL?'<span class="chip">YMYL</span>':''} ${custom?'<span class="chip" style="color:var(--aut)">custom</span>':'<span class="chip">preset</span>'}</div><div class="lr-sub">${ct.desc} · all ${totalN} checks scored · ${(ct.required||[]).length} required</div></div>`;
     const btns=document.createElement('div'); btns.style.display='flex'; btns.style.gap='6px';
     if(custom){
       btns.innerHTML=`<button class="btn btn-sm" onclick="closeModal('catMgrModal');openCatModal('${key}')">Edit</button>`;
@@ -2000,7 +2289,7 @@ function saveCustomParam(){
   customParams.push({k:'cp_'+slugify(name)+'_'+uid().slice(0,3),n:name,num:prefix+n,pillar,def});
   lsSave(LS.params,customParams);
   installCustomParams();
-  buildCheckboxes();
+  buildParamSummary();
   document.getElementById('pName').value=''; document.getElementById('pDef').value='';
   renderCustomParamList();
 }
@@ -2010,7 +2299,7 @@ function deleteCustomParam(k){
   customParams=customParams.filter(c=>c.k!==k);
   lsSave(LS.params,customParams);
   installCustomParams();
-  buildCheckboxes();
+  buildParamSummary();
   renderCustomParamList();
 }
 
@@ -2103,13 +2392,14 @@ function deleteClient(){
 installCustomParams();
 rebuildCats();
 buildCTSelector();
-buildCheckboxes();
+buildParamSummary();
 buildClientSelect();
 buildClCatSelect();
 (function restoreClient(){
   const last=lsLoad(LS.lastClient,'');
   if(last && clients.find(c=>c.id===last)){ document.getElementById('clientSelect').value=last; applyClient(); }
 })();
+updateEngineStatus();
 
 
 </script>
