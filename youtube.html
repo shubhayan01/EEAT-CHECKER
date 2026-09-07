@@ -1,0 +1,1197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>YouTube Keyword & Competitor Research Tool</title>
+<style>
+  :root {
+    --bg: #0f1115;
+    --panel: #171a21;
+    --panel2: #1c2030;
+    --border: #262b36;
+    --text: #e8eaed;
+    --muted: #9aa2b1;
+    --accent: #ff4d4f;
+    --accent2: #4d7fff;
+    --accent3: #22c55e;
+    --accent4: #f59e0b;
+    --short-color: #a855f7;
+    --long-color: #06b6d4;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    padding: 28px 20px 80px;
+    min-height: 100vh;
+  }
+  .wrap { max-width: 960px; margin: 0 auto; }
+
+  /* HEADER */
+  .header { margin-bottom: 24px; }
+  .header h1 { font-size: 20px; font-weight: 700; letter-spacing: -0.3px; }
+  .header p { color: var(--muted); font-size: 13px; margin-top: 4px; }
+
+  /* TABS */
+  .tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--border); margin-bottom: 22px; }
+  .tab {
+    padding: 10px 18px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    color: var(--muted);
+    transition: 0.15s;
+    border-radius: 6px 6px 0 0;
+    user-select: none;
+  }
+  .tab:hover { color: var(--text); }
+  .tab.active { color: var(--text); border-bottom-color: var(--accent2); }
+  .tab-pane { display: none; }
+  .tab-pane.active { display: block; }
+
+  /* PANELS */
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 18px;
+    margin-bottom: 18px;
+  }
+  .panel-title { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: var(--muted); margin-bottom: 14px; }
+
+  /* FORM ELEMENTS */
+  label { font-size: 12px; color: var(--muted); display: block; margin-bottom: 5px; }
+  input[type=text], input[type=password], input[type=url] {
+    width: 100%;
+    padding: 10px 12px;
+    background: #0a0d12;
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    color: var(--text);
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  input:focus { border-color: var(--accent2); }
+  .hint { font-size: 11px; color: var(--muted); margin-top: 5px; }
+  .hint a { color: var(--accent2); }
+
+  .row { display: flex; gap: 10px; align-items: end; }
+  .row > .grow { flex: 1; }
+
+  /* BUTTONS */
+  button {
+    padding: 10px 18px;
+    border: none;
+    border-radius: 7px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    color: white;
+    white-space: nowrap;
+    transition: filter 0.15s, opacity 0.15s;
+  }
+  button.red { background: var(--accent); }
+  button.blue { background: var(--accent2); }
+  button.green { background: var(--accent3); color: #000; }
+  button.amber { background: var(--accent4); color: #000; }
+  button:disabled { opacity: 0.45; cursor: not-allowed; }
+  button:hover:not(:disabled) { filter: brightness(1.1); }
+
+  /* CHIPS */
+  .suggestions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+  .chip {
+    background: #1d212b;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 6px 13px;
+    font-size: 12px;
+    cursor: pointer;
+    user-select: none;
+    transition: 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .chip:hover { border-color: var(--accent2); }
+  .chip.selected { background: rgba(77,127,255,0.15); border-color: var(--accent2); color: white; }
+  .chip .vol {
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 10px;
+    background: rgba(255,255,255,0.07);
+    color: var(--muted);
+  }
+  .chip.selected .vol { background: rgba(77,127,255,0.3); color: #a0b8ff; }
+  .chip .vol.vol-high { color: #22c55e; }
+  .chip .vol.vol-med { color: #f59e0b; }
+  .chip .vol.vol-low { color: #9aa2b1; }
+
+  /* TOOLBAR */
+  .toolbar { display: flex; justify-content: space-between; align-items: center; margin-top: 14px; gap: 10px; flex-wrap: wrap; }
+  .count { font-size: 12px; color: var(--muted); }
+
+  /* STATUS */
+  .status { font-size: 13px; color: var(--muted); margin-top: 10px; min-height: 18px; line-height: 1.4; }
+  .status.error { color: var(--accent); }
+  .status.success { color: var(--accent3); }
+
+  /* ANALYSIS */
+  .analysis { white-space: pre-wrap; line-height: 1.7; font-size: 14px; }
+
+  /* PROGRESS */
+  .progress-bar-wrap { background: #1a1e28; border-radius: 6px; height: 6px; overflow: hidden; margin-top: 10px; }
+  .progress-bar { height: 100%; background: var(--accent2); transition: width 0.3s ease; border-radius: 6px; }
+
+  /* COMPETITOR RESEARCH TABLE */
+  .research-table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 4px; }
+  .research-table th {
+    text-align: left;
+    padding: 10px 12px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    color: var(--muted);
+    border-bottom: 1px solid var(--border);
+    background: #0f1218;
+  }
+  .research-table td {
+    padding: 11px 12px;
+    vertical-align: top;
+    border-bottom: 1px solid #1a1e28;
+    line-height: 1.4;
+  }
+  .research-table tr:last-child td { border-bottom: none; }
+  .research-table tr:hover td { background: #1a1e28; }
+
+  .kw-cell { color: var(--accent2); font-weight: 600; font-size: 12px; }
+  .vid-title { font-size: 13px; color: var(--text); font-weight: 500; }
+  .vid-title a { color: var(--text); text-decoration: none; }
+  .vid-title a:hover { color: var(--accent2); }
+  .views-cell { font-weight: 700; color: var(--text); font-size: 13px; white-space: nowrap; }
+  .views-cell .views-sub { font-size: 11px; color: var(--muted); font-weight: 400; display: block; }
+  .format-badge {
+    display: inline-block;
+    padding: 3px 9px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+  .format-badge.short { background: rgba(168,85,247,0.15); color: #c084fc; border: 1px solid rgba(168,85,247,0.3); }
+  .format-badge.long { background: rgba(6,182,212,0.15); color: #67e8f9; border: 1px solid rgba(6,182,212,0.3); }
+  .rank-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    font-size: 11px;
+    font-weight: 800;
+    margin-right: 8px;
+    flex-shrink: 0;
+  }
+  .rank-1 { background: rgba(245,158,11,0.2); color: #fbbf24; border: 1px solid rgba(245,158,11,0.4); }
+  .rank-2 { background: rgba(156,163,175,0.15); color: #9ca3af; border: 1px solid rgba(156,163,175,0.3); }
+  .rank-3 { background: rgba(180,83,9,0.15); color: #cd7c47; border: 1px solid rgba(180,83,9,0.3); }
+
+  .kw-group-row td { background: #13161f; }
+  .kw-group-label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.7px;
+    color: var(--accent2);
+    padding: 8px 12px 4px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .kw-group-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+  /* KEYWORD PILLS in research */
+  .kw-pill {
+    display: inline-block;
+    background: rgba(77,127,255,0.12);
+    border: 1px solid rgba(77,127,255,0.25);
+    color: #a0b8ff;
+    border-radius: 5px;
+    padding: 2px 8px;
+    font-size: 11px;
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+
+  /* SUMMARY STATS */
+  .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 18px; }
+  .stat-box {
+    background: var(--panel2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px;
+  }
+  .stat-box .val { font-size: 22px; font-weight: 800; color: var(--text); }
+  .stat-box .lbl { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+  /* CHANNEL CHIP */
+  .channel-name { font-size: 11px; color: var(--muted); margin-top: 3px; }
+
+  /* STEP INDICATOR */
+  .steps { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; }
+  .step {
+    display: flex; align-items: center; gap: 5px;
+    font-size: 11px; color: var(--muted);
+    background: #1a1e28;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 4px 10px;
+  }
+  .step.done { color: var(--accent3); border-color: rgba(34,197,94,0.3); background: rgba(34,197,94,0.05); }
+  .step.active { color: var(--accent2); border-color: rgba(77,127,255,0.4); background: rgba(77,127,255,0.07); animation: pulse 1.5s infinite; }
+  .step.error { color: var(--accent); border-color: rgba(255,77,79,0.3); }
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.6; } }
+  .step-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
+
+  /* EXPORT */
+  .export-row { display: flex; gap: 8px; margin-top: 14px; justify-content: flex-end; }
+
+  /* SPINNER */
+  .spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.15); border-top-color: var(--accent2); border-radius: 50%; animation: spin 0.7s linear infinite; vertical-align: middle; margin-right: 6px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* TREND / VIEWS-PER-HOUR BLOCKS (in AI Insight panel) */
+  .trend-heading { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.7px; color: var(--muted); margin-bottom: 6px; }
+  .trend-block { border: 1px solid var(--border); border-radius: 8px; background: #0f1218; margin-top: 12px; overflow: hidden; }
+  .trend-block-kw { font-weight: 700; color: #fff; padding: 10px 14px; border-bottom: 1px solid var(--border); }
+  .trend-body { padding: 14px; }
+  .trend-body > .trend-top-label:first-child { margin-top: 0; }
+  .vph-tag { font-size: 11px; font-weight: 700; color: var(--accent4); background: rgba(245,158,11,0.12); border-radius: 10px; padding: 2px 8px; margin-left: 8px; white-space: nowrap; }
+  .vph-tag.green-tag { color: var(--accent3); background: rgba(34,197,94,0.12); }
+  .trend-top-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin: 14px 0 8px; }
+  .trend-top a { color: #fff; font-weight: 600; text-decoration: none; }
+  .trend-top a:hover { color: var(--accent2); }
+  .trend-svg { width: 100%; height: 180px; display: block; }
+  .trend-svg text { fill: var(--muted); font-size: 10px; }
+  .trend-line { fill: none; stroke: var(--accent2); stroke-width: 2; }
+  .trend-dot { fill: var(--accent); }
+  .trend-area { fill: rgba(77,127,255,0.12); }
+
+  @media (max-width: 640px) {
+    .stats-row { grid-template-columns: repeat(2, 1fr); }
+    .research-table { font-size: 12px; }
+    .research-table th, .research-table td { padding: 8px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="header">
+    <h1>🎬 YouTube Keyword & Competitor Research Tool</h1>
+    <p>Live YouTube autosuggest with volume estimates · AI-powered competitor video research</p>
+  </div>
+
+  <div class="tabs">
+    <div class="tab active" onclick="switchTab('suggest')">🔍 Keyword Suggestions</div>
+    <div class="tab" onclick="switchTab('research')">📊 Competitor Research</div>
+    <div class="tab" onclick="switchTab('keys')">🔑 API Keys</div>
+  </div>
+
+  <!-- ===== TAB 1: KEYWORD SUGGESTIONS ===== -->
+  <div id="tab-suggest" class="tab-pane active">
+    <div class="panel">
+      <div class="panel-title">Search</div>
+      <div class="row">
+        <div class="grow">
+          <label for="keyword">Seed Keyword</label>
+          <input type="text" id="keyword" placeholder="e.g. content marketing strategy" />
+        </div>
+        <button class="red" id="searchBtn" onclick="fetchSuggestions()">Get Suggestions</button>
+      </div>
+      <div class="row" style="margin-top:10px;">
+        <div class="grow">
+          <label for="gl">Region (gl)</label>
+          <input type="text" id="gl" value="IN" />
+        </div>
+        <div class="grow">
+          <label for="hl">Language (hl)</label>
+          <input type="text" id="hl" value="en" />
+        </div>
+      </div>
+      <div class="status" id="searchStatus"></div>
+      <div class="suggestions" id="suggestionsList"></div>
+      <div class="toolbar" id="toolbar" style="display:none;">
+        <div class="count" id="selCount">0 selected</div>
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+          <button class="green" id="volBtn" onclick="fetchRealVolumes()">Fetch real volume</button>
+          <button class="blue" onclick="selectAll()">Select all</button>
+          <button class="amber" id="analyzeBtn" onclick="analyze()">Analyze with AI</button>
+        </div>
+      </div>
+    </div>
+    <div class="panel" id="analysisPanel" style="display:none;">
+      <div class="panel-title">AI Insight</div>
+      <div class="status" id="analyzeStatus"></div>
+      <div id="selectedTrends"></div>
+      <div class="analysis" id="analysisOutput"></div>
+    </div>
+  </div>
+
+  <!-- ===== TAB 2: COMPETITOR RESEARCH ===== -->
+  <div id="tab-research" class="tab-pane">
+    <div class="panel">
+      <div class="panel-title">Product / Service URL</div>
+      <div class="row">
+        <div class="grow">
+          <label for="researchUrl">Page URL to analyze</label>
+          <input type="url" id="researchUrl" placeholder="https://www.justwords.in/content/content-marketing-services/" value="https://www.justwords.in/content/content-marketing-services/" />
+        </div>
+        <button class="green" id="researchBtn" onclick="startResearch()">Run Research</button>
+      </div>
+      <div class="hint" style="margin-top:8px;">Requires Groq API key + YouTube Data API v3 key (set in API Keys tab). Groq will analyze the URL content, generate 10 keywords, then find top YouTube videos per keyword with real view counts &amp; format.</div>
+    </div>
+
+    <div class="panel" id="researchProgress" style="display:none;">
+      <div class="panel-title">Progress</div>
+      <div class="steps" id="stepsList"></div>
+      <div class="progress-bar-wrap" style="margin-top:12px;">
+        <div class="progress-bar" id="progressBar" style="width:0%"></div>
+      </div>
+      <div class="status" id="researchStatus"></div>
+    </div>
+
+    <div id="researchResults" style="display:none;">
+      <div class="stats-row" id="summaryStats"></div>
+      <div class="panel">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-wrap:wrap; gap:10px;">
+          <div class="panel-title" style="margin-bottom:0;">Video Report</div>
+          <div class="export-row" style="margin-top:0;">
+            <button class="blue" onclick="exportCSV()">Export CSV</button>
+            <button class="blue" onclick="exportHTML()">Export Report</button>
+          </div>
+        </div>
+        <div style="overflow-x:auto;">
+          <table class="research-table" id="resultTable">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Keyword</th>
+                <th>Video Title &amp; Channel</th>
+                <th>Views</th>
+                <th>Format</th>
+                <th>Rank</th>
+              </tr>
+            </thead>
+            <tbody id="resultTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== TAB 3: API KEYS ===== -->
+  <div id="tab-keys" class="tab-pane">
+    <div class="panel">
+      <div class="panel-title">Groq API Key (used for all AI features)</div>
+      <label for="groqKey">Groq API Key</label>
+      <input type="password" id="groqKey" placeholder="gsk_..." />
+      <div class="hint">Get a free key at <a href="https://console.groq.com/keys" target="_blank">console.groq.com/keys</a>. Used in both tabs — keyword intent analysis and competitor research. Never sent anywhere except directly to Groq.</div>
+    </div>
+    <div class="panel">
+      <div class="panel-title">YouTube Data API v3 Key (Tab 2 — Video Data)</div>
+      <label for="ytKey">YouTube Data API Key</label>
+      <input type="password" id="ytKey" placeholder="AIza..." />
+      <div class="hint">
+        Get a key at <a href="https://console.cloud.google.com/" target="_blank">Google Cloud Console</a> → Enable "YouTube Data API v3" → Create credentials → API Key. Required for real view counts, titles, and duration data. Free quota: 10,000 units/day.
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ===================== STATE =====================
+const KEYS_LS = {
+  groq: 'yt_tool_groq_key',
+  yt: 'yt_tool_yt_key'
+};
+let currentSuggestions = [];
+let selected = new Set();
+let jsonpCounter = 0;
+let researchData = [];
+let volumeMap = {};   // keyword -> { views, vph, top, videos } real YouTube demand
+let detailCache = {}; // keyword -> top-10 video data (for trend graphs)
+
+// Restore keys
+const groqKeyEl = document.getElementById('groqKey');
+const ytKeyEl = document.getElementById('ytKey');
+groqKeyEl.value = localStorage.getItem(KEYS_LS.groq) || '';
+ytKeyEl.value = localStorage.getItem(KEYS_LS.yt) || '';
+groqKeyEl.addEventListener('input', () => localStorage.setItem(KEYS_LS.groq, groqKeyEl.value.trim()));
+ytKeyEl.addEventListener('input', () => localStorage.setItem(KEYS_LS.yt, ytKeyEl.value.trim()));
+
+// ===================== TABS =====================
+function switchTab(name) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+  const idx = ['suggest','research','keys'].indexOf(name);
+  document.querySelectorAll('.tab')[idx].classList.add('active');
+  document.getElementById('tab-' + name).classList.add('active');
+}
+
+// ===================== TAB 1: SUGGESTIONS =====================
+const keywordEl = document.getElementById('keyword');
+const suggestionsListEl = document.getElementById('suggestionsList');
+const toolbarEl = document.getElementById('toolbar');
+const selCountEl = document.getElementById('selCount');
+const searchStatusEl = document.getElementById('searchStatus');
+const analysisPanelEl = document.getElementById('analysisPanel');
+const analyzeStatusEl = document.getElementById('analyzeStatus');
+const analysisOutputEl = document.getElementById('analysisOutput');
+
+function fetchYouTubeSuggestJSONP(keyword, gl, hl) {
+  return new Promise((resolve, reject) => {
+    const cbName = 'ytSuggestCb_' + (jsonpCounter++);
+    const script = document.createElement('script');
+    let settled = false;
+    const cleanup = () => { delete window[cbName]; script.remove(); };
+    window[cbName] = (data) => {
+      if (settled) return;
+      settled = true; cleanup();
+      try { resolve(data[1].map(item => Array.isArray(item) ? item[0] : item)); }
+      catch (e) { resolve([]); }
+    };
+    const params = new URLSearchParams({ client: 'youtube', ds: 'yt', hl: hl || 'en', gl: gl || 'US', callback: cbName, q: keyword, _: Date.now().toString() });
+    script.src = 'https://suggestqueries.google.com/complete/search?' + params.toString();
+    script.onerror = () => { if (settled) return; settled = true; cleanup(); reject(new Error('Network error')); };
+    document.body.appendChild(script);
+    setTimeout(() => { if (!settled) { settled = true; cleanup(); reject(new Error('Timeout')); } }, 8000);
+  });
+}
+
+async function fetchWithRetry(keyword, gl, hl) {
+  try { return await fetchYouTubeSuggestJSONP(keyword, gl, hl); }
+  catch (e) { await sleep(600); return await fetchYouTubeSuggestJSONP(keyword, gl, hl); }
+}
+
+// Volume estimation: heuristic from keyword characteristics
+function estimateVolume(keyword, rank) {
+  const kw = keyword.toLowerCase();
+  const wordCount = kw.split(/\s+/).length;
+  const hasNumbers = /\d/.test(kw);
+  const hasYear = /202[0-9]/.test(kw);
+  const isQuestion = /^(how|what|why|when|where|who|which|can|does|is|are)/.test(kw);
+  const isBeginner = /beginner|introduction|basics|tutorial|learn|start/.test(kw);
+  const isSpecific = wordCount >= 4;
+
+  let score = 100 - (rank * 5); // base: earlier suggestions = higher volume
+  if (wordCount <= 2) score += 30;
+  if (wordCount >= 5) score -= 20;
+  if (isQuestion) score += 15;
+  if (isBeginner) score += 10;
+  if (hasYear) score += 5;
+  if (isSpecific) score -= 10;
+  if (hasNumbers && !hasYear) score -= 5;
+
+  score = Math.max(5, Math.min(100, score));
+
+  // Convert to volume tier
+  if (score >= 70) return { label: 'High', tier: 'high', est: '100K+' };
+  if (score >= 45) return { label: 'Med', tier: 'med', est: '10K–100K' };
+  return { label: 'Low', tier: 'low', est: '<10K' };
+}
+
+async function fetchSuggestions() {
+  const keyword = keywordEl.value.trim();
+  const gl = document.getElementById('gl').value.trim() || 'US';
+  const hl = document.getElementById('hl').value.trim() || 'en';
+  if (!keyword) { setStatus(searchStatusEl, 'Enter a keyword first.', 'error'); return; }
+
+  setStatus(searchStatusEl, 'Fetching live suggestions from YouTube...', '');
+  suggestionsListEl.innerHTML = '';
+  toolbarEl.style.display = 'none';
+  analysisPanelEl.style.display = 'none';
+  selected = new Set();
+  volumeMap = {};
+
+  try {
+    const suggestions = await fetchWithRetry(keyword, gl, hl);
+    currentSuggestions = suggestions;
+    if (!suggestions.length) { setStatus(searchStatusEl, 'No suggestions found.', ''); return; }
+
+    const fetchedAt = new Date().toLocaleTimeString();
+    setStatus(searchStatusEl, `${suggestions.length} live suggestions · ${gl.toUpperCase()} region · ${fetchedAt} · badge shows a heuristic tier — click "Fetch real volume" for actual view-based numbers.`, '');
+
+    suggestions.forEach((s, i) => {
+      const vol = estimateVolume(s, i);
+      const chip = document.createElement('div');
+      chip.className = 'chip';
+      chip.dataset.i = i;
+      chip.innerHTML = `<span class="chip-lbl"></span><span class="vol vol-${vol.tier}" title="Estimated volume: ${vol.est}">${vol.label}</span>`;
+      chip.querySelector('.chip-lbl').textContent = s;
+      chip.onclick = () => toggleChip(i, chip);
+      suggestionsListEl.appendChild(chip);
+    });
+    toolbarEl.style.display = 'flex';
+    updateCount();
+
+    // Feature 1: if a YouTube key is set, load real volume for every suggestion now.
+    if (ytKeyEl.value.trim()) fetchRealVolumes();
+  } catch (err) {
+    setStatus(searchStatusEl, 'Error: ' + err.message, 'error');
+  }
+}
+
+// Volume tier colour keyed off real combined views of the top-3 ranking videos.
+function volTierClass(views) { return views >= 1e6 ? 'vol-high' : views >= 1e5 ? 'vol-med' : 'vol-low'; }
+
+// Feature 1: replace the heuristic badges with real demand = combined views of
+// each keyword's top-3 ranking YouTube videos (and cache views/hr for later).
+async function fetchRealVolumes() {
+  const key = ytKeyEl.value.trim();
+  if (!key) { setStatus(searchStatusEl, 'Add your YouTube Data API v3 key (API Keys tab) to load real search volume.', 'error'); return; }
+  if (!currentSuggestions.length) return;
+
+  const btn = document.getElementById('volBtn');
+  if (btn) btn.disabled = true;
+  setStatus(searchStatusEl, `Fetching real volume (top-3 video views) for ${currentSuggestions.length} keywords…`, '');
+  document.querySelectorAll('.chip .vol').forEach(v => { v.textContent = '…'; v.className = 'vol'; });
+
+  try {
+    const entries = await Promise.all(currentSuggestions.map(kw =>
+      getKeywordVideoData(kw, key, 3).then(d => ({ kw, d })).catch(e => ({ kw, err: e.message }))
+    ));
+    entries.forEach(({ kw, d, err }) => { volumeMap[kw] = err ? { err } : d; });
+
+    document.querySelectorAll('.chip').forEach(c => {
+      const kw = currentSuggestions[+c.dataset.i];
+      const v = c.querySelector('.vol');
+      const d = volumeMap[kw];
+      if (!v) return;
+      if (d && !d.err) {
+        v.textContent = formatViews(d.views);
+        v.className = 'vol ' + volTierClass(d.views);
+        v.title = d.views.toLocaleString() + ' combined views (top 3) · ' + fmtVph(d.vph) + ' views/hr';
+      } else { v.textContent = 'n/a'; v.className = 'vol vol-low'; v.title = (d && d.err) || ''; }
+    });
+    setStatus(searchStatusEl, 'Real volume loaded — the number on each keyword = combined views of its top 3 videos. Select keywords + "Analyze with AI" to see the top video and view-trend graph.', 'success');
+  } catch (e) {
+    setStatus(searchStatusEl, 'Volume fetch failed: ' + e.message, 'error');
+    document.querySelectorAll('.chip .vol').forEach(v => { if (v.textContent === '…') { v.textContent = 'n/a'; v.className = 'vol vol-low'; } });
+  } finally {
+    if (btn) btn.disabled = false;
+  }
+}
+
+function toggleChip(i, el) {
+  if (selected.has(i)) { selected.delete(i); el.classList.remove('selected'); }
+  else { selected.add(i); el.classList.add('selected'); }
+  updateCount();
+}
+function selectAll() {
+  selected = new Set(currentSuggestions.map((_, i) => i));
+  document.querySelectorAll('.chip').forEach(c => c.classList.add('selected'));
+  updateCount();
+}
+function updateCount() { selCountEl.textContent = selected.size + ' selected'; }
+
+async function analyze() {
+  const keyword = keywordEl.value.trim();
+  const groqKey = groqKeyEl.value.trim();
+  const picked = currentSuggestions.filter((_, i) => selected.has(i));
+  if (!groqKey) { alert('Enter your Groq API key in the API Keys tab.'); return; }
+  if (!picked.length) { alert('Select at least one suggestion.'); return; }
+
+  analysisPanelEl.style.display = 'block';
+  setStatus(analyzeStatusEl, '<span class="spinner"></span>Analyzing with Groq (openai/gpt-oss-120b)...', '');
+  analysisOutputEl.textContent = '';
+  document.getElementById('analyzeBtn').disabled = true;
+
+  // Features 2 & 3: show the top video + view-trend graph + views/hr for each
+  // selected keyword, in parallel with the Groq call.
+  renderSelectedTrends(picked);
+
+  const prompt = `You are a YouTube SEO and content strategist. Seed keyword: "${keyword}"
+
+Autosuggest results:
+${picked.map(s => '- ' + s).join('\n')}
+
+Give me:
+1. **Search Intent Breakdown** - group into intent categories with suggestions listed under each.
+2. **What the Audience Actually Wants** - underlying questions/needs driving these searches.
+3. **Content Gaps & Opportunities** - underserved or high-opportunity angles.
+4. **5 Video Title Ideas** - concrete, clickable titles mapped to search intent above.
+
+Be concise and practical.`;
+
+  try {
+    const text = await callGroqAPI(groqKey, [{ role: 'user', content: prompt }]);
+    setStatus(analyzeStatusEl, '', '');
+    analysisOutputEl.textContent = text || 'No response.';
+  } catch (err) {
+    setStatus(analyzeStatusEl, 'Error: ' + err.message, 'error');
+  } finally {
+    document.getElementById('analyzeBtn').disabled = false;
+  }
+}
+
+keywordEl.addEventListener('keydown', e => { if (e.key === 'Enter') fetchSuggestions(); });
+
+// ===================== TAB 2: COMPETITOR RESEARCH =====================
+const STEPS = [
+  { id: 'fetch', label: 'Fetch URL' },
+  { id: 'keywords', label: 'Generate Keywords' },
+  { id: 'search', label: 'Search YouTube' },
+  { id: 'videos', label: 'Fetch Video Data' },
+  { id: 'report', label: 'Build Report' }
+];
+
+let stepStates = {};
+
+function renderSteps() {
+  const el = document.getElementById('stepsList');
+  el.innerHTML = STEPS.map(s => {
+    const state = stepStates[s.id] || 'pending';
+    return `<div class="step ${state}"><div class="step-dot"></div>${s.label}</div>`;
+  }).join('');
+}
+
+function setStep(id, state) {
+  stepStates[id] = state;
+  renderSteps();
+}
+
+function setProgress(pct) {
+  document.getElementById('progressBar').style.width = pct + '%';
+}
+
+async function startResearch() {
+  const url = document.getElementById('researchUrl').value.trim();
+  const groqKey = groqKeyEl.value.trim();
+  const ytKey = ytKeyEl.value.trim();
+
+  if (!url) { alert('Enter a URL to analyze.'); return; }
+  if (!groqKey) { alert('Enter your Groq API key in the API Keys tab.'); switchTab('keys'); return; }
+  if (!ytKey) { alert('Enter your YouTube Data API v3 key in the API Keys tab.'); switchTab('keys'); return; }
+
+  document.getElementById('researchBtn').disabled = true;
+  document.getElementById('researchProgress').style.display = 'block';
+  document.getElementById('researchResults').style.display = 'none';
+  stepStates = {};
+  renderSteps();
+  setProgress(0);
+  researchData = [];
+
+  try {
+    // STEP 1: Fetch & understand URL
+    setStep('fetch', 'active');
+    setStatus(document.getElementById('researchStatus'), 'Fetching and analyzing the product page...', '');
+    const pageContent = await fetchAndAnalyzePage(url, groqKey);
+    setStep('fetch', 'done');
+    setProgress(20);
+
+    // STEP 2: Generate keywords
+    setStep('keywords', 'active');
+    setStatus(document.getElementById('researchStatus'), 'Generating 10 target YouTube keywords...', '');
+    const keywords = await generateKeywords(pageContent, groqKey);
+    setStep('keywords', 'done');
+    setProgress(40);
+    setStatus(document.getElementById('researchStatus'), `Generated ${keywords.length} keywords. Searching YouTube for each...`, '');
+
+    // STEP 3: Search YouTube for each keyword
+    setStep('search', 'active');
+    const searchResults = await searchYouTubeForKeywords(keywords, ytKey);
+    setStep('search', 'done');
+    setProgress(65);
+
+    // STEP 4: Fetch video details
+    setStep('videos', 'active');
+    setStatus(document.getElementById('researchStatus'), 'Fetching view counts and durations...', '');
+    const videoDetails = await fetchVideoDetails(searchResults, ytKey);
+    setStep('videos', 'done');
+    setProgress(85);
+
+    // STEP 5: Build report
+    setStep('report', 'active');
+    researchData = videoDetails;
+    buildReport(researchData);
+    setStep('report', 'done');
+    setProgress(100);
+    setStatus(document.getElementById('researchStatus'), `✓ Report ready — ${researchData.length} videos across ${keywords.length} keywords.`, 'success');
+
+  } catch (err) {
+    const activeStep = STEPS.find(s => stepStates[s.id] === 'active');
+    if (activeStep) setStep(activeStep.id, 'error');
+    setStatus(document.getElementById('researchStatus'), 'Error: ' + err.message, 'error');
+  } finally {
+    document.getElementById('researchBtn').disabled = false;
+  }
+}
+
+async function fetchAndAnalyzePage(url, apiKey) {
+  // Fetch page text via several CORS-friendly readers with fallback (see fetchPageText).
+  const pageText = await fetchPageText(url);
+
+  const res = await callGroqAPI(apiKey, [
+    { role: 'user', content: `Here is the text content scraped from this webpage: ${url}\n\n---\n${pageText}\n---\n\nSummarize in 300 words:\n- What service/product is this?\n- Who is the target audience (be specific)?\n- What are the core value propositions?\n- What problems does it solve?\n- What industry/niche is it in?\n\nBe factual and concise.` }
+  ], 'You are a content strategist who analyzes web pages to understand products and audiences.');
+  return res;
+}
+
+async function generateKeywords(pageAnalysis, apiKey) {
+  const res = await callGroqAPI(apiKey, [
+    { role: 'user', content: `Based on this product/service analysis:\n\n${pageAnalysis}\n\nGenerate exactly 10 YouTube search keywords that the TARGET AUDIENCE would realistically search on YouTube when looking for this type of service, learning about it, or solving related problems.\n\nRules:\n- Think like the buyer/user, not the brand\n- Mix informational, comparison, and how-to intent\n- Keep keywords 3-7 words long\n- Make them specific enough to be meaningful but broad enough to have real search volume\n- Do NOT include the brand name\n\nReturn ONLY a JSON array of 10 strings. Example: ["keyword one", "keyword two", ...]\nNo explanation, no markdown, just the raw JSON array.` }
+  ], 'You are a YouTube SEO specialist. Return only valid JSON.');
+
+  try {
+    const clean = res.replace(/```json|```/g, '').trim();
+    const arr = JSON.parse(clean);
+    if (!Array.isArray(arr) || arr.length === 0) throw new Error('Invalid keywords response');
+    return arr.slice(0, 10);
+  } catch (e) {
+    // Fallback: extract quoted strings
+    const matches = res.match(/"([^"]{5,60})"/g);
+    if (matches && matches.length >= 5) return matches.slice(0, 10).map(m => m.replace(/"/g, ''));
+    throw new Error('Could not parse keywords from AI response: ' + res.slice(0, 200));
+  }
+}
+
+async function searchYouTubeForKeywords(keywords, ytKey) {
+  const results = [];
+  for (let i = 0; i < keywords.length; i++) {
+    const kw = keywords[i];
+    setStatus(document.getElementById('researchStatus'), `Searching YouTube: "${kw}" (${i+1}/${keywords.length})...`, '');
+    try {
+      const r = await searchYouTube(kw, ytKey, 3);
+      results.push({ keyword: kw, videos: r });
+    } catch (e) {
+      results.push({ keyword: kw, videos: [], error: e.message });
+    }
+    await sleep(200); // rate limiting
+  }
+  return results;
+}
+
+async function searchYouTube(query, apiKey, maxResults = 3) {
+  const params = new URLSearchParams({
+    part: 'snippet',
+    q: query,
+    type: 'video',
+    maxResults: maxResults,
+    key: apiKey,
+    relevanceLanguage: 'en',
+    regionCode: 'IN',
+    order: 'relevance'
+  });
+  const res = await fetch(`https://www.googleapis.com/youtube/v3/search?${params}`);
+  if (!res.ok) {
+    const err = await res.json();
+    throw new Error(err.error?.message || 'YouTube API error ' + res.status);
+  }
+  const data = await res.json();
+  return (data.items || []).map(item => ({
+    videoId: item.id?.videoId,
+    title: item.snippet?.title,
+    channel: item.snippet?.channelTitle,
+    publishedAt: item.snippet?.publishedAt
+  })).filter(v => v.videoId);
+}
+
+async function fetchVideoDetails(searchResults, apiKey) {
+  // Collect all video IDs
+  const allIds = [];
+  const idToSearch = {};
+  searchResults.forEach(({ keyword, videos }) => {
+    videos.forEach((v, rank) => {
+      allIds.push(v.videoId);
+      idToSearch[v.videoId] = { keyword, rank: rank + 1, ...v };
+    });
+  });
+
+  if (allIds.length === 0) throw new Error('No videos found. Try different keywords or check your YouTube API key.');
+
+  // Batch fetch (max 50 per call)
+  const batches = [];
+  for (let i = 0; i < allIds.length; i += 50) batches.push(allIds.slice(i, i + 50));
+
+  const detailsMap = {};
+  for (const batch of batches) {
+    const params = new URLSearchParams({
+      part: 'statistics,contentDetails,snippet',
+      id: batch.join(','),
+      key: apiKey
+    });
+    const res = await fetch(`https://www.googleapis.com/youtube/v3/videos?${params}`);
+    if (!res.ok) throw new Error('YouTube videos API error ' + res.status);
+    const data = await res.json();
+    (data.items || []).forEach(item => {
+      detailsMap[item.id] = {
+        views: parseInt(item.statistics?.viewCount || '0'),
+        likes: parseInt(item.statistics?.likeCount || '0'),
+        duration: item.contentDetails?.duration || 'PT0S',
+        title: item.snippet?.title || '',
+        channel: item.snippet?.channelTitle || ''
+      };
+    });
+  }
+
+  // Merge
+  const rows = [];
+  searchResults.forEach(({ keyword, videos }) => {
+    videos.forEach((v, rank) => {
+      const details = detailsMap[v.videoId] || {};
+      const durationSec = parseDuration(details.duration || 'PT0S');
+      rows.push({
+        keyword,
+        rank: rank + 1,
+        videoId: v.videoId,
+        title: details.title || v.title,
+        channel: details.channel || v.channel,
+        views: details.views || 0,
+        likes: details.likes || 0,
+        durationSec,
+        isShort: durationSec <= 60 || (details.title || '').toLowerCase().includes('#short'),
+        url: `https://www.youtube.com/watch?v=${v.videoId}`,
+        publishedAt: v.publishedAt
+      });
+    });
+  });
+  return rows;
+}
+
+function parseDuration(iso) {
+  // ISO 8601 duration: PT4M30S
+  const m = iso.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/);
+  if (!m) return 0;
+  return ((parseInt(m[1] || 0) * 3600) + (parseInt(m[2] || 0) * 60) + parseInt(m[3] || 0));
+}
+
+function formatViews(n) {
+  if (n >= 1e9) return (n / 1e9).toFixed(1) + 'B';
+  if (n >= 1e6) return (n / 1e6).toFixed(1) + 'M';
+  if (n >= 1e3) return (n / 1e3).toFixed(1) + 'K';
+  return n.toString();
+}
+
+function formatDuration(sec) {
+  if (sec < 60) return sec + 's';
+  const m = Math.floor(sec / 60), s = sec % 60;
+  const h = Math.floor(m / 60), mm = m % 60;
+  if (h > 0) return `${h}:${String(mm).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  return `${m}:${String(s).padStart(2,'0')}`;
+}
+
+function buildReport(data) {
+  document.getElementById('researchResults').style.display = 'block';
+
+  // Summary stats
+  const totalViews = data.reduce((a, r) => a + r.views, 0);
+  const shorts = data.filter(r => r.isShort).length;
+  const keywords = [...new Set(data.map(r => r.keyword))];
+  const topVideo = data.reduce((a, b) => b.views > a.views ? b : a, data[0]);
+
+  document.getElementById('summaryStats').innerHTML = `
+    <div class="stat-box"><div class="val">${keywords.length}</div><div class="lbl">Keywords Analyzed</div></div>
+    <div class="stat-box"><div class="val">${data.length}</div><div class="lbl">Videos Found</div></div>
+    <div class="stat-box"><div class="val">${formatViews(totalViews)}</div><div class="lbl">Total Views (combined)</div></div>
+    <div class="stat-box"><div class="val">${shorts} / ${data.length - shorts}</div><div class="lbl">Shorts / Long-form</div></div>
+  `;
+
+  // Table
+  const tbody = document.getElementById('resultTableBody');
+  tbody.innerHTML = '';
+  let rowNum = 0;
+
+  keywords.forEach(kw => {
+    const kwVideos = data.filter(r => r.keyword === kw);
+    // Keyword group header row
+    const headerRow = document.createElement('tr');
+    headerRow.innerHTML = `<td colspan="6" style="padding:0;"><div class="kw-group-label"><span class="kw-pill">${escHtml(kw)}</span></div></td>`;
+    tbody.appendChild(headerRow);
+
+    kwVideos.forEach(row => {
+      rowNum++;
+      const tr = document.createElement('tr');
+      const rankClass = `rank-${row.rank}`;
+      tr.innerHTML = `
+        <td style="color:var(--muted);font-size:12px;">${rowNum}</td>
+        <td></td>
+        <td>
+          <div style="display:flex;align-items:flex-start;gap:6px;">
+            <span class="rank-badge ${rankClass}">${row.rank}</span>
+            <div>
+              <div class="vid-title"><a href="${row.url}" target="_blank">${escHtml(row.title)}</a></div>
+              <div class="channel-name">${escHtml(row.channel)} ${row.publishedAt ? '· ' + new Date(row.publishedAt).getFullYear() : ''}</div>
+            </div>
+          </div>
+        </td>
+        <td class="views-cell">
+          ${formatViews(row.views)}
+          <span class="views-sub">${row.views.toLocaleString()} views</span>
+          <span class="views-sub">${formatDuration(row.durationSec)}</span>
+        </td>
+        <td><span class="format-badge ${row.isShort ? 'short' : 'long'}">${row.isShort ? '⚡ Short' : '▶ Long-form'}</span></td>
+        <td style="color:var(--muted);font-size:12px;">#${row.rank}</td>
+      `;
+      tbody.appendChild(tr);
+    });
+  });
+}
+
+// ===================== EXPORT =====================
+function exportCSV() {
+  if (!researchData.length) return;
+  const headers = ['Keyword', 'Rank', 'Video Title', 'Channel', 'Views', 'Duration', 'Format', 'URL'];
+  const rows = researchData.map(r => [
+    `"${r.keyword}"`, r.rank, `"${r.title.replace(/"/g,'""')}"`, `"${r.channel}"`,
+    r.views, formatDuration(r.durationSec), r.isShort ? 'Short' : 'Long-form', r.url
+  ]);
+  const csv = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+  downloadFile('yt-competitor-research.csv', csv, 'text/csv');
+}
+
+function exportHTML() {
+  if (!researchData.length) return;
+  const keywords = [...new Set(researchData.map(r => r.keyword))];
+  const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>YouTube Competitor Report</title>
+<style>
+body{font-family:sans-serif;max-width:960px;margin:40px auto;color:#1a1a2e;background:#f8f9fc;}
+h1{color:#1a1a2e;margin-bottom:4px;}
+.meta{color:#666;font-size:13px;margin-bottom:32px;}
+.kw-section{margin-bottom:32px;}
+.kw-title{font-size:14px;font-weight:700;color:#4d7fff;background:#eef3ff;padding:8px 14px;border-radius:6px;margin-bottom:12px;display:inline-block;}
+table{width:100%;border-collapse:collapse;font-size:13px;}
+th{background:#f1f3f8;text-align:left;padding:10px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#666;border-bottom:2px solid #e0e4ef;}
+td{padding:10px;border-bottom:1px solid #e8ecf5;vertical-align:top;}
+tr:hover td{background:#f8f9fc;}
+.rank{font-weight:800;color:#4d7fff;}
+a{color:#1a73e8;text-decoration:none;}
+a:hover{text-decoration:underline;}
+.views{font-weight:700;}
+.short{background:#f3e8ff;color:#7c3aed;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:700;}
+.long{background:#e0f7fa;color:#00838f;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:700;}
+.channel{color:#888;font-size:12px;}
+</style></head><body>
+<h1>📊 YouTube Competitor Research Report</h1>
+<div class="meta">Generated ${new Date().toLocaleString()} · ${researchData.length} videos · ${keywords.length} keywords</div>
+${keywords.map(kw => {
+  const vids = researchData.filter(r => r.keyword === kw);
+  return `<div class="kw-section">
+<div class="kw-title">🔍 ${escHtml(kw)}</div>
+<table><thead><tr><th>Rank</th><th>Title</th><th>Channel</th><th>Views</th><th>Duration</th><th>Format</th></tr></thead>
+<tbody>${vids.map(r => `<tr>
+<td class="rank">#${r.rank}</td>
+<td><a href="${r.url}" target="_blank">${escHtml(r.title)}</a></td>
+<td class="channel">${escHtml(r.channel)}</td>
+<td class="views">${formatViews(r.views)}</td>
+<td>${formatDuration(r.durationSec)}</td>
+<td><span class="${r.isShort ? 'short' : 'long'}">${r.isShort ? '⚡ Short' : '▶ Long-form'}</span></td>
+</tr>`).join('')}</tbody></table></div>`;
+}).join('')}
+</body></html>`;
+  downloadFile('yt-competitor-report.html', html, 'text/html');
+}
+
+function downloadFile(filename, content, mime) {
+  const blob = new Blob([content], { type: mime });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = filename;
+  a.click();
+}
+
+// ===================== SHARED YOUTUBE DATA + TRENDS =====================
+// Views/hour = lifetime views ÷ hours since publish. A velocity/momentum signal.
+function hoursSince(iso) { const t = Date.parse(iso || ''); if (isNaN(t)) return 0; return Math.max(1, (Date.now() - t) / 3.6e6); }
+function viewsPerHour(views, iso) { const h = hoursSince(iso); return h ? (views || 0) / h : 0; }
+function fmtVph(v) { return formatViews(Math.round(v)); }
+function fmtDate(iso) { const t = Date.parse(iso || ''); if (isNaN(t)) return '—'; return new Date(t).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }); }
+
+// statistics + snippet for a set of video ids -> map keyed by id.
+async function fetchVideoStatsMap(ids, key) {
+  const map = {};
+  for (let i = 0; i < ids.length; i += 50) {
+    const batch = ids.slice(i, i + 50);
+    if (!batch.length) continue;
+    const params = new URLSearchParams({ part: 'statistics,contentDetails,snippet', id: batch.join(','), key });
+    const res = await fetch(`https://www.googleapis.com/youtube/v3/videos?${params}`);
+    if (!res.ok) throw new Error('YouTube videos API error ' + res.status);
+    const data = await res.json();
+    (data.items || []).forEach(it => {
+      map[it.id] = {
+        views: parseInt(it.statistics?.viewCount || '0'),
+        durationSec: parseDuration(it.contentDetails?.duration || 'PT0S'),
+        title: it.snippet?.title || '',
+        channel: it.snippet?.channelTitle || '',
+        publishedAt: it.snippet?.publishedAt || ''
+      };
+    });
+  }
+  return map;
+}
+
+// Search top-N videos for a keyword and return { views(top-N combined), vph, top, videos }.
+async function getKeywordVideoData(kw, key, n = 3) {
+  const found = await searchYouTube(kw, key, n);
+  const stats = found.length ? await fetchVideoStatsMap(found.map(v => v.videoId), key) : {};
+  const videos = found.map(v => ({ ...v, ...(stats[v.videoId] || { views: 0, durationSec: 0 }) }));
+  const views = videos.reduce((a, v) => a + (v.views || 0), 0);
+  const vph = videos.reduce((a, v) => a + viewsPerHour(v.views || 0, v.publishedAt), 0);
+  const top = videos.slice().sort((a, b) => (b.views || 0) - (a.views || 0))[0] || null;
+  return { views, vph, top, videos };
+}
+
+// Features 2 & 3: render a top-video + view-trend + views/hr block per selected keyword.
+async function renderSelectedTrends(keywords) {
+  const host = document.getElementById('selectedTrends');
+  const key = ytKeyEl.value.trim();
+  if (!key) {
+    host.innerHTML = '<div class="hint" style="margin:0 0 12px;">Add your YouTube Data API v3 key (API Keys tab) to see the top video and view-trend graph for each selected keyword.</div>';
+    return;
+  }
+  host.innerHTML = '<div class="trend-heading">Top video &amp; view trend — selected keyword' + (keywords.length > 1 ? 's' : '') + '</div>';
+
+  for (const kw of keywords) {
+    const block = document.createElement('div');
+    block.className = 'trend-block';
+    block.innerHTML = '<div class="trend-block-kw"></div><div class="trend-body">Loading top video &amp; trend…</div>';
+    block.querySelector('.trend-block-kw').textContent = kw;
+    host.appendChild(block);
+    const body = block.querySelector('.trend-body');
+    try {
+      if (!detailCache[kw]) detailCache[kw] = await getKeywordVideoData(kw, key, 10);
+      const d = detailCache[kw];
+      block.querySelector('.trend-block-kw').innerHTML =
+        escHtml(kw) + ' <span class="vph-tag" title="Combined views/hr of ranking videos — high &amp; sustained = lasting demand; a lone spike = a one-off">' + fmtVph(d.vph) + ' views/hr</span>';
+      drawTrend(body, kw, d.videos);
+    } catch (e) {
+      body.innerHTML = '<span style="color:var(--accent)">Could not load trend: ' + escHtml(e.message) + '</span>';
+    }
+  }
+}
+
+function drawTrend(host, kw, videos) {
+  const dated = videos.filter(v => Date.parse(v.publishedAt || ''));
+  const top = videos.slice().sort((a, b) => (b.views || 0) - (a.views || 0))[0];
+  const svg = dated.length >= 2 ? trendSvg(dated)
+    : '<div class="hint" style="margin:0;">Not enough dated videos to plot a trend.</div>';
+  const topBlock = top ? `
+    <div class="trend-top-label">Top-viewed video</div>
+    <div class="trend-top">
+      <a href="https://www.youtube.com/watch?v=${top.videoId}" target="_blank">${escHtml(top.title)}</a>
+      <span class="vph-tag green-tag">${(top.views || 0).toLocaleString()} views</span>
+      <div class="channel-name">${escHtml(top.channel)} · ${fmtDate(top.publishedAt)} · ${fmtVph(viewsPerHour(top.views, top.publishedAt))} views/hr · ${formatDuration(top.durationSec || 0)}</div>
+    </div>` : '';
+  host.innerHTML =
+    `<div class="trend-top-label">View trend — ranking videos by publish date (${dated.length} of top ${videos.length})</div>${svg}${topBlock}`;
+}
+
+// Inline SVG line chart: x = publish date, y = views, across the ranking videos.
+function trendSvg(videos) {
+  const pts = videos.map(v => ({ t: Date.parse(v.publishedAt), y: v.views || 0, v })).sort((a, b) => a.t - b.t);
+  const W = 640, H = 180, padL = 52, padR = 16, padT = 14, padB = 26;
+  const xs = pts.map(p => p.t), ys = pts.map(p => p.y);
+  const minX = Math.min(...xs), maxX = Math.max(...xs), maxY = Math.max(1, ...ys);
+  const sx = t => padL + (maxX === minX ? (W - padL - padR) / 2 : (t - minX) / (maxX - minX) * (W - padL - padR));
+  const sy = y => H - padB - (y / maxY) * (H - padT - padB);
+  const line = pts.map((p, i) => (i ? 'L' : 'M') + sx(p.t).toFixed(1) + ' ' + sy(p.y).toFixed(1)).join(' ');
+  const area = 'M' + sx(pts[0].t).toFixed(1) + ' ' + (H - padB) + ' ' +
+    pts.map(p => 'L' + sx(p.t).toFixed(1) + ' ' + sy(p.y).toFixed(1)).join(' ') +
+    ' L' + sx(pts[pts.length - 1].t).toFixed(1) + ' ' + (H - padB) + ' Z';
+  const dots = pts.map(p =>
+    `<circle class="trend-dot" cx="${sx(p.t).toFixed(1)}" cy="${sy(p.y).toFixed(1)}" r="3.5"><title>${escHtml(p.v.title)}\n${(p.y).toLocaleString()} views · ${fmtDate(p.v.publishedAt)}</title></circle>`
+  ).join('');
+  const yLabels = [0, maxY / 2, maxY].map(y =>
+    `<text x="${padL - 8}" y="${(sy(y) + 3).toFixed(1)}" text-anchor="end">${formatViews(Math.round(y))}</text>`
+  ).join('');
+  const xLabels =
+    `<text x="${padL}" y="${H - 8}" text-anchor="start">${fmtDate(new Date(minX).toISOString())}</text>` +
+    `<text x="${W - padR}" y="${H - 8}" text-anchor="end">${fmtDate(new Date(maxX).toISOString())}</text>`;
+  return `<svg class="trend-svg" viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet" role="img" aria-label="View trend for ranking videos">
+    <path class="trend-area" d="${area}"/><path class="trend-line" d="${line}"/>${dots}${yLabels}${xLabels}
+  </svg>`;
+}
+
+// ===================== ROBUST PAGE FETCH =====================
+function stripHtml(html) {
+  return String(html)
+    .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '')
+    .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '')
+    .replace(/<[^>]+>/g, ' ');
+}
+
+// Feature 4: fetch a page's readable text through several CORS-friendly readers,
+// falling back in order because any single proxy gets blocked/rate-limited for some sites.
+async function fetchPageText(url) {
+  const target = /^https?:\/\//i.test(url) ? url : 'https://' + url;
+  const attempts = [
+    { name: 'AllOrigins', url: `https://api.allorigins.win/get?url=${encodeURIComponent(target)}`, json: true },
+    { name: 'Jina Reader', url: 'https://r.jina.ai/' + target, text: true },
+    { name: 'corsproxy.io', url: `https://corsproxy.io/?url=${encodeURIComponent(target)}` },
+    { name: 'AllOrigins-raw', url: `https://api.allorigins.win/raw?url=${encodeURIComponent(target)}` },
+  ];
+  let lastErr = '';
+  for (const a of attempts) {
+    try {
+      const r = await fetch(a.url);
+      if (!r.ok) { lastErr = a.name + ' → HTTP ' + r.status; continue; }
+      let raw = a.json ? ((await r.json()).contents || '') : (await r.text());
+      // Jina returns clean text/markdown; others return raw HTML we strip.
+      let text = (a.text && !/<[a-z][\s\S]*>/i.test(raw)) ? raw : stripHtml(raw);
+      text = text.replace(/\s+/g, ' ').trim();
+      if (text.length < 60) { lastErr = a.name + ' → returned almost no text'; continue; }
+      return text.slice(0, 4000);
+    } catch (e) {
+      lastErr = a.name + ' → ' + (e.message || e);
+    }
+  }
+  throw new Error('Could not fetch the page after trying ' + attempts.length + ' readers. Last: ' + lastErr + '. The site may block automated readers — try another URL.');
+}
+
+// ===================== GROQ API =====================
+async function callGroqAPI(apiKey, messages, systemPrompt = '') {
+  const msgs = systemPrompt
+    ? [{ role: 'system', content: systemPrompt }, ...messages]
+    : messages;
+
+  const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + apiKey
+    },
+    body: JSON.stringify({
+      // Groq retired llama-3.3-70b-versatile (shutdown 2026-08-16). gpt-oss-120b
+      // is Groq's recommended production replacement. It is a reasoning model, so
+      // keep reasoning_effort low or the reasoning pass eats the completion budget.
+      model: 'openai/gpt-oss-120b',
+      messages: msgs,
+      temperature: 0.4,
+      max_tokens: 1024,
+      reasoning_effort: 'low'
+    })
+  });
+
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error?.message || 'Groq API error ' + res.status);
+  }
+
+  const data = await res.json();
+  return data.choices?.[0]?.message?.content || '';
+}
+
+// ===================== UTILS =====================
+function setStatus(el, msg, type) {
+  el.innerHTML = msg;
+  el.className = 'status' + (type ? ' ' + type : '');
+}
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+function escHtml(str) { return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+</script>
+</body>
+</html>

@@ -1,0 +1,12 @@
+# Dependencies
+node_modules/
+
+# Server-side report database (runtime data)
+reports.json
+
+# Unrelated WordPress snippet that lives in this folder
+rad.php
+
+# OS / editor cruft
+.DS_Store
+Thumbs.db

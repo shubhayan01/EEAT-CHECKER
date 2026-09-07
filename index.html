@@ -219,6 +219,7 @@ body{background:var(--bg);color:var(--text);font-family:'Instrument Sans',sans-s
 .score-hero{background:linear-gradient(135deg,rgba(155,110,243,.06),rgba(74,232,160,.03),rgba(232,131,74,.03));border:1px solid var(--border);border-radius:var(--r2);padding:22px;margin-bottom:18px;position:relative;overflow:hidden;}
 .score-hero::before{content:'';position:absolute;top:-50px;right:-50px;width:180px;height:180px;border-radius:50%;background:radial-gradient(circle,rgba(155,110,243,.08),transparent 70%);pointer-events:none;}
 .score-top{display:flex;align-items:flex-start;gap:20px;}
+.hero-cap{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--t3);margin-bottom:4px;}
 .score-big{font-family:'Syne',sans-serif;font-size:70px;font-weight:800;line-height:1;letter-spacing:-3px;background:linear-gradient(135deg,#2a2d3a 20%,var(--aut));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
 .score-pct{font-size:24px;opacity:.4;letter-spacing:0;}
 .score-meta{flex:1;padding-top:5px;}
@@ -412,6 +413,61 @@ mark.hl:hover::before{content:'';position:absolute;left:10px;bottom:calc(100% + 
 .rev-note:focus{border-color:var(--aut);}
 .rev-note::placeholder{color:var(--t3);}
 
+/* ── Login screen ── */
+.login-screen{position:fixed;inset:0;z-index:1000;display:flex;align-items:center;justify-content:center;padding:22px;background:linear-gradient(135deg,#e8ebf2,#f3f5f9);}
+.login-card{background:var(--s2);border:1px solid var(--border2);border-radius:var(--r2);width:100%;max-width:380px;padding:34px 30px 28px;box-shadow:0 24px 60px rgba(20,24,40,.16);text-align:left;}
+.login-logo{width:46px;height:46px;background:linear-gradient(135deg,var(--exp),var(--aut));border-radius:11px;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:17px;color:#fff;margin:0 auto 16px;}
+.login-card h1{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;text-align:center;letter-spacing:-.3px;}
+.login-sub{text-align:center;color:var(--t3);font-size:12px;margin:3px 0 22px;}
+.login-error{color:#d83a3a;font-size:12px;margin-top:10px;min-height:16px;font-weight:600;}
+.login-hint{margin-top:16px;padding-top:14px;border-top:1px solid var(--border);font-size:11px;color:var(--t3);line-height:1.6;text-align:center;}
+
+/* ── User box in header ── */
+.user-box{display:flex;align-items:center;gap:9px;margin-left:14px;}
+.user-chip{font-size:11px;font-weight:600;color:var(--t2);background:var(--s3);border:1px solid var(--border);padding:4px 11px;border-radius:100px;}
+.user-chip #userRole{color:var(--aut);text-transform:uppercase;font-size:9px;letter-spacing:.6px;font-weight:700;}
+.user-logout{font-size:11px;font-weight:700;padding:5px 12px;border-radius:var(--r);border:1px solid var(--border2);background:var(--s2);color:var(--text);cursor:pointer;font-family:'Syne',sans-serif;}
+.user-logout:hover{background:var(--s3);}
+
+/* ── Upload report button ── */
+.btn-upload{display:inline-flex;align-items:center;gap:7px;padding:9px 15px;background:linear-gradient(135deg,#0f9d63,#0c7d4f);border:none;border-radius:var(--r);color:#fff;font-family:'Syne',sans-serif;font-size:12px;font-weight:700;cursor:pointer;transition:all .2s;letter-spacing:.2px;}
+.btn-upload:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(15,157,99,.3);}
+.btn-upload:disabled{opacity:.6;cursor:default;transform:none;box-shadow:none;}
+
+/* ── Admin panel ── */
+.admin-panel{padding:26px 30px;max-width:1200px;margin:0 auto;height:calc(100vh - 57px);overflow-y:auto;}
+.admin-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:18px;}
+.admin-head h2{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;letter-spacing:-.4px;}
+.admin-sub{color:var(--t3);font-size:12px;margin-top:2px;}
+.admin-actions{display:flex;align-items:center;gap:9px;flex-wrap:wrap;}
+.admin-search{width:260px;max-width:60vw;}
+.admin-stats{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:18px;}
+.admin-stat{background:var(--s2);border:1px solid var(--border);border-radius:var(--r);padding:12px 16px;min-width:120px;}
+.admin-stat .as-num{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:var(--text);}
+.admin-stat .as-lbl{font-size:10px;text-transform:uppercase;letter-spacing:.7px;color:var(--t3);font-weight:600;margin-top:1px;}
+.rpt-row{display:grid;grid-template-columns:1fr 150px 84px 118px 130px auto;gap:12px;align-items:center;background:var(--s2);border:1px solid var(--border);border-radius:var(--r);padding:13px 16px;margin-bottom:8px;transition:border-color .15s;}
+.rpt-row:hover{border-color:var(--border2);}
+.rpt-head{background:transparent;border:none;padding:4px 16px;font-size:10px;text-transform:uppercase;letter-spacing:.7px;color:var(--t3);font-weight:700;margin-bottom:2px;}
+.rpt-client{font-weight:700;font-size:14px;color:var(--text);}
+.rpt-title{font-size:11px;color:var(--t3);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.rpt-cat{font-size:12px;color:var(--t2);}
+.rpt-score{font-family:'Syne',sans-serif;font-weight:800;font-size:18px;}
+.rpt-meta{font-size:11px;color:var(--t3);}
+.rpt-decision{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;padding:3px 9px;border-radius:100px;display:inline-block;}
+.dec-CLEARED{background:rgba(15,157,99,.12);color:var(--tru);}
+.dec-REVIEW{background:rgba(232,210,74,.16);color:var(--aeo);}
+.dec-BLOCKED{background:rgba(232,91,91,.12);color:#d83a3a;}
+.rpt-actions{display:flex;gap:6px;justify-content:flex-end;}
+.rpt-btn{font-size:11px;font-weight:700;padding:6px 11px;border-radius:8px;border:1px solid var(--border2);background:var(--s1);color:var(--text);cursor:pointer;font-family:'Syne',sans-serif;}
+.rpt-btn:hover{background:var(--s3);}
+.rpt-btn.danger{color:#d83a3a;border-color:rgba(232,91,91,.4);}
+.rpt-btn.danger:hover{background:rgba(232,91,91,.08);}
+.admin-empty{text-align:center;padding:60px 20px;color:var(--t3);}
+.admin-empty .empty-icon{font-size:42px;margin-bottom:10px;}
+.report-view-body{margin-top:6px;}
+.report-view-body .rmk-tab,.report-view-body .report-toolbar{display:none!important;}
+@media(max-width:820px){.rpt-row{grid-template-columns:1fr auto;}.rpt-cat,.rpt-meta,.rpt-decision{display:none;}}
+
 /* Print / Save-as-PDF: isolate the report */
 @media print{
   @page{margin:14mm;}
@@ -437,6 +493,28 @@ mark.hl:hover::before{content:'';position:absolute;left:10px;bottom:calc(100% + 
 </head>
 <body>
 
+<!-- ── Login screen ────────────────────────────────────────────── -->
+<div class="login-screen" id="loginScreen">
+  <div class="login-card">
+    <div class="login-logo">JW</div>
+    <h1>Content Quality Checker</h1>
+    <p class="login-sub">Sign in to continue</p>
+    <form id="loginForm" onsubmit="return doLogin(event)">
+      <label class="lbl">Username</label>
+      <input type="text" class="key-input" id="loginUser" autocomplete="username" placeholder="emp or admin" required>
+      <label class="lbl" style="margin-top:12px">Password</label>
+      <input type="password" class="key-input" id="loginPass" autocomplete="current-password" placeholder="••••••••" required>
+      <div class="login-error" id="loginError"></div>
+      <button type="submit" class="btn-analyze" id="loginBtn" style="margin-top:14px;width:100%">
+        <span class="spin" id="loginSpin"></span><span id="loginBtnTxt">Sign in</span>
+      </button>
+    </form>
+    <div class="login-hint" id="loginHint">
+      Employees generate reports and upload them.<br>Admins review every uploaded report.
+    </div>
+  </div>
+</div>
+
 <header class="header">
   <div class="logo-mark">JW</div>
   <div class="header-title">
@@ -449,6 +527,10 @@ mark.hl:hover::before{content:'';position:absolute;left:10px;bottom:calc(100% + 
     <span class="pill pill-aut">Authority</span>
     <span class="pill pill-tru">Trust</span>
     <span class="pill pill-aeo">Gate Rules</span>
+  </div>
+  <div class="user-box" id="userBox" style="display:none">
+    <span class="user-chip"><span id="userName"></span> · <span id="userRole"></span></span>
+    <button class="user-logout" onclick="doLogout()">Logout</button>
   </div>
 </header>
 
@@ -468,10 +550,11 @@ mark.hl:hover::before{content:'';position:absolute;left:10px;bottom:calc(100% + 
       <input type="password" class="key-input" id="groqKey" placeholder="gsk_…"/>
       <label class="lbl" style="margin-top:10px">Model</label>
       <select class="key-input" id="modelSel">
-        <option value="llama-3.3-70b-versatile">Llama 3.3 70B — Best quality (lower daily limit)</option>
-        <option value="llama-3.1-8b-instant">Llama 3.1 8B — Fast, high daily limit</option>
+        <option value="openai/gpt-oss-120b">GPT-OSS 120B — Best quality (recommended)</option>
+        <option value="openai/gpt-oss-20b">GPT-OSS 20B — Faster, lighter</option>
+        <option value="qwen/qwen3.6-27b">Qwen 3.6 27B — Alternative reasoning model</option>
       </select>
-      <div class="help">Hit the daily token limit on 70B? Switch to 8B to keep working. One analysis = one API call.</div>
+      <div class="help">Groq retired the old Llama free-tier models in June 2026; these are the current free reasoning models. All share an 8k tokens/min limit — if one is busy or capped, switch and re-run. One analysis = one API call.</div>
       <label class="lbl" style="margin-top:10px">Google Search Key <span style="color:var(--t3);text-transform:none;letter-spacing:0;font-weight:400">(Serper.dev — Content Analysis tab only)</span> <a href="https://serper.dev/api-key" target="_blank">→ Get free key</a></label>
       <input type="password" class="key-input" id="serperKey" placeholder="Serper.dev API key (optional)"/>
       <div class="help">Only needed for the <strong>Content Analysis</strong> tab, which searches Google for your topic and compares the top-ranking blogs against yours. The Content Score tab doesn't use it.</div>
@@ -498,7 +581,7 @@ mark.hl:hover::before{content:'';position:absolute;left:10px;bottom:calc(100% + 
       </div>
       <!-- Token warning shown when content is large -->
       <div class="token-banner" id="tokenBanner">
-        <strong>Long article.</strong> If it exceeds the model's token budget, the beginning and end are sent in full and only the middle is sampled — your intro, conclusion and structure are always analysed, so scores stay reliable. This is not an error. For complete coverage of very long pieces, use the 70B model or analyse in sections.
+        <strong>Long article.</strong> If it exceeds the model's token budget, the beginning and end are sent in full and only the middle is sampled — your intro, conclusion and structure are always analysed, so scores stay reliable. This is not an error. For complete coverage of very long pieces, analyse in sections.
       </div>
     </div>
 
@@ -582,6 +665,33 @@ mark.hl:hover::before{content:'';position:absolute;left:10px;bottom:calc(100% + 
       </div>
       <div id="analysisResults"></div>
     </div>
+  </div>
+</div>
+
+<!-- ── Admin panel (reports dashboard) ─────────────────────────── -->
+<div class="admin-panel" id="adminPanel" style="display:none">
+  <div class="admin-head">
+    <div>
+      <h2>📋 Reports Dashboard</h2>
+      <p class="admin-sub">Every content quality report uploaded by the team.</p>
+    </div>
+    <div class="admin-actions">
+      <input type="text" class="key-input admin-search" id="adminSearch" placeholder="Search client, category, uploader…" oninput="renderAdminReports()">
+      <button class="rev-pill" onclick="loadAdminReports()">↻ Refresh</button>
+    </div>
+  </div>
+  <div class="admin-stats" id="adminStats"></div>
+  <div id="adminReportsList"></div>
+</div>
+
+<!-- ── Report viewer (admin) ───────────────────────────────────── -->
+<div class="overlay" id="reportViewModal">
+  <div class="modal" style="max-width:920px">
+    <div class="modal-head">
+      <div class="modal-title" id="reportViewTitle">Report</div>
+      <button class="modal-close" onclick="closeModal('reportViewModal')">✕</button>
+    </div>
+    <div id="reportViewBody" class="report-view-body"></div>
   </div>
 </div>
 
@@ -882,8 +992,8 @@ document.getElementById('content').addEventListener('input',function(){
   document.getElementById('wc').textContent=wc;
   document.getElementById('cc').textContent=this.value.length;
   // Show token warning banner only for genuinely long articles that may be sampled.
-  // The 70B model comfortably handles ~2,000+ words, so don't alarm people early.
-  document.getElementById('tokenBanner').classList.toggle('show', wc > 2200);
+  // On the 8k-TPM free tier, articles past ~1,300 words start getting sampled.
+  document.getElementById('tokenBanner').classList.toggle('show', wc > 1300);
 });
 
 // ── Content-Score System Prompt ────────────────────────────────
@@ -949,7 +1059,7 @@ function buildEEATSys(enabledParams, contentType){
   });
 
   const paramKeys = Object.keys(enabledParams).map(k =>
-    `"${k}":{"status":"missing","evidence":"","quote":"","priority":"medium","area":"","suggestion":"","example":""}`
+    `"${k}":{"status":"missing","evidence":"","quote":"","suggestion":""}`
   ).join(',');
 
   return `You are a senior content-quality analyst at Justwords, a professional content agency. Your reports are read by editors who produce content for many companies across many industries. Evaluate the supplied "${ct.label}" article${ct.isYMYL ? ' — this is YMYL content, so apply stricter Trust and accuracy standards' : ''}. Judge the MEANING and INTENT of the writing, not the presence of specific keywords. Be fair and experienced, like a real editor who understands the "feel" of a piece.
@@ -966,12 +1076,13 @@ JUDGEMENT PRINCIPLES (balanced — neither inflate nor nitpick):
 - Reward substance over vocabulary. A point made well in plain language is "strong" even if it avoids the textbook term.
 - First-person experience counts whether the author writes "I", "my", "we", "our" or "us". For a brand, "we/our" IS the normal voice — treat it as fully equivalent to "I".
 - A conclusion/takeaway does NOT need a "Conclusion" heading or the words "in conclusion"; any closing passage that synthesises, recommends, or points to a next step satisfies it.
+- Judge like a senior editor separating genuine first-hand expertise from generic, content-mill filler. Real E-E-A-T shows specific numbers, named sources, lived detail, and a point of view only a practitioner could write. Fluent-but-hollow prose that could describe any brand is NOT "strong" — it is "partial" at best, no matter how polished.
+- Score decisively across the full 0–100 range. Do not cluster everything at "partial"/mid-range to play safe — genuinely strong writing earns "strong", genuinely absent requirements earn "missing". A hedged middle report is less useful to the editor than an honest, discriminating one.
 
 EVIDENCE RULES:
 - "evidence" must quote or closely paraphrase the specific text that justifies the status. Never invent quotes. If you cannot find supporting text, the status is "missing".
 - "quote" is DIFFERENT from "evidence" and is used to highlight the article for the editor: copy a span of 10–200 characters VERBATIM, character-for-character, out of the supplied article — no paraphrase, no ellipsis, no quotation marks around it, nothing added or corrected. For "strong", quote the passage that proves the check passed. For "partial", quote the weak passage that needs strengthening. For "missing", return "" (there is nothing to point at). If you cannot copy an exact span, return "" rather than approximating — a wrong quote highlights the wrong text.
-- A required parameter that is "partial" or "missing" must use priority "high".
-- For every "partial" or "missing", give a concrete "area" (what is weak) plus a "suggestion" and a short "example" edit the writer can apply.
+- For every "partial" or "missing", give a specific, actionable "suggestion" — name what is weak and the concrete edit the writer should make (not generic advice like "add more detail"). For "strong", leave "suggestion" as "".
 
 PILLAR SCORE FIELDS (experience_score etc.): recomputed by our system from your per-parameter statuses — just return them as 0.
 
@@ -994,20 +1105,26 @@ Return ONLY this JSON (no markdown, no backticks). Keep evidence/suggestion stri
 
 // ── Groq API call helper ───────────────────────────────────────
 async function callGroq(key, sysPrompt, userMsg, maxTokens = 6000){
-  const model = (document.getElementById('modelSel')||{}).value || 'llama-3.3-70b-versatile';
+  const model = (document.getElementById('modelSel')||{}).value || 'openai/gpt-oss-120b';
+  const body = {
+    model,
+    max_tokens: maxTokens,
+    temperature: 0.1,
+    response_format: { type: 'json_object' },
+    messages: [
+      { role: 'system', content: sysPrompt },
+      { role: 'user', content: userMsg }
+    ]
+  };
+  // The current Groq free models are reasoning models. A modest reasoning pass
+  // sharpens the editorial judgement, but on the 8k-tokens/min free tier the
+  // reasoning tokens compete with the article + JSON output, so keep it low so
+  // the whole request reliably fits the budget.
+  if (model.startsWith('openai/gpt-oss')) body.reasoning_effort = 'low';
   const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${key}` },
-    body: JSON.stringify({
-      model,
-      max_tokens: maxTokens,
-      temperature: 0.1,
-      response_format: { type: 'json_object' },
-      messages: [
-        { role: 'system', content: sysPrompt },
-        { role: 'user', content: userMsg }
-      ]
-    })
+    body: JSON.stringify(body)
   });
   if (!res.ok) {
     const e = await res.json().catch(() => ({ error: { message: `HTTP ${res.status}` } }));
@@ -1087,28 +1204,34 @@ async function callClaude(key, sysPrompt, userMsg, maxTokens = 4096){
 }
 
 // ── Adaptive request sizing ────────────────────────────────────
-// Groq counts input + max_tokens (output reservation) against the per-minute
-// limit. The 8B model is only 6k TPM, so we must scale both the article we
-// send AND the output we reserve to the selected model's budget.
+// Groq counts prompt + reasoning + output tokens against the per-minute limit.
+// The current free reasoning models all sit at 8k TPM, so we scale the article
+// we send AND the output we reserve to fit inside that ceiling, and set aside a
+// slice for the model's (low-effort) reasoning pass.
 const MODEL_LIMITS = {
-  'llama-3.3-70b-versatile': { tpm: 12000 },
-  'llama-3.1-8b-instant':    { tpm: 6000 }
+  'openai/gpt-oss-120b': { tpm: 8000, reasoning: 700 },
+  'openai/gpt-oss-20b':  { tpm: 8000, reasoning: 600 },
+  'qwen/qwen3.6-27b':    { tpm: 8000, reasoning: 500 }
 };
 function estTokens(str){ return Math.ceil((str||'').length / 4); }
 function planRequest(sysPrompt, userPrefix, articleText, numParams){
-  const model = (document.getElementById('modelSel')||{}).value || 'llama-3.3-70b-versatile';
-  const tpm = (MODEL_LIMITS[model] || { tpm:6000 }).tpm;
-  const safety = 350;
+  const model = (document.getElementById('modelSel')||{}).value || 'openai/gpt-oss-120b';
+  const lim = MODEL_LIMITS[model] || { tpm:8000, reasoning:600 };
+  const tpm = lim.tpm;
+  const reasoningReserve = lim.reasoning || 0;
+  const safety = 300;
   const sysTok = estTokens(sysPrompt) + 40;
   const wrapTok = estTokens(userPrefix) + 30;
   // Output floor: enough to return every parameter object without truncating the
-  // JSON (which would break parsing). Don't reserve less than this.
-  const minOut = numParams * 50 + 1200;
-  let maxTokens = Math.min(6000, minOut + 400);
-  let articleBudget = tpm - safety - maxTokens - sysTok - wrapTok;
-  if (articleBudget < 400){          // trim the output reservation down to the floor first
+  // JSON (which would break parsing). The output was trimmed to four fields per
+  // parameter, so ~30 tokens each is realistic. Don't reserve less than this.
+  const minOut = numParams * 30 + 900;
+  let maxTokens = Math.min(2600, minOut + 250);
+  const fixed = safety + reasoningReserve + sysTok + wrapTok;
+  let articleBudget = tpm - fixed - maxTokens;
+  if (articleBudget < 500){          // trim the output reservation down to the floor first
     maxTokens = minOut;
-    articleBudget = tpm - safety - maxTokens - sysTok - wrapTok;
+    articleBudget = tpm - fixed - maxTokens;
   }
   if (articleBudget < 400){          // even at the floor it won't fit — tell the user how to fix it
     throw new Error('TOO_BIG::' + JSON.stringify({ tpm, numParams, model }));
@@ -1468,22 +1591,21 @@ async function analyze(){
     const isBig = msg.startsWith('TOO_BIG::');
     if (isBig) {
       let info = {}; try { info = JSON.parse(msg.replace('TOO_BIG::','')); } catch(e){}
-      const is8b = (info.model||'').includes('8b');
       document.getElementById('emptyState').innerHTML =
-        `<div class="empty-icon">📉</div><h3 style="color:var(--improve)">Request Too Large for This Model</h3>`+
-        `<p style="color:var(--t2);max-width:360px;text-align:center">The ${is8b?'Llama 3.1 8B':'selected'} model allows only <strong style="color:var(--text)">${info.tpm||'6000'} tokens/minute</strong>, and this analysis (${info.numParams||'many'} parameters + your article) needs more.<br><br>`+
+        `<div class="empty-icon">📉</div><h3 style="color:var(--improve)">Article Too Long for One Free-Tier Call</h3>`+
+        `<p style="color:var(--t2);max-width:360px;text-align:center">Groq's free reasoning models allow <strong style="color:var(--text)">${info.tpm||'8000'} tokens/minute</strong>, and this analysis (${info.numParams||'many'} checks + your article) needs more in a single request.<br><br>`+
         `<strong style="color:var(--text)">Fixes, easiest first:</strong><br>`+
-        `${is8b?'• Switch the model to <strong style="color:var(--xpt)">Llama 3.3 70B</strong> (12k/min)<br>':''}`+
+        `• Analyse the article in sections (intro + body, then conclusion)<br>`+
         `• Deselect some parameters in the left panel<br>`+
-        `• Paste a shorter article (or analyse in sections)</p>`;
+        `• Add a Claude key and turn on Advanced Analysis (much larger context)</p>`;
     } else if (isRL) {
       const raw = err.message.replace('RATE_LIMIT::','');
       const m = raw.match(/try again in ([\dhms.\s]+?)[.\)]/i);
       const wait = m ? m[1].trim() : 'a little while';
       document.getElementById('emptyState').innerHTML =
-        `<div class="empty-icon">⏳</div><h3 style="color:var(--improve)">Daily Token Limit Reached</h3>`+
-        `<p style="color:var(--t2);max-width:340px;text-align:center">Groq's free tier caps tokens per day on the 70B model. Resets in <strong style="color:var(--text)">${wait}</strong>.<br><br>`+
-        `<strong style="color:var(--text)">Keep working now:</strong> switch the model dropdown to <strong style="color:var(--xpt)">Llama 3.1 8B (high-limit)</strong> and re-run — it has a far larger daily allowance.<br><br>`+
+        `<div class="empty-icon">⏳</div><h3 style="color:var(--improve)">Groq Rate Limit Hit</h3>`+
+        `<p style="color:var(--t2);max-width:340px;text-align:center">The free tier caps tokens per minute (8k) and requests per day (1k). Resets in <strong style="color:var(--text)">${wait}</strong>.<br><br>`+
+        `<strong style="color:var(--text)">Keep working now:</strong> wait a minute and re-run, switch to another model in the dropdown, or add a Claude key and turn on Advanced Analysis.<br><br>`+
         `Or upgrade at <span style="color:var(--aut)">console.groq.com/settings/billing</span>.</p>`;
     } else {
       document.getElementById('emptyState').innerHTML = `<div class="empty-icon">⚠️</div><h3 style="color:#d83a3a">Analysis Failed</h3><p style="color:var(--t2);max-width:320px;text-align:center">${err.message}</p>`;
@@ -1508,50 +1630,21 @@ function vc(s){
 
 function fmt1(n){ return Number.isInteger(n) ? n : n.toFixed(1); }
 
-// Two layer scores: the Content Score (the E-E-A-T pillar average) and Gate
-// Compliance (the publish checks). Each has its own verdict.
-function renderScorecard(r, gates, cntStrong, cntPartial, cntMissing){
-  const colors={good:'var(--tru)',warn:'var(--improve)',fail:'#d83a3a'};
-
-  const eScore=r.overall_score ?? 0;
-  const eStat=eScore>=65?'good':eScore>=40?'warn':'fail';
-  const eVerd=eScore>=85?'EXCELLENT':eScore>=65?'GOOD':eScore>=40?'NEEDS WORK':'POOR';
-
-  // Gate compliance ("low" = nice-to-have, never blocks; "info" = advisory, excluded)
-  const applicable=gates.filter(g=>!g.na && !g.info);
-  const hardFails=applicable.filter(g=>!g.passed && g.type==='hard');
-  const softWarns=applicable.filter(g=>!g.low && ((!g.passed && g.type==='soft')||g.warning));
-  const passed=applicable.filter(g=>g.passed && !g.warning).length;
-  const gScore=applicable.length?Math.round(passed/applicable.length*100):100;
-  const gStat=hardFails.length?'fail':softWarns.length?'warn':'good';
-  const gVerd=hardFails.length?'NOT GOOD':softWarns.length?'REVIEW':'GOOD';
-  const gSub=`${passed}/${applicable.length} gates passed`+(hardFails.length?` · ${hardFails.length} hard fail`:'')+(softWarns.length?` · ${softWarns.length} need review`:'');
-
-  const card=(stat,label,verd,num,unit,sub)=>`<div class="sc-card sc-${stat}">
-    <div class="sc-top"><span class="sc-label">${label}</span><span class="sc-verdict scv-${stat}">${verd}</span></div>
-    <div class="sc-num">${num}<span>${unit}</span></div>
-    <div class="sc-bar"><div class="sc-bar-fill" style="width:${Math.max(0,Math.min(100,num))}%;background:${colors[stat]}"></div></div>
-    <div class="sc-sub">${sub}</div>
-  </div>`;
-
-  return `<div class="scorecard scorecard-2">
-    ${card(eStat,'🎯 Content Score',eVerd,eScore,'/100',`${cntStrong} strong · ${cntPartial} partial · ${cntMissing} missing`)}
-    ${card(gStat,'🔒 Gate Compliance',gVerd,gScore,'%',gSub)}
-  </div>`;
-}
-
 function renderPubStatus(gates){
+  const applicable = gates.filter(g => !g.na && !g.info);
+  const passed = applicable.filter(g => g.passed && !g.warning).length;
+  const ratio = applicable.length ? `${passed}/${applicable.length} publish checks passed` : 'No publish checks apply';
   const hardFails = gates.filter(g => !g.na && !g.info && !g.passed && g.type === 'hard');
   const softWarns = gates.filter(g => !g.na && !g.info && !g.low && ((!g.passed && g.type === 'soft') || g.warning));
   if (hardFails.length) {
     const tags = hardFails.map(g => `<span class="pub-fail-tag">${g.label}</span>`).join('');
-    return `<div class="pub-status pub-blocked"><div class="pub-icon">🚫</div><div class="pub-info"><div class="pub-title">BLOCKED — Do Not Publish</div><div class="pub-detail">${hardFails.length} critical gate${hardFails.length > 1 ? 's' : ''} failed. Fix all blocked items before going live.</div><div class="pub-tags">${tags}</div></div></div>`;
+    return `<div class="pub-status pub-blocked"><div class="pub-icon">🚫</div><div class="pub-info"><div class="pub-title">Publish decision: BLOCKED — do not publish</div><div class="pub-detail">${ratio}. ${hardFails.length} critical gate${hardFails.length > 1 ? 's' : ''} must be fixed before going live:</div><div class="pub-tags">${tags}</div></div></div>`;
   }
   if (softWarns.length) {
     const tags = softWarns.map(g => `<span class="pub-warn-tag">${g.label}</span>`).join('');
-    return `<div class="pub-status pub-review"><div class="pub-icon">⚠️</div><div class="pub-info"><div class="pub-title">REVIEW REQUIRED Before Publishing</div><div class="pub-detail">${softWarns.length} flag${softWarns.length > 1 ? 's' : ''} need editor review before this can go live.</div><div class="pub-tags">${tags}</div></div></div>`;
+    return `<div class="pub-status pub-review"><div class="pub-icon">⚠️</div><div class="pub-info"><div class="pub-title">Publish decision: REVIEW before publishing</div><div class="pub-detail">${ratio}. ${softWarns.length} item${softWarns.length > 1 ? 's' : ''} need an editor's eye before this goes live:</div><div class="pub-tags">${tags}</div></div></div>`;
   }
-  return `<div class="pub-status pub-cleared"><div class="pub-icon">✅</div><div class="pub-info"><div class="pub-title">CLEARED — Ready for Publishing</div><div class="pub-detail">All gate rules passed. Proceed with standard editorial sign-off.</div></div></div>`;
+  return `<div class="pub-status pub-cleared"><div class="pub-icon">✅</div><div class="pub-info"><div class="pub-title">Publish decision: CLEARED — ready to publish</div><div class="pub-detail">${ratio}. All publish gates pass — proceed with standard editorial sign-off.</div></div></div>`;
 }
 
 function renderGates(gates){
@@ -1870,20 +1963,24 @@ function render(r, enabledParams, gates, articleText, metrics){
           <div style="margin-top:8px;font-size:10px;color:var(--t3)">${cntStrong} strong · ${cntPartial} partial · ${cntMissing} missing — across ${scoredCount} scored check${scoredCount===1?'':'s'} in ${pillarsUsed} pillar${pillarsUsed===1?'':'s'}</div>
           ${currentClient && currentClient.notes ? `<div style="margin-top:8px;font-size:11px;color:var(--t2);padding:8px 10px;background:var(--s2);border:1px solid var(--border);border-radius:8px;line-height:1.55"><strong style="color:var(--aut)">Client brief:</strong> ${currentClient.notes}</div>` : ''}`;
 
-  // SECTION 1 — score, publish decision, gate rules
-  const editorNote = r.editor_note ? `<div class="rsec-note" style="margin-top:14px"><strong>Editor's key note:</strong> ${escHtml(r.editor_note)}</div>` : '';
+  // SECTION 1 — read top-to-bottom: (1) can I publish it? (2) the single most
+  // important fix, (3) how good is it (one quality score + its breakdown),
+  // (4) the full gate checklist behind the decision.
+  const editorNote = r.editor_note ? `<div class="rsec-note" style="margin-top:0;margin-bottom:16px"><strong>Editor's #1 fix:</strong> ${escHtml(r.editor_note)}</div>` : '';
   const sec1 = `
     ${renderPubStatus(gates)}
-    ${renderScorecard(r, gates, cntStrong, cntPartial, cntMissing)}
+    ${editorNote}
     <div class="score-hero">
       <div class="score-top">
-        <div class="score-big">${r.overall_score}<span class="score-pct">%</span></div>
+        <div>
+          <div class="hero-cap">Content quality score</div>
+          <div class="score-big">${r.overall_score}<span class="score-pct">/100</span></div>
+        </div>
         <div class="score-meta">${heroMeta}</div>
       </div>
     </div>
     ${renderScoreExplanation(r, enabledParams)}
-    ${renderGates(gates)}
-    ${editorNote}`;
+    ${renderGates(gates)}`;
 
   // SECTION 2 — what needs fixing, ranked
   const badItems = rankedBad(r, enabledParams, gates);
@@ -1902,18 +1999,51 @@ function render(r, enabledParams, gates, articleText, metrics){
       <span style="flex:1"></span>
       <button class="rev-pill" onclick="copyReview()">⧉ Copy editor remarks</button>
       <button class="btn-pdf" onclick="downloadPDF()">⬇ Download PDF</button>
+      <button class="btn-upload" id="uploadReportBtn" onclick="uploadReport()"><span class="spin" id="uploadSpin" style="display:none"></span><span id="uploadBtnTxt">⬆ Upload Report</span></button>
     </div>
     <div class="print-head">
       <div class="ph-t">Content Quality Report</div>
       <div class="ph-s">${currentClient ? `${currentClient.name}${currentClient.industry ? ' · ' + currentClient.industry : ''} · ` : ''}${ct.icon} ${ct.label}${ct.isYMYL ? ' · YMYL' : ''} · Content Score ${r.overall_score}% · ${engine === 'claude' ? 'Claude' : 'Groq'} · ${new Date().toLocaleDateString()}</div>
     </div>
-    ${reportSection(1, '🎯', 'Score, Publish Decision &amp; Gate Rules', 'The headline number, the publish verdict, how the score was built, and every gate check.', sec1)}
+    ${reportSection(1, '🎯', 'Verdict, Score &amp; Gate Rules', 'Read top to bottom: can you publish it, the one key fix, the quality score with its breakdown, then every gate check behind the decision.', sec1)}
     ${reportSection(2, '🔧', 'What Needs Fixing', `${badItems.length} finding${badItems.length === 1 ? '' : 's'}, ranked by impact — blocking gates and required checks first. Add a remark on any row you disagree with.`, sec2)}
     ${reportSection(3, '✅', "What's Good", `${goodItems.length} strength${goodItems.length === 1 ? '' : 's'}, ranked by value — required checks the article meets lead. Add a remark on any row you disagree with.`, sec3)}
     ${reportSection(4, '🖍️', 'The Content, Marked Up', 'Your article with the weak passages in red and the strong ones in green — hover any highlight for the reason.', sec4)}`;
   document.getElementById('results').style.display = 'block';
   document.getElementById('paneScore').scrollTop = 0;
   revStatus();
+
+  // ── Snapshot this report so the employee can upload it to the admin dashboard ──
+  const firstLine = (articleText || '').split('\n').map(s => s.trim()).find(Boolean) || '';
+  _lastReport = {
+    meta: {
+      client: currentClient ? currentClient.name : '',
+      industry: currentClient ? (currentClient.industry || '') : '',
+      title: firstLine.slice(0, 140),
+      category: ct.label,
+      categoryIcon: ct.icon,
+      isYMYL: !!ct.isYMYL,
+      score: r.overall_score,
+      verdict: verdict.label,
+      decision: pubDecision(gates),
+      engine: engine === 'claude' ? ('Claude · ' + CLAUDE_MODEL) : 'Groq',
+      summary: r.summary || '',
+      wordCount: (articleText || '').split(/\s+/).filter(Boolean).length,
+    },
+  };
+  _reportUploaded = false;
+  const upBtn = document.getElementById('uploadReportBtn');
+  if (upBtn) { upBtn.disabled = false; document.getElementById('uploadBtnTxt').textContent = '⬆ Upload Report'; }
+}
+
+// The publish decision behind the current gate set (mirrors renderPubStatus).
+function pubDecision(gates){
+  if(!Array.isArray(gates)) return '';
+  const hardFails = gates.filter(g => !g.na && !g.info && !g.passed && g.type === 'hard');
+  if(hardFails.length) return 'BLOCKED';
+  const softWarns = gates.filter(g => !g.na && !g.info && !g.low && ((!g.passed && g.type === 'soft') || g.warning));
+  if(softWarns.length) return 'REVIEW';
+  return 'CLEARED';
 }
 
 // Export the on-screen report to PDF via the browser's print engine
@@ -2052,7 +2182,7 @@ async function runCompetitiveAnalysis(){
     document.getElementById('analysisEmpty').style.display='flex';
     const msg = typeof err.message==='string'?err.message:'';
     const nice = msg.startsWith('RATE_LIMIT::')
-      ? 'Groq daily token limit reached — switch the model dropdown to Llama 3.1 8B and retry.'
+      ? 'Groq rate limit hit — wait a minute and retry, or switch the model in the dropdown.'
       : msg || 'Analysis failed.';
     alert('Content Analysis failed:\n\n'+nice);
   }finally{
@@ -2247,6 +2377,7 @@ function duplicateCat(key){
 }
 
 
+
 function openCatManager(){
   const list=document.getElementById('catMgrList'); list.innerHTML='';
   Object.entries(ALLCATS).forEach(([key,ct])=>{
@@ -2388,6 +2519,231 @@ function deleteClient(){
   closeModal('clientModal'); closeModal('clientMgrModal');
 }
 
+
+
+// ═══════════════════════════════════════════════════════════════
+// AUTH · REPORT UPLOAD · ADMIN DASHBOARD
+// ═══════════════════════════════════════════════════════════════
+// Same-origin when served by server.js (npm start → http://localhost:8787).
+// If the file is opened directly (file://) we fall back to the local server.
+const API_BASE = (location.protocol === 'http:' || location.protocol === 'https:') ? '' : 'http://localhost:8787';
+const AUTH = { token:null, role:null, user:null };
+let _lastReport = null;      // snapshot of the most recent analysis (for upload)
+let _reportUploaded = false;
+let _adminReports = [];      // cached list for the admin dashboard search
+
+function authHeaders(extra){ return Object.assign({}, extra||{}, AUTH.token ? { 'Authorization':'Bearer '+AUTH.token } : {}); }
+function saveAuth(){ try{ sessionStorage.setItem('jw_auth', JSON.stringify(AUTH)); }catch(e){} }
+function loadAuth(){
+  try{ const a = JSON.parse(sessionStorage.getItem('jw_auth')||'null');
+    if(a && a.token){ AUTH.token=a.token; AUTH.role=a.role; AUTH.user=a.user; return true; }
+  }catch(e){}
+  return false;
+}
+
+async function doLogin(ev){
+  if(ev) ev.preventDefault();
+  const user = document.getElementById('loginUser').value.trim();
+  const pass = document.getElementById('loginPass').value;
+  const errEl = document.getElementById('loginError'); errEl.textContent = '';
+  const btn = document.getElementById('loginBtn'); btn.disabled = true;
+  document.getElementById('loginSpin').style.display = 'block';
+  document.getElementById('loginBtnTxt').textContent = 'Signing in…';
+  try{
+    const res = await fetch(API_BASE+'/login', {
+      method:'POST', headers:{ 'Content-Type':'application/json' },
+      body: JSON.stringify({ username:user, password:pass })
+    });
+    let data = {}; try{ data = await res.json(); }catch(e){}
+    if(!res.ok || !data.ok) throw new Error(data.error || 'Login failed');
+    AUTH.token = data.token; AUTH.role = data.role; AUTH.user = data.username;
+    saveAuth();
+    document.getElementById('loginPass').value = '';
+    applyAuthView();
+  }catch(e){
+    errEl.textContent = /Failed to fetch|NetworkError|ERR_CONNECTION/i.test(e.message)
+      ? 'Cannot reach the server. Start it with "npm start", then open http://localhost:8787.'
+      : e.message;
+  }finally{
+    btn.disabled = false;
+    document.getElementById('loginSpin').style.display = 'none';
+    document.getElementById('loginBtnTxt').textContent = 'Sign in';
+  }
+  return false;
+}
+
+function doLogout(){
+  AUTH.token = null; AUTH.role = null; AUTH.user = null;
+  try{ sessionStorage.removeItem('jw_auth'); }catch(e){}
+  applyAuthView();
+}
+
+function applyAuthView(){
+  const authed = !!AUTH.token;
+  const isAdmin = AUTH.role === 'admin';
+  document.getElementById('loginScreen').style.display = authed ? 'none' : 'flex';
+  document.querySelector('.header').style.display = authed ? 'flex' : 'none';
+  document.querySelector('.app').style.display = (authed && !isAdmin) ? 'grid' : 'none';
+  document.getElementById('adminPanel').style.display = (authed && isAdmin) ? 'block' : 'none';
+  document.querySelector('.header-pills').style.display = (authed && isAdmin) ? 'none' : 'flex';
+  const ub = document.getElementById('userBox');
+  if(authed){
+    ub.style.display = 'flex';
+    document.getElementById('userName').textContent = AUTH.user;
+    document.getElementById('userRole').textContent = AUTH.role;
+  } else {
+    ub.style.display = 'none';
+  }
+  if(authed && isAdmin) loadAdminReports();
+}
+
+// ── Employee: upload the current report to the admin dashboard ──
+// Capture the rendered report HTML minus the interactive toolbar/remark controls,
+// then append any editor remarks the reviewer typed so they persist in the snapshot.
+function captureReportHtml(){
+  const src = document.getElementById('results');
+  if(!src) return '';
+  const node = src.cloneNode(true);
+  node.querySelectorAll('.report-toolbar, .rmk-tab, .rmk-box').forEach(el => el.remove());
+  let html = node.innerHTML;
+  const remarks = [];
+  Object.entries(_editorFeedback || {}).forEach(([k, f]) => {
+    if(!f || (!f.verdict && !(f.note||'').trim())) return;
+    const m = _revMeta[k] || { name:k };
+    remarks.push(`<div style="padding:8px 0;border-bottom:1px solid var(--border)"><strong>${escHtml(m.name)}</strong>${f.verdict?` — <em>${escHtml(f.verdict)}</em>`:''}${(f.note||'').trim()?`<div style="color:var(--t2);margin-top:2px">${escHtml(f.note)}</div>`:''}</div>`);
+  });
+  if(remarks.length){
+    html += `<div class="rsec" style="margin-top:16px"><div class="rsec-head"><span class="rsec-icon">💬</span><div><div class="rsec-title">Editor Remarks</div></div></div><div style="padding:4px 16px 12px">${remarks.join('')}</div></div>`;
+  }
+  return html;
+}
+
+async function uploadReport(){
+  if(!_lastReport){ alert('Run an analysis first, then upload the report.'); return; }
+  if(_reportUploaded){ alert('This report has already been uploaded.'); return; }
+  const btn = document.getElementById('uploadReportBtn');
+  const txt = document.getElementById('uploadBtnTxt');
+  const spin = document.getElementById('uploadSpin');
+  btn.disabled = true; spin.style.display = 'block'; txt.textContent = 'Uploading…';
+  try{
+    const payload = { meta: _lastReport.meta, reportHtml: captureReportHtml() };
+    const res = await fetch(API_BASE+'/report', {
+      method:'POST', headers: authHeaders({ 'Content-Type':'application/json' }),
+      body: JSON.stringify(payload)
+    });
+    let data = {}; try{ data = await res.json(); }catch(e){}
+    if(res.status === 401){ throw new Error('Your session expired — please sign in again.'); }
+    if(!res.ok || !data.ok) throw new Error(data.error || 'Upload failed');
+    _reportUploaded = true;
+    txt.textContent = '✓ Uploaded';
+  }catch(e){
+    btn.disabled = false; txt.textContent = '⬆ Upload Report';
+    alert('Could not upload the report:\n\n' + (/Failed to fetch/i.test(e.message)
+      ? 'Cannot reach the server. Make sure it is running (npm start).' : e.message));
+  }finally{
+    spin.style.display = 'none';
+  }
+}
+
+// ── Admin: load, render, view and delete reports ──
+async function loadAdminReports(){
+  const list = document.getElementById('adminReportsList');
+  list.innerHTML = `<div class="admin-empty">Loading reports…</div>`;
+  try{
+    const res = await fetch(API_BASE+'/reports', { headers: authHeaders() });
+    let data = {}; try{ data = await res.json(); }catch(e){}
+    if(res.status === 401 || res.status === 403){ throw new Error(data.error || 'Access denied'); }
+    if(!res.ok || !data.ok) throw new Error(data.error || 'Could not load reports');
+    _adminReports = data.reports || [];
+    renderAdminReports();
+  }catch(e){
+    _adminReports = [];
+    document.getElementById('adminStats').innerHTML = '';
+    list.innerHTML = `<div class="admin-empty"><div class="empty-icon">⚠️</div><h3>Could not load reports</h3><p>${escHtml(e.message)}</p></div>`;
+  }
+}
+
+function renderAdminReports(){
+  const q = (document.getElementById('adminSearch').value || '').toLowerCase().trim();
+  const all = _adminReports;
+  const rows = all.filter(r => {
+    if(!q) return true;
+    const m = r.meta || {};
+    return [m.client, m.category, m.title, r.uploadedBy].some(v => (v||'').toLowerCase().includes(q));
+  });
+
+  // Stats
+  const cleared = all.filter(r => (r.meta||{}).decision === 'CLEARED').length;
+  const review  = all.filter(r => (r.meta||{}).decision === 'REVIEW').length;
+  const blocked = all.filter(r => (r.meta||{}).decision === 'BLOCKED').length;
+  const avg = all.length ? Math.round(all.reduce((s,r)=>s+(Number((r.meta||{}).score)||0),0)/all.length) : 0;
+  document.getElementById('adminStats').innerHTML = all.length ? `
+    <div class="admin-stat"><div class="as-num">${all.length}</div><div class="as-lbl">Total reports</div></div>
+    <div class="admin-stat"><div class="as-num">${avg}</div><div class="as-lbl">Avg score</div></div>
+    <div class="admin-stat"><div class="as-num" style="color:var(--tru)">${cleared}</div><div class="as-lbl">Cleared</div></div>
+    <div class="admin-stat"><div class="as-num" style="color:var(--aeo)">${review}</div><div class="as-lbl">Review</div></div>
+    <div class="admin-stat"><div class="as-num" style="color:#d83a3a">${blocked}</div><div class="as-lbl">Blocked</div></div>` : '';
+
+  const list = document.getElementById('adminReportsList');
+  if(!all.length){
+    list.innerHTML = `<div class="admin-empty"><div class="empty-icon">📭</div><h3>No reports yet</h3><p>Reports uploaded by employees will appear here.</p></div>`;
+    return;
+  }
+  if(!rows.length){
+    list.innerHTML = `<div class="admin-empty"><div class="empty-icon">🔍</div><h3>No matches</h3><p>No reports match "${escHtml(q)}".</p></div>`;
+    return;
+  }
+  const head = `<div class="rpt-row rpt-head" style="border:none;background:transparent;padding-bottom:0"><div>Client / Article</div><div>Category</div><div>Score</div><div>Decision</div><div>Uploaded</div><div></div></div>`;
+  list.innerHTML = head + rows.map(r => {
+    const m = r.meta || {};
+    const dec = m.decision || '—';
+    const sc = Number(m.score);
+    const scColor = sc >= 80 ? 'var(--tru)' : sc >= 60 ? 'var(--aeo)' : '#d83a3a';
+    const when = r.createdAt ? new Date(r.createdAt).toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'}) : '';
+    return `<div class="rpt-row">
+      <div><div class="rpt-client">${escHtml(m.client || 'Untitled client')}${m.isYMYL?' <span class="ymyl-chip">YMYL</span>':''}</div><div class="rpt-title">${escHtml(m.categoryIcon||'')} ${escHtml(m.title || m.summary || '')}</div></div>
+      <div class="rpt-cat">${escHtml(m.category || '')}</div>
+      <div class="rpt-score" style="color:${scColor}">${isNaN(sc)?'—':sc}</div>
+      <div><span class="rpt-decision dec-${escHtml(dec)}">${escHtml(dec)}</span></div>
+      <div class="rpt-meta">${escHtml(when)}<br>by ${escHtml(r.uploadedBy||'—')}</div>
+      <div class="rpt-actions">
+        <button class="rpt-btn" onclick="viewReport('${escHtml(r.id)}')">View</button>
+        <button class="rpt-btn danger" onclick="deleteReport('${escHtml(r.id)}')">Delete</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function viewReport(id){
+  const body = document.getElementById('reportViewBody');
+  document.getElementById('reportViewTitle').textContent = 'Loading…';
+  body.innerHTML = `<div class="admin-empty">Loading report…</div>`;
+  openModal('reportViewModal');
+  try{
+    const res = await fetch(API_BASE+'/report?id='+encodeURIComponent(id), { headers: authHeaders() });
+    let data = {}; try{ data = await res.json(); }catch(e){}
+    if(!res.ok || !data.ok) throw new Error(data.error || 'Could not load report');
+    const rep = data.report; const m = rep.meta || {};
+    document.getElementById('reportViewTitle').textContent = `${m.client || 'Report'} — ${m.category || ''} · ${m.score}/100`;
+    body.innerHTML = rep.reportHtml || '<div class="admin-empty">This report has no saved content.</div>';
+  }catch(e){
+    body.innerHTML = `<div class="admin-empty"><div class="empty-icon">⚠️</div><p>${escHtml(e.message)}</p></div>`;
+  }
+}
+
+async function deleteReport(id){
+  if(!confirm('Delete this report permanently?')) return;
+  try{
+    const res = await fetch(API_BASE+'/report?id='+encodeURIComponent(id), { method:'DELETE', headers: authHeaders() });
+    let data = {}; try{ data = await res.json(); }catch(e){}
+    if(!res.ok || !data.ok) throw new Error(data.error || 'Delete failed');
+    _adminReports = _adminReports.filter(r => r.id !== id);
+    renderAdminReports();
+  }catch(e){
+    alert('Could not delete the report:\n\n' + e.message);
+  }
+}
+
 // ── Init ──────────────────────────────────────────────────────
 installCustomParams();
 rebuildCats();
@@ -2401,6 +2757,9 @@ buildClCatSelect();
 })();
 updateEngineStatus();
 
+// Restore any existing session and show the right view (login / tool / admin).
+loadAuth();
+applyAuthView();
 
 </script>
 </body>
