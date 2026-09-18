@@ -42,6 +42,54 @@ body{background:var(--bg);color:var(--text);font-family:'Instrument Sans',sans-s
 .content-area::placeholder{color:var(--t3);}
 .meta{font-size:11px;color:var(--t3);margin-top:5px;display:flex;gap:10px;flex-wrap:wrap;}
 .meta strong{color:var(--t2);}
+/* ── Rich (contenteditable) paste box — keeps Google-Docs headings, links, lists ── */
+#contentRich{overflow:auto;white-space:normal;cursor:text;}
+#contentRich.is-empty:before{content:attr(data-ph);color:var(--t3);pointer-events:none;}
+#contentRich h1,#contentRich h2,#contentRich h3,#contentRich h4,#contentRich h5,#contentRich h6{font-family:'Instrument Sans',sans-serif;margin:12px 0 5px;line-height:1.3;color:var(--text);}
+#contentRich h1{font-size:18px;font-weight:700;}
+#contentRich h2{font-size:15px;font-weight:700;}
+#contentRich h3{font-size:13.5px;font-weight:600;}
+#contentRich h4,#contentRich h5,#contentRich h6{font-size:12.5px;font-weight:600;color:var(--t2);}
+#contentRich p{margin:0 0 8px;}
+#contentRich ul,#contentRich ol{margin:0 0 8px;padding-left:20px;}
+#contentRich li{margin:2px 0;}
+#contentRich a{color:var(--xpt);text-decoration:underline;}
+#contentRich table{border-collapse:collapse;margin:8px 0;font-size:12px;}
+#contentRich td,#contentRich th{border:1px solid var(--border);padding:4px 7px;}
+#contentRich img{max-width:130px;height:auto;border-radius:4px;opacity:.85;vertical-align:middle;}
+#contentRich blockquote{margin:8px 0;padding-left:10px;border-left:3px solid var(--border);color:var(--t2);}
+.paste-hint{font-size:10px;color:var(--t3);margin-top:2px;line-height:1.45;}
+.paste-hint strong{color:var(--t2);}
+/* ── Structure & internal-linking report section ── */
+.struct-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(115px,1fr));gap:8px;margin-bottom:14px;}
+.struct-card{background:var(--s2);border:1px solid var(--border);border-radius:10px;padding:10px 12px;}
+.struct-num{font-size:20px;font-weight:700;color:var(--text);line-height:1;}
+.struct-lbl{font-size:10px;color:var(--t3);margin-top:5px;text-transform:uppercase;letter-spacing:.4px;}
+.struct-sub{font-size:10px;margin-top:3px;line-height:1.4;}
+.sub-ok{color:var(--tru);}.sub-warn{color:var(--aeo);}.sub-bad{color:#e46060;}
+.outline,.linkpanel{background:var(--s2);border:1px solid var(--border);border-radius:10px;padding:11px 13px;margin-bottom:12px;}
+.outline-title,.linkpanel-title{font-size:12px;font-weight:700;color:var(--t2);margin-bottom:9px;display:flex;align-items:center;gap:7px;}
+.oitem{display:flex;gap:9px;align-items:baseline;padding:3px 0;font-size:12px;}
+.oitem .olvl{font-size:9px;color:var(--t3);width:26px;flex-shrink:0;font-weight:600;letter-spacing:.3px;}
+.oitem .otext{color:var(--text);flex:1;word-break:break-word;}
+.oitem .owords{font-size:10px;color:var(--t3);flex-shrink:0;white-space:nowrap;}
+.oitem.warn .otext{color:var(--aeo);}
+.oflag{font-size:10px;color:var(--aeo);margin-left:0;}
+.linkrow{display:flex;gap:8px;align-items:baseline;padding:5px 0;font-size:12px;border-top:1px solid var(--border);}
+.linkrow:first-of-type{border-top:none;}
+.lanchor{color:var(--text);flex:1;word-break:break-word;}
+.lanchor .lurl{color:var(--t3);font-size:10px;display:block;margin-top:1px;word-break:break-all;}
+.lbadge{font-size:9px;padding:1px 6px;border-radius:5px;flex-shrink:0;font-weight:700;letter-spacing:.2px;}
+.lb-int{background:rgba(155,110,243,.16);color:var(--aut);}
+.lb-ext{background:rgba(74,181,232,.14);color:var(--xpt);}
+.lb-weak{background:rgba(232,210,74,.16);color:var(--aeo);}
+.lb-bad{background:rgba(216,58,58,.14);color:#e46060;}
+.struct-empty{font-size:12px;color:var(--t3);padding:14px;text-align:center;line-height:1.6;}
+.link-callout{font-size:11.5px;line-height:1.6;padding:9px 11px;border-radius:9px;margin-bottom:10px;}
+.lc-good{background:rgba(74,232,160,.08);border:1px solid rgba(74,232,160,.3);color:var(--tru);}
+.lc-warn{background:rgba(232,210,74,.07);border:1px solid rgba(232,210,74,.3);color:var(--aeo);}
+.lc-bad{background:rgba(216,58,58,.07);border:1px solid rgba(216,58,58,.3);color:#e46060;}
+.link-callout strong{color:var(--text);}
 
 .ct-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px;}
 .ct-btn{background:var(--s2);border:1.5px solid var(--border);border-radius:var(--r);padding:9px 6px;cursor:pointer;transition:all .15s;text-align:center;font-family:'Instrument Sans',sans-serif;}
@@ -574,15 +622,24 @@ mark.hl:hover::before{content:'';position:absolute;left:10px;bottom:calc(100% + 
     </div>
 
     <div class="ls" style="flex:1;display:flex;flex-direction:column;gap:6px;">
-      <label class="lbl">Blog Content</label>
-      <textarea class="content-area" id="content" placeholder="Paste your full blog article here — title, introduction, body sections, author bio, disclaimers, internal links, everything."></textarea>
+      <label class="lbl">Blog Content <span style="color:var(--t3);text-transform:none;letter-spacing:0;font-weight:400">— paste straight from Google Docs</span></label>
+      <div class="content-area is-empty" id="contentRich" contenteditable="true" spellcheck="false" data-ph="Paste your full blog article here — copy it out of Google Docs (Ctrl/⌘+A then Ctrl/⌘+C) and paste. Your real headings, internal links, lists and tables are kept, so the tool can check structure and linkage, not just the words."></div>
+      <!-- Hidden plain-text mirror: keeps every existing text-based check working -->
+      <textarea id="content" style="display:none"></textarea>
+      <div class="paste-hint" id="pasteHint">✅ <strong>Formatting is read.</strong> Headings, links (internal &amp; external), lists and tables are detected from your paste — no need to find "view source". Pasting as plain text still works, but structure &amp; link checks need the formatting.</div>
       <div class="meta">
-        Words: <strong id="wc">0</strong> · Chars: <strong id="cc">0</strong> · Type: <strong id="ctLabel">General / Informational</strong>
+        Words: <strong id="wc">0</strong> · Chars: <strong id="cc">0</strong> · <strong id="structMeta">0 headings · 0 internal links</strong> · Type: <strong id="ctLabel">General / Informational</strong>
       </div>
       <!-- Token warning shown when content is large -->
       <div class="token-banner" id="tokenBanner">
-        <strong>Long article.</strong> If it exceeds the model's token budget, the beginning and end are sent in full and only the middle is sampled — your intro, conclusion and structure are always analysed, so scores stay reliable. This is not an error. For complete coverage of very long pieces, analyse in sections.
+        <strong>Long article — full coverage is on.</strong> On the free Groq tier this is analysed in parts (no text is skipped) and the parts are merged, so accuracy holds on long pieces. Because the free tier caps tokens per minute, a very long article may pause a few seconds between parts and take a little longer — that's expected, not an error. Adding a Claude key (Advanced Analysis) does the whole article in one pass, instantly.
       </div>
+    </div>
+
+    <div class="ls">
+      <label class="lbl">Your Site Domain <span style="color:var(--t3);text-transform:none;letter-spacing:0;font-weight:400">— so links to your own posts count as internal</span></label>
+      <input type="text" class="key-input" id="siteDomain" placeholder="e.g. justwords.in  (optional — auto-detected if blank)" oninput="onSiteDomainInput()"/>
+      <div class="help">A link pointing at this domain is treated as an <strong>internal link to your own blog</strong> (topic-cluster linkage). Leave it blank and the tool infers your domain from the most-linked site in the article. Remembered for next time.</div>
     </div>
 
     <div class="ls">
@@ -986,18 +1043,130 @@ function getEnabledParams(){
   return enabled;
 }
 
-document.getElementById('content').addEventListener('input',function(){
-  const t=this.value.trim();
-  const wc=t?t.split(/\s+/).length:0;
-  document.getElementById('wc').textContent=wc;
-  document.getElementById('cc').textContent=this.value.length;
-  // Show token warning banner only for genuinely long articles that may be sampled.
-  // On the 8k-TPM free tier, articles past ~1,300 words start getting sampled.
-  document.getElementById('tokenBanner').classList.toggle('show', wc > 1300);
+// ── Rich paste box → hidden plain-text mirror ──────────────────
+// The visible box is contenteditable so a Google-Docs paste keeps its real
+// headings, links, lists and tables. We hold the sanitised HTML in _lastDocHTML
+// (for the deterministic structure/link parser) and mirror a clean plain-text
+// version into the hidden #content textarea so every existing text-based check,
+// the LLM call and the highlight pass keep working unchanged.
+let _lastDocHTML = '';
+
+// Google Docs wraps every hyperlink in a redirect: https://www.google.com/url?q=<real>&sa=…
+function unwrapGoogleUrl(href){
+  if(!href) return href;
+  try{
+    const u = new URL(href, location.href);
+    if(/(^|\.)google\.[a-z.]+$/i.test(u.hostname) && u.pathname === '/url'){
+      const q = u.searchParams.get('q') || u.searchParams.get('url');
+      if(q) return q;
+    }
+  }catch(e){}
+  return href;
+}
+
+const KEEP_TAGS = new Set(['H1','H2','H3','H4','H5','H6','P','UL','OL','LI','A','B','STRONG','I','EM','U','BLOCKQUOTE','TABLE','THEAD','TBODY','TR','TD','TH','BR','IMG','FIGURE','FIGCAPTION','HR','CODE','PRE','SUP','SUB']);
+// Turn a pasted HTML fragment into a small, trusted subset: structural tags only,
+// no styles/classes/scripts, links unwrapped. Google's normal-weight <b> wrapper
+// (its way of holding a whole doc) is unwrapped so it doesn't bold everything.
+function sanitizePastedHTML(html){
+  const parsed = new DOMParser().parseFromString(html || '', 'text/html');
+  parsed.querySelectorAll('script,style,meta,link,head,noscript,title').forEach(n => n.remove());
+  const walk = (el) => {
+    [...el.children].forEach(child => {
+      walk(child);
+      const tag = child.tagName;
+      const styleAttr = child.getAttribute('style') || '';
+      const fakeBold = (tag === 'B' || tag === 'STRONG') && /font-weight\s*:\s*(normal|400)\b/i.test(styleAttr);
+      if (!KEEP_TAGS.has(tag) || fakeBold){
+        child.replaceWith(...child.childNodes);          // unwrap, keep contents
+        return;
+      }
+      const keep = {};
+      if (tag === 'A'){ const h = child.getAttribute('href'); if (h) keep.href = unwrapGoogleUrl(h); }
+      if (tag === 'IMG'){ const s = child.getAttribute('src'); const a = child.getAttribute('alt'); if (s) keep.src = s; keep.alt = a || ''; }
+      [...child.attributes].forEach(a => child.removeAttribute(a.name));
+      Object.entries(keep).forEach(([k, v]) => child.setAttribute(k, v));
+    });
+  };
+  walk(parsed.body);
+  return parsed.body.innerHTML;
+}
+
+// Plain-text view of the rich box that preserves block boundaries (each heading /
+// paragraph / list item on its own line) so word counts, the LLM input and the
+// quote-highlighter all behave exactly as they did with the old textarea.
+const _BLOCK_TAGS = new Set(['H1','H2','H3','H4','H5','H6','P','LI','BLOCKQUOTE','TR','FIGCAPTION','PRE','DIV','UL','OL','TABLE']);
+function richToText(el){
+  let out = '';
+  const rec = (node) => {
+    node.childNodes.forEach(n => {
+      if (n.nodeType === 3){ out += n.nodeValue; }
+      else if (n.nodeType === 1){
+        if (n.tagName === 'BR'){ out += '\n'; return; }
+        const isBlock = _BLOCK_TAGS.has(n.tagName);
+        if (isBlock && out && !out.endsWith('\n')) out += '\n';
+        rec(n);
+        if (isBlock && !out.endsWith('\n')) out += '\n';
+      }
+    });
+  };
+  rec(el);
+  return out.replace(/[ \t]+\n/g, '\n').replace(/\n{3,}/g, '\n\n').trim();
+}
+
+const richEl = document.getElementById('contentRich');
+const hiddenContentEl = document.getElementById('content');
+function markEmpty(){ richEl.classList.toggle('is-empty', !richEl.textContent.trim()); }
+function refreshContentMeta(){
+  _lastDocHTML = richEl.innerHTML;
+  const text = richToText(richEl);
+  hiddenContentEl.value = text;
+  const wc = text.trim() ? text.trim().split(/\s+/).length : 0;
+  document.getElementById('wc').textContent = wc;
+  document.getElementById('cc').textContent = text.length;
+  try{
+    const doc = parseDoc(_lastDocHTML, text, currentSiteDomain());
+    document.getElementById('structMeta').textContent =
+      `${doc.headings.length} heading${doc.headings.length===1?'':'s'} · ${doc.internalLinks.length} internal link${doc.internalLinks.length===1?'':'s'}`;
+  }catch(e){ /* meta is cosmetic */ }
+  // ~650 words is the one-call ceiling on the free tier; past it we analyse in
+  // parts (full coverage), which can take a little longer — surface the heads-up.
+  document.getElementById('tokenBanner').classList.toggle('show', wc > 1000);
+  markEmpty();
+}
+richEl.addEventListener('input', refreshContentMeta);
+// On paste, let the browser insert the rich content natively (reliable for large
+// Google-Docs selections), then sanitise the whole box once — stripping styles,
+// classes and Google's link-redirect wrappers while keeping headings/links/lists.
+richEl.addEventListener('paste', function(){
+  setTimeout(() => {
+    try{
+      const cleaned = sanitizePastedHTML(richEl.innerHTML);
+      if (cleaned !== richEl.innerHTML) richEl.innerHTML = cleaned;
+    }catch(e){}
+    refreshContentMeta();
+  }, 0);
 });
+richEl.addEventListener('blur', markEmpty);
+markEmpty();
+
+// Site-domain field: remembered across sessions so the team sets it once.
+function currentSiteDomain(){
+  let d = (document.getElementById('siteDomain') || {}).value || '';
+  return d.trim().replace(/^https?:\/\//i,'').replace(/\/.*$/,'').replace(/^www\./i,'').toLowerCase();
+}
+function onSiteDomainInput(){
+  lsSave('jw_eeat_site_domain', currentSiteDomain());
+  refreshContentMeta();
+}
+(function(){ const s = lsLoad('jw_eeat_site_domain',''); if (s){ const el = document.getElementById('siteDomain'); if (el) el.value = s; } })();
 
 // ── Content-Score System Prompt ────────────────────────────────
-function buildEEATSys(enabledParams, contentType){
+// `compact` builds a leaner prompt for long-article chunk mode: the full param
+// definitions and gate-check spec are kept (accuracy-critical), only the repeated
+// prose guidance is condensed — this roughly quadruples how much article fits in
+// one free-tier call, so long pieces need far fewer parts.
+function buildEEATSys(enabledParams, contentType, compact){
   const ct = getCT(contentType);
   const required = new Set(ct.required);
 
@@ -1026,12 +1195,12 @@ function buildEEATSys(enabledParams, contentType){
     third_party_expert_quote:`P31: Direct quote from a named subject matter expert or institution.`,
     professional_association_referenced:`P32: References a relevant professional body.`,
     certification_or_credential_mentioned:`P33: Business certification/licence/accreditation mentioned.`,
-    topic_cluster_internal_links:`P34: References or links to the site's OWN related articles, proportionate to length. Pasted text may strip hyperlink markup — if the writing clearly points to another of the brand's articles/resources by name or anchor phrase, count it; do NOT mark "missing" merely because the raw URL isn't visible. If the format genuinely calls for no internal links, mark "na".`,
+    topic_cluster_internal_links:`P34: Links to the site's OWN related articles (topic-cluster linkage), proportionate to length. If a "STRUCTURE & LINK FACTS" block is provided, use its "Internal links to the site's own posts" count as the truth: 0 → "missing"; below the recommended number → "partial"; at or above it → "strong". Only fall back to reading the prose for internal references when no facts block is present.`,
     publish_or_updated_date_visible:`P35: An actual date is written IN THE SUPPLIED TEXT (e.g. "Published 12 March 2025", "Updated: …"). Pasted article bodies usually omit the CMS date — if no date string actually appears in the text, this is "missing". Never assume a date exists just because it is a blog; quote the date in "evidence" or mark it missing.`,
     content_freshness_current_data:`P36: Facts, rates, regulations cited are current.`,
     no_misleading_title_or_clickbait:`P37: Title is literal and proportionate — no superlatives or manufactured urgency.`,
     informative_tone_not_sales_pitch:`P38: Genuinely helps the reader. Not primarily selling the business's services.`,
-    descriptive_anchor_text:`P39: Where internal links exist, the anchor phrasing is descriptive, not "click here". Pasted text may not show URLs — judge from the visible anchor wording. If there are clearly no internal references and the format doesn't call for any, mark "na" rather than "missing".`,
+    descriptive_anchor_text:`P39: Where internal links exist, the anchor phrasing is descriptive (the target's topic), not "click here", a bare URL, or a single word. The facts block lists the actual internal-link anchors — judge those. If there are no internal links at all, this is "missing".`,
     disclaimer_for_sensitive_topics:`P40: An EXPLICIT disclaimer is actually written in the text (e.g. "This article is for informational purposes only and is not a substitute for professional medical/legal/financial advice."). Quote it verbatim in "evidence". A passing "talk to your doctor" aside is NOT a disclaimer. If no explicit disclaimer sentence appears, this is "missing" — never infer one.`,
     no_factual_errors_or_outdated_info:`P41: All claims are accurate and current.`,
     formatting_serves_reader_not_seo:`P42: Headings/lists/tables used to help reader navigate, not keyword-stuffed.`,
@@ -1062,37 +1231,61 @@ function buildEEATSys(enabledParams, contentType){
     `"${k}":{"status":"missing","evidence":"","quote":"","suggestion":""}`
   ).join(',');
 
-  return `You are a senior content-quality analyst at Justwords, a professional content agency. Your reports are read by editors who produce content for many companies across many industries. Evaluate the supplied "${ct.label}" article${ct.isYMYL ? ' — this is YMYL content, so apply stricter Trust and accuracy standards' : ''}. Judge the MEANING and INTENT of the writing, not the presence of specific keywords. Be fair and experienced, like a real editor who understands the "feel" of a piece.
-
-HOW TO SCORE EACH PARAMETER — a PRESENCE / PASS-FAIL check. The question is "is what this parameter asks for genuinely present, and can I point to it?". Choose exactly one status:
+  // The prose guidance differs by mode; the param definitions, JSON schema and
+  // gate-check spec below are IDENTICAL in both — accuracy is not traded away.
+  const scoreRules = `HOW TO SCORE EACH PARAMETER — a PRESENCE / PASS-FAIL check. The question is "is what this parameter asks for genuinely present, and can I point to it?". Choose exactly one status:
 - "strong"  = the requirement is met AND you can cite the specific text that proves it. You MUST quote or closely paraphrase the exact words / number / section in the "evidence" field. It counts even if brief or stated only once — but if you cannot point to concrete supporting text, it is NOT "strong". Never infer presence from the topic alone, from what the piece "probably" contains, or from page furniture (author box, publish date, hyperlinks) that is not actually in the supplied text.
 - "partial" = the writer gestures at the requirement but it is too vague, generic, or hedged for a fair reader to be sure it is met, OR only part of what the parameter asks for is present.
 - "missing" = the requirement is genuinely absent — no reasonable reader would find it in the text. Also use "missing" (never "strong") when the check depends on markup or metadata that is simply not present in the pasted text.
-DO NOT use a "na" / "not_applicable" status. Every parameter below is always evaluated, so each MUST be scored "strong", "partial", or "missing". If a requirement is genuinely not relevant to this topic, that means the article does not satisfy it → return "missing", and say so plainly in the evidence. Ignore any "Mark na if…" wording in the definitions below.
+DO NOT use a "na" / "not_applicable" status. Every parameter below is always evaluated, so each MUST be scored "strong", "partial", or "missing". If a requirement is genuinely not relevant to this topic, that means the article does not satisfy it → return "missing", and say so plainly in the evidence. Ignore any "Mark na if…" wording in the definitions below.`;
 
-JUDGEMENT PRINCIPLES (balanced — neither inflate nor nitpick):
+  const principlesBlock = compact
+    ? `KEY PRINCIPLES: present with citable evidence → "strong" (even if brief, stated once); vague/hedged/only-partly-present → "partial"; genuinely absent → "missing". No quotable evidence = never "strong". "I/my" and "we/our/us" count equally as first-person (for a brand "we/our" is normal). Fluent-but-hollow prose that could describe any brand is "partial", not "strong". A closing passage that synthesises/recommends counts as a conclusion. Score decisively across the full range — don't cluster at the middle.`
+    : `JUDGEMENT PRINCIPLES (balanced — neither inflate nor nitpick):
 - If the requirement is genuinely present with citable evidence, mark it "strong" and move on — do not withhold "strong" merely because the writer "could add more". A single clear, evidenced instance is enough.
 - But do NOT award "strong" on vibes. No quotable evidence = not strong. This keeps the score honest and stops false "all strong" reports.
 - Reward substance over vocabulary. A point made well in plain language is "strong" even if it avoids the textbook term.
 - First-person experience counts whether the author writes "I", "my", "we", "our" or "us". For a brand, "we/our" IS the normal voice — treat it as fully equivalent to "I".
 - A conclusion/takeaway does NOT need a "Conclusion" heading or the words "in conclusion"; any closing passage that synthesises, recommends, or points to a next step satisfies it.
 - Judge like a senior editor separating genuine first-hand expertise from generic, content-mill filler. Real E-E-A-T shows specific numbers, named sources, lived detail, and a point of view only a practitioner could write. Fluent-but-hollow prose that could describe any brand is NOT "strong" — it is "partial" at best, no matter how polished.
-- Score decisively across the full 0–100 range. Do not cluster everything at "partial"/mid-range to play safe — genuinely strong writing earns "strong", genuinely absent requirements earn "missing". A hedged middle report is less useful to the editor than an honest, discriminating one.
+- Score decisively across the full 0–100 range. Do not cluster everything at "partial"/mid-range to play safe — genuinely strong writing earns "strong", genuinely absent requirements earn "missing". A hedged middle report is less useful to the editor than an honest, discriminating one.`;
 
-EVIDENCE RULES:
+  const evidenceBlock = compact
+    ? `EVIDENCE: "evidence" = the specific text (quote or close paraphrase) that justifies the status; if none, status is "missing". "quote" = a VERBATIM 10–200-char span copied exactly (character-for-character) from the supplied text for "strong"/"partial", else "". "suggestion" = one concrete, actionable fix for "partial"/"missing" (not "add more detail"), "" for "strong". Never invent quotes.`
+    : `EVIDENCE RULES:
 - "evidence" must quote or closely paraphrase the specific text that justifies the status. Never invent quotes. If you cannot find supporting text, the status is "missing".
 - "quote" is DIFFERENT from "evidence" and is used to highlight the article for the editor: copy a span of 10–200 characters VERBATIM, character-for-character, out of the supplied article — no paraphrase, no ellipsis, no quotation marks around it, nothing added or corrected. For "strong", quote the passage that proves the check passed. For "partial", quote the weak passage that needs strengthening. For "missing", return "" (there is nothing to point at). If you cannot copy an exact span, return "" rather than approximating — a wrong quote highlights the wrong text.
-- For every "partial" or "missing", give a specific, actionable "suggestion" — name what is weak and the concrete edit the writer should make (not generic advice like "add more detail"). For "strong", leave "suggestion" as "".
+- For every "partial" or "missing", give a specific, actionable "suggestion" — name what is weak and the concrete edit the writer should make (not generic advice like "add more detail"). For "strong", leave "suggestion" as "".`;
+
+  const summaryBlock = compact
+    ? `Also write a 1–2 sentence "summary", an "editor_note" (the single highest-impact fix), three "top_wins" and three "top_gaps" — specific and grounded in the supplied text. If the text is only one PART of a longer article, judge this part only; the parts are merged afterwards.`
+    : `Also write, in the voice of a seasoned managing editor giving direct feedback to the writer — specific, grounded in THIS article, never generic:
+- "summary": 1–2 sentences on where the piece stands and what it would take to publish. Name the actual topic and the real strength/weakness, not boilerplate.
+- "editor_note": the single highest-impact fix, phrased as a concrete instruction a writer can act on today (name the section/claim and what to do to it), not "add more detail".
+- "top_wins": three genuine strengths, each pointing at something specific in the text.
+- "top_gaps": three highest-impact fixes, each naming the exact problem and the exact edit — the kind of note a demanding editor leaves in the margin.`;
+
+  const intro = compact
+    ? `You are a senior content-quality analyst at Justwords. Evaluate the supplied "${ct.label}" text${ct.isYMYL ? ' (YMYL — stricter Trust/accuracy)' : ''}, judging meaning and intent, not keywords.`
+    : `You are a senior content-quality analyst at Justwords, a professional content agency. Your reports are read by editors who produce content for many companies across many industries. Evaluate the supplied "${ct.label}" article${ct.isYMYL ? ' — this is YMYL content, so apply stricter Trust and accuracy standards' : ''}. Judge the MEANING and INTENT of the writing, not the presence of specific keywords. Be fair and experienced, like a real editor who understands the "feel" of a piece.`;
+
+  return `${intro}
+
+${scoreRules}
+
+${principlesBlock}
+
+${evidenceBlock}
 
 PILLAR SCORE FIELDS (experience_score etc.): recomputed by our system from your per-parameter statuses — just return them as 0.
 
 PARAMETERS TO EVALUATE (the four scored pillars feed the Content Score; the AEO group is reported as gate rules, not scored):
 ${paramDefs}
-Also write: a 1–2 sentence "summary" of overall quality, an "editor_note" with the single most important fix, three "top_wins" (genuine strengths), and three "top_gaps" (highest-impact fixes).
+${summaryBlock}
 
 ──────────────────────────────────────────────
 PART 2 — PUBLISH GATE CHECKS ("gate_checks") — be strict and literal:
-- structure: subheading_count = how many distinct section subheadings/headers the article uses to organise itself. IMPORTANT: the text is often PASTED and may have lost its heading formatting (no #, no <h2>), so do NOT judge structure from markup — count every short standalone header-like line AND every clear new-section topic transition as a subheading. has_sections=true when the piece is organised into clear sections rather than one undifferentiated block. Be generous: a genuinely structured article must not be reported as 0 subheadings just because the tags were stripped on paste.
+- structure: subheading_count = number of section subheadings. If a "STRUCTURE & LINK FACTS" block is provided above, use ITS heading count verbatim — that is measured from the real formatting. Only when no facts block is present, fall back to counting header-like lines and clear new-section topic transitions. has_sections=true when the piece is organised into clear sections rather than one undifferentiated block.
 - unsourced_stats: Find every numeric or percentage claim that does NOT have a citation/source within the same or next sentence. Return count and up to 3 verbatim "examples". Round/common-knowledge numbers (e.g. "3 steps") don't count.
 - citation_tier: Count external sources cited. total_citations = how many. tier1_2_count = how many are Tier 1–2 (primary research, .gov, .edu, peer-reviewed journals, official statistics, reputable named journalism). tier1_2_pct = round(tier1_2_count/total_citations*100) or 0 if none.
 - ymyl_author_bio: present=true ONLY if a named author with relevant professional credentials/qualifications is shown. Put the credentials in "credentials" and the supporting text in "evidence".
@@ -1214,30 +1407,165 @@ const MODEL_LIMITS = {
   'qwen/qwen3.6-27b':    { tpm: 8000, reasoning: 500 }
 };
 function estTokens(str){ return Math.ceil((str||'').length / 4); }
-function planRequest(sysPrompt, userPrefix, articleText, numParams){
+// How much article (chars) and output (tokens) fit in ONE free-tier call, given
+// the fixed cost of the system prompt + wrapper + reasoning reserve. Shared by
+// the single-call planner and the chunked long-article planner.
+function perCallBudget(sysPrompt, userPrefix, numParams){
   const model = (document.getElementById('modelSel')||{}).value || 'openai/gpt-oss-120b';
   const lim = MODEL_LIMITS[model] || { tpm:8000, reasoning:600 };
   const tpm = lim.tpm;
-  const reasoningReserve = lim.reasoning || 0;
   const safety = 300;
   const sysTok = estTokens(sysPrompt) + 40;
   const wrapTok = estTokens(userPrefix) + 30;
-  // Output floor: enough to return every parameter object without truncating the
-  // JSON (which would break parsing). The output was trimmed to four fields per
-  // parameter, so ~30 tokens each is realistic. Don't reserve less than this.
   const minOut = numParams * 30 + 900;
   let maxTokens = Math.min(2600, minOut + 250);
-  const fixed = safety + reasoningReserve + sysTok + wrapTok;
+  const fixed = safety + (lim.reasoning || 0) + sysTok + wrapTok;
   let articleBudget = tpm - fixed - maxTokens;
-  if (articleBudget < 500){          // trim the output reservation down to the floor first
-    maxTokens = minOut;
-    articleBudget = tpm - fixed - maxTokens;
+  if (articleBudget < 500){ maxTokens = minOut; articleBudget = tpm - fixed - maxTokens; }
+  const maxChars = Math.max(1200, Math.min(16000, articleBudget * 4));
+  return { maxChars, maxTokens, tpm, model };
+}
+function planRequest(sysPrompt, userPrefix, articleText, numParams){
+  const { maxChars, maxTokens } = perCallBudget(sysPrompt, userPrefix, numParams);
+  return { userMsg: userPrefix + articleText, maxTokens, trimmed: articleText.length > maxChars, maxChars };
+}
+
+// ── Long-article FULL-COVERAGE analysis (map-reduce over the whole text) ───────
+// The free tier only allows ~8k tokens/minute, so a long article can't fit one
+// call. Instead of sampling out the middle (which hurt accuracy), we split the
+// WHOLE article into budget-sized parts, analyse each part, then MERGE: because
+// every E-E-A-T check is "is this present anywhere?", a parameter is as strong as
+// the best part that evidences it — nothing is dropped, coverage is complete.
+function chunkArticle(text, maxChars){
+  if (text.length <= maxChars) return [text];
+  const paras = text.split(/\n{2,}/);
+  const chunks = []; let cur = '';
+  const flush = () => { if (cur.trim()) chunks.push(cur.trim()); cur = ''; };
+  for (const para of paras){
+    if (para.length > maxChars){                 // a single huge block — hard-split it
+      flush();
+      for (let i = 0; i < para.length; i += maxChars) chunks.push(para.slice(i, i + maxChars));
+      continue;
+    }
+    if (cur && (cur.length + para.length + 2) > maxChars) flush();
+    cur += (cur ? '\n\n' : '') + para;
   }
-  if (articleBudget < 400){          // even at the floor it won't fit — tell the user how to fix it
-    throw new Error('TOO_BIG::' + JSON.stringify({ tpm, numParams, model }));
+  flush();
+  return chunks;
+}
+
+function parseRetryMs(msg){
+  const m = String(msg||'').match(/try again in ([\d.]+)\s*(ms|s|m|min)?/i);
+  if (!m) return 8000;
+  const v = parseFloat(m[1]); const u = (m[2]||'s').toLowerCase();
+  if (u === 'ms') return Math.ceil(v);
+  if (u === 'm' || u === 'min') return Math.ceil(v * 60000);
+  return Math.ceil(v * 1000);
+}
+// callGroq, but a rate-limit (429) is caught and retried after the wait Groq asks
+// for — so a multi-part long article rides out the per-minute cap automatically.
+async function callGroqRetry(key, sys, user, maxTokens, onWait){
+  for (let attempt = 0; attempt < 5; attempt++){
+    try { return await callGroq(key, sys, user, maxTokens); }
+    catch(e){
+      const msg = String(e.message || '');
+      if (msg.startsWith('RATE_LIMIT::') && attempt < 4){
+        const ms = Math.min(65000, parseRetryMs(msg) + 600);
+        if (onWait) onWait(ms);
+        await new Promise(r => setTimeout(r, ms));
+        continue;
+      }
+      throw e;
+    }
   }
-  const maxChars = Math.min(16000, articleBudget * 4);
-  return { userMsg: userPrefix + sampleArticle(articleText, maxChars), maxTokens, trimmed: articleText.length > maxChars };
+}
+
+const _STATUS_RANK = { strong:3, good:3, partial:2, needs_improvement:0, missing:0 };
+// Merge the per-part results into one whole-article result.
+function mergeChunkResults(results, enabledParams){
+  const out = { params:{}, gate_checks:{}, summary:'', editor_note:'', top_wins:[], top_gaps:[] };
+  // Params — best status across parts wins; carry that part's evidence/quote/suggestion.
+  Object.keys(enabledParams).forEach(k => {
+    let best = null, bestRank = -1;
+    results.forEach(r => {
+      const d = (r.params || {})[k]; if (!d) return;
+      const rank = _STATUS_RANK[d.status] ?? 0;
+      if (rank > bestRank){ bestRank = rank; best = d; }
+    });
+    out.params[k] = best || { status:'missing', evidence:'', quote:'', suggestion:'' };
+  });
+  // Gate checks — counts SUM across disjoint parts (this is the accuracy win over
+  // sampling), presence checks are true if any part found them with evidence.
+  let usCount = 0, usEx = []; let tot = 0, t12 = 0; let sub = 0;
+  let bio = { present:false, credentials:'', evidence:'' };
+  let con = { found:false, items:[] };
+  results.forEach(r => {
+    const g = r.gate_checks || {};
+    if (g.unsourced_stats){ usCount += g.unsourced_stats.count || 0; (g.unsourced_stats.examples||[]).forEach(e => usEx.push(e)); }
+    if (g.citation_tier){ tot += g.citation_tier.total_citations || 0; t12 += g.citation_tier.tier1_2_count || 0; }
+    if (g.structure){ sub += g.structure.subheading_count || 0; }
+    if (g.ymyl_author_bio && g.ymyl_author_bio.present){ bio = { present:true, credentials:g.ymyl_author_bio.credentials||'', evidence:g.ymyl_author_bio.evidence||'' }; }
+    if (g.contradictions && g.contradictions.found){ con.found = true; (g.contradictions.items||[]).forEach(i => con.items.push(i)); }
+  });
+  out.gate_checks.unsourced_stats = { count: usCount, examples: usEx.slice(0,3) };
+  out.gate_checks.citation_tier = { total_citations: tot, tier1_2_count: t12, tier1_2_pct: tot ? Math.round(t12/tot*100) : 0 };
+  out.gate_checks.ymyl_author_bio = bio;
+  out.gate_checks.contradictions = { found: con.found, items: con.items.slice(0,3) };
+  out.gate_checks.structure = { subheading_count: sub, has_sections: sub > 0 };
+  out.gate_checks.title_promise = ((results[0]||{}).gate_checks || {}).title_promise || { delivered:true };
+  return out;
+}
+
+// A small REDUCE call: writes one coherent whole-article verdict from the merged
+// per-check digest (no article text → tiny + always fits). Falls back to a
+// client-side synthesis if it fails, so the report never blocks on it.
+async function reduceSynthesis(key, merged, enabledParams, ctLabel){
+  const digest = Object.entries(merged.params).map(([k,d]) =>
+    `${k}: ${d.status}${d.evidence?(' — '+String(d.evidence).slice(0,70)):''}`).join('\n');
+  const gc = merged.gate_checks || {};
+  const sys = `You are a senior managing editor at Justwords. A long ${ctLabel} article was analysed in parts and the per-check verdicts were merged. Write a coherent WHOLE-ARTICLE editorial judgement in a direct, specific editor voice. Return ONLY JSON: {"summary":"1-2 sentences on where it stands","editor_note":"the single highest-impact fix, concrete","top_wins":["","",""],"top_gaps":["","",""]}`;
+  const user = `Merged per-check verdicts:\n${digest}\n\nUnsourced stats: ${(gc.unsourced_stats||{}).count||0}. External citations: ${(gc.citation_tier||{}).total_citations||0}. Contradictions: ${(gc.contradictions||{}).found?'yes':'no'}.`;
+  return await callGroq(key, sys, user, 700);
+}
+function clientSynthesis(merged, enabledParams){
+  const strong = [], missing = [];
+  Object.entries(merged.params).forEach(([k,d]) => {
+    const meta = (function(){ let m=null; PILLARS.forEach(pl=>pl.params.forEach(p=>{if(p.k===k)m=p;})); return m; })();
+    const name = meta ? `${meta.num} ${meta.n}` : k;
+    if (_STATUS_RANK[d.status] >= 3) strong.push(name); else if ((_STATUS_RANK[d.status]||0) === 0) missing.push(name);
+  });
+  return {
+    summary: `Full-coverage analysis of the whole article: ${strong.length} checks clearly met, ${missing.length} absent.`,
+    editor_note: missing[0] ? `Highest-impact fix: address ${missing[0]}.` : 'No absent checks — tighten the partial passages next.',
+    top_wins: strong.slice(0,3),
+    top_gaps: missing.slice(0,3),
+  };
+}
+
+async function analyzeChunked(key, sysPrompt, facts, text, numParams, enabledParams, ctLabel, onProgress){
+  // Reserve room for the per-part instruction in the wrapper when sizing chunks.
+  const sampleWrap = `${facts}\nThis is PART 9 of 9 of one long ${ctLabel} article. Judge each parameter using ONLY the text of this part; if something is not in this part mark it "missing" (it may appear in another part — parts are merged afterwards).\nText of this part:\n\n`;
+  const { maxChars, maxTokens } = perCallBudget(sysPrompt, sampleWrap, numParams);
+  const chunks = chunkArticle(text, maxChars);
+  const results = [];
+  for (let i = 0; i < chunks.length; i++){
+    onProgress && onProgress(`Analysing part ${i+1} of ${chunks.length} — full coverage, no text skipped…`);
+    const partPrefix = `${facts}\nThis is PART ${i+1} of ${chunks.length} of one long ${ctLabel} article. Judge each parameter using ONLY the text of this part; if something is not in this part mark it "missing" (it may appear in another part — parts are merged afterwards).\nText of part ${i+1} of ${chunks.length}:\n\n`;
+    const r = await callGroqRetry(key, sysPrompt, partPrefix + chunks[i], maxTokens,
+      ms => onProgress && onProgress(`Free-tier rate limit — resuming part ${i+1} of ${chunks.length} in ${Math.round(ms/1000)}s (this keeps accuracy; no text is dropped)…`));
+    results.push(r);
+  }
+  const merged = mergeChunkResults(results, enabledParams);
+  onProgress && onProgress('Synthesising the whole-article verdict…');
+  let synth = null;
+  try { synth = await reduceSynthesis(key, merged, enabledParams, ctLabel); } catch(e){ synth = null; }
+  if (!synth || !synth.summary) synth = clientSynthesis(merged, enabledParams);
+  merged.summary = synth.summary || '';
+  merged.editor_note = synth.editor_note || '';
+  merged.top_wins = synth.top_wins || [];
+  merged.top_gaps = synth.top_gaps || [];
+  merged._parts = chunks.length;
+  return merged;
 }
 
 // ── Compute score ──────────────────────────────────────────────
@@ -1315,8 +1643,135 @@ function clientSideMetrics(text){
   return { words, fillerCount: filler, fillerPer1000, headingCount, wordsPerHeading: headingCount ? Math.round(words/headingCount) : null, externalLinks, introPct };
 }
 
+// ── Deterministic document analysis (no LLM, no tokens) ────────
+// Reads the ACTUAL formatting the writer produced — the whole point of the rich
+// paste box. Every structure and internal-linking judgement comes from here, so
+// it is honest: no heading = genuinely no heading, no link = genuinely no link.
+const _GENERIC_ANCHOR = /^(click here|here|read more|learn more|this|link|more|read|click|see more|continue reading|find out more|read on|go here|check it out|website|page|link here|this page|this article|this post)\.?$/i;
+function _host(href){
+  try{ return new URL(href, location.href).hostname.replace(/^www\./i,'').toLowerCase(); }
+  catch(e){ return ''; }
+}
+function _wordCount(s){ return ((s||'').match(/\S+/g) || []).length; }
+
+function parseDoc(html, text, siteDomain){
+  const root = new DOMParser().parseFromString(html || '', 'text/html').body;
+  const totalWords = _wordCount(text || root.textContent || '');
+
+  // ── Heading outline & hierarchy ──
+  const hEls = [...root.querySelectorAll('h1,h2,h3,h4,h5,h6')].filter(h => (h.textContent||'').trim());
+  const headings = hEls.map(h => ({ level: +h.tagName[1], text: (h.textContent||'').trim() }));
+  let multipleH1 = headings.filter(h => h.level === 1).length > 1;
+  const skips = [];
+  for (let i = 1; i < headings.length; i++){
+    if (headings[i].level - headings[i-1].level > 1) skips.push({ from: headings[i-1].level, to: headings[i].level, text: headings[i].text });
+  }
+
+  // ── Words per section (document order; text before the first heading = intro) ──
+  const sections = []; let cur = { heading: '(intro)', level: 0, words: 0 };
+  const countWalk = (node) => {
+    node.childNodes.forEach(n => {
+      // Start a new section only for headings that have text, matching `headings`
+      // above so section[i] lines up with heading[i].
+      if (n.nodeType === 1 && /^H[1-6]$/.test(n.tagName) && (n.textContent||'').trim()){
+        sections.push(cur);
+        cur = { heading: (n.textContent||'').trim(), level: +n.tagName[1], words: 0 };
+      } else if (n.nodeType === 3){ cur.words += _wordCount(n.nodeValue); }
+      else if (n.nodeType === 1){ countWalk(n); }
+    });
+  };
+  countWalk(root);
+  sections.push(cur);
+  const bodySections = sections.filter(s => s.level > 0);
+  // Intro = everything from the top down to the first real SECTION heading (H2+):
+  // any text before the first heading, plus the body under an H1 title. This is
+  // what "lean intro" means — the opening before the article's first section.
+  // Only meaningful when a first-section boundary (an H2+) actually exists.
+  const hasSectionHeading = headings.some(h => h.level >= 2);
+  let introWords = null, introPct = null;
+  if (hasSectionHeading){
+    introWords = 0;
+    for (const s of sections){ if (s.level >= 2) break; introWords += s.words; }
+    introPct = totalWords ? Math.round(introWords / totalWords * 100) : null;
+  }
+  const longestSection = bodySections.reduce((m, s) => s.words > m.words ? s : m, { words: 0, heading: '' });
+
+  // ── Links: internal vs external, anchor quality, placeholders ──
+  const aEls = [...root.querySelectorAll('a[href]')];
+  // If no domain was given, infer "your site" as the most-linked host (a post
+  // usually links to its OWN blog several times; outside sources appear once each).
+  let resolvedDomain = (siteDomain || '').replace(/^www\./,'');
+  if (!resolvedDomain){
+    const freq = {};
+    aEls.forEach(a => { const h = _host(a.getAttribute('href')); if (h) freq[h] = (freq[h]||0) + 1; });
+    let best = '', bestN = 1;
+    Object.entries(freq).forEach(([h, n]) => { if (n > bestN){ best = h; bestN = n; } });
+    if (best) resolvedDomain = best;
+  }
+  const links = aEls.map(a => {
+    const rawHref = (a.getAttribute('href') || '').trim();
+    const anchor = (a.textContent || '').trim();
+    const host = _host(rawHref);
+    const isPlaceholder = !rawHref || rawHref === '#' || /^javascript:/i.test(rawHref) || /^\s*$/.test(rawHref);
+    const isRelative = /^\/(?!\/)/.test(rawHref);
+    const internal = !isPlaceholder && (isRelative || (!!resolvedDomain && (host === resolvedDomain || host.endsWith('.' + resolvedDomain))));
+    const anchorIsUrl = /^https?:\/\//i.test(anchor) || /^www\./i.test(anchor);
+    const generic = _GENERIC_ANCHOR.test(anchor);
+    const descriptive = !generic && !anchorIsUrl && _wordCount(anchor) >= 2;
+    let issue = null;
+    if (isPlaceholder) issue = 'placeholder';
+    else if (generic) issue = 'generic-anchor';
+    else if (anchorIsUrl) issue = 'bare-url';
+    else if (!anchor) issue = 'empty-anchor';
+    return { href: rawHref, anchor, host, internal, descriptive, issue, isPlaceholder };
+  });
+  const internalLinks = links.filter(l => l.internal && !l.isPlaceholder);
+  const externalLinks = links.filter(l => !l.internal && !l.isPlaceholder);
+  const placeholderLinks = links.filter(l => l.isPlaceholder);
+  const weakInternalAnchors = internalLinks.filter(l => !l.descriptive);
+
+  return {
+    hasHTML: !!(html && /<(h[1-6]|p|ul|ol|li|a|table)\b/i.test(html)),
+    totalWords, headings, multipleH1, skips,
+    firstHeadingLevel: headings.length ? headings[0].level : null,
+    sections: bodySections, longestSection,
+    wordsPerHeading: headings.length ? Math.round(totalWords / headings.length) : null,
+    introWords, introPct,
+    paragraphs: root.querySelectorAll('p').length,
+    lists: root.querySelectorAll('ul,ol').length,
+    tables: root.querySelectorAll('table').length,
+    images: (() => { const im = [...root.querySelectorAll('img')]; const withAlt = im.filter(i => (i.getAttribute('alt')||'').trim()).length; return { total: im.length, withAlt, withoutAlt: im.length - withAlt }; })(),
+    links, internalLinks, externalLinks, placeholderLinks, weakInternalAnchors,
+    resolvedDomain, domainWasInferred: !siteDomain && !!resolvedDomain,
+  };
+}
+
+// Recommended internal-link count for a post of this length: at least 2, then
+// roughly one per ~450 words, capped so long pieces aren't asked for absurd counts.
+function recommendedInternalLinks(words){ return Math.min(9, Math.max(2, Math.floor(words / 450))); }
+
+// A compact, factual brief handed to the LLM so it JUDGES structure and linking
+// from the writer's real formatting instead of guessing. Kept short to respect
+// the free-tier token budget. Only sent when real formatting was pasted.
+function buildStructFacts(doc, wordCount){
+  if (!doc || !doc.hasHTML || !doc.headings) return '';
+  const outline = doc.headings.slice(0, 30)
+    .map(h => `${'  '.repeat(Math.max(0,h.level-1))}H${h.level}: ${h.text}`).join('\n');
+  const lines = [];
+  lines.push('STRUCTURE & LINK FACTS (measured from the article\'s real formatting — treat as ground truth; do NOT contradict these counts):');
+  lines.push(`- Headings: ${doc.headings.length}${doc.wordsPerHeading?` (~1 per ${doc.wordsPerHeading} words)`:''}${doc.multipleH1?'; WARNING: more than one H1':''}${(doc.skips&&doc.skips.length)?`; WARNING: heading level skips from H${doc.skips[0].from} to H${doc.skips[0].to}`:''}.`);
+  if (outline) lines.push('- Heading outline:\n' + outline);
+  if (doc.introPct != null) lines.push(`- Intro before the first section heading: ${doc.introWords} words (${doc.introPct}% of the article).`);
+  lines.push(`- Lists: ${doc.lists} · Tables: ${doc.tables} · Images: ${doc.images.total} (${doc.images.withoutAlt} missing alt text).`);
+  lines.push(`- Internal links to the site's own posts: ${doc.internalLinks.length} (recommended ~${recommendedInternalLinks(wordCount)} for this length). External source links: ${doc.externalLinks.length}. Placeholder/empty links: ${doc.placeholderLinks.length}.`);
+  if (doc.internalLinks.length) lines.push('- Internal-link anchors: ' + doc.internalLinks.slice(0,8).map(l => `"${l.anchor||'(no text)'}"`).join(', ') + '.');
+  lines.push('Use these facts when judging structure, formatting, internal linking (P34/P39), table-of-contents and answer-placement checks. If a count above is 0, the thing is genuinely absent — mark the related check "missing", never "strong".');
+  return '\n' + lines.join('\n') + '\n';
+}
+
 // ── Compute gates ──────────────────────────────────────────────
-function computeGates(result, contentType, wordCount, enabledParams, metrics){
+function computeGates(result, contentType, wordCount, enabledParams, metrics, doc){
+  doc = doc || {};
   const ct = getCT(contentType);
   const g = ct.gates || {};
   const isCommercial = contentType === 'product' || g.requireExperience === true;
@@ -1384,12 +1839,12 @@ function computeGates(result, contentType, wordCount, enabledParams, metrics){
   // #2 External links — ADVISORY ONLY. A browser can't check cross-site 404s, and
   // there is NO required number of external links. Purely an informational note,
   // never a warning or a block (info:true keeps it out of the review/fail tallies).
-  const links = metrics.externalLinks || [];
-  gates.push({ id:'links_resolve', label:'External Links (optional spot-check)', type:'soft', low:true, info:true, na:false,
+  const nExtLinks = (doc.externalLinks && doc.externalLinks.length) || (metrics.externalLinks || []).length;
+  gates.push({ id:'links_resolve', label:'External Source Links (optional spot-check)', type:'soft', low:true, info:true, na:false,
     passed:true, warning:false,
-    detail: links.length===0
-      ? 'No external links in the pasted text — nothing to verify. External links are optional; there is no required number.'
-      : `${links.length} external link${links.length>1?'s':''} present — optional: spot-check they still resolve. There is no required link count, and this never blocks publishing.` });
+    detail: nExtLinks===0
+      ? 'No external links found — nothing to verify. External links are optional; there is no required number.'
+      : `${nExtLinks} external source link${nExtLinks>1?'s':''} present — optional: spot-check they still resolve. There is no required link count, and this never blocks publishing.` });
 
   // #3 YMYL credentialed author bio (HARD, YMYL only)
   if (ct.isYMYL){
@@ -1429,27 +1884,77 @@ function computeGates(result, contentType, wordCount, enabledParams, metrics){
       : `${cit.tier1_2_pct||0}% of ${cit.total_citations} sources are Tier 1–2 (primary/.gov/.edu/journals)` });
 
   // #7 Intro not over 12% of article (SOFT)
-  const ip = metrics.introPct;
+  // Prefer the deterministic intro measure (words before the first REAL heading);
+  // fall back to the plain-text scan only when no formatting was pasted.
+  const ip = (doc.introPct != null) ? doc.introPct : metrics.introPct;
   gates.push({ id:'intro_length', label:'Lean Intro (≤'+introMaxPct+'%)', type:'soft',
     na: ip==null, passed: ip!=null && ip<=introMaxPct, warning: ip!=null && ip>introMaxPct,
-    detail: ip==null ? 'Skipped — the first-subheading position can\'t be located in pasted plain text (this measures how much of the article runs before the first subheading)'
-      : `Intro is ${ip}% of the article — max ${introMaxPct}%` });
+    detail: ip==null ? 'Skipped — no headings found, so the first-section boundary can\'t be located (this measures how much of the article runs before the first subheading)'
+      : `Intro runs ${ip}% of the article (${doc.introWords!=null?doc.introWords+' words ':''}before the first subheading) — max ${introMaxPct}%` });
 
-  // #8 Structural minimum — 1 subheading per 400 words (NICE-TO-HAVE / soft, low)
-  // Pasted text usually loses heading markup, so trust the model's SEMANTIC
-  // subheading count when it perceives more structure than the raw-text scan did.
-  const llmSub   = Math.max(0, +((gc.structure||{}).subheading_count) || 0);
-  const headCount = Math.max(metrics.headingCount||0, llmSub);
+  // #8 Structural minimum — 1 subheading per 400 words.
+  // Now driven by the REAL headings the rich paste box preserved. The LLM's
+  // semantic count is only a fallback for when plain text was pasted.
+  const realHeads = (doc.headings && doc.headings.length) || 0;
+  const llmSub    = Math.max(0, +((gc.structure||{}).subheading_count) || 0);
+  const usingReal = doc.hasHTML && realHeads > 0;
+  const headCount = usingReal ? realHeads : Math.max(metrics.headingCount||0, llmSub);
   const wph = headCount>0 ? Math.round(wordCount/headCount) : null;
   const structOk = headCount>0 && wph!=null && wph<=minWordsPerHd;
-  gates.push({ id:'subheadings', label:'Structure (1 subhead / '+minWordsPerHd+'w)', type:'soft', low:true,
+  gates.push({ id:'subheadings', label:'Section Structure (1 subhead / '+minWordsPerHd+'w)', type:'soft', low:true,
     na:false, passed: structOk,
     warning: !structOk && wordCount>minWordsPerHd,
     detail: headCount===0
       ? (wordCount>minWordsPerHd
-          ? `No subheadings detected in ${wordCount} words. If the article IS structured, its heading tags were stripped on paste — paste as HTML or markdown so the tool can see them.`
+          ? `No headings in ${wordCount} words — the article is one undifferentiated block. Add H2 subheadings every ~${minWordsPerHd} words so readers (and search engines) can scan it. If you pasted plain text, paste again from Google Docs so the headings come through.`
           : 'Short enough to skip subheadings')
-      : `${headCount} subheading${headCount>1?'s':''} detected — ~1 per ${wph} words` });
+      : `${headCount} subheading${headCount>1?'s':''} — about 1 per ${wph} words${usingReal?'':' (inferred; paste from Google Docs for an exact read)'}${structOk?'':`. Aim for 1 per ${minWordsPerHd} words.`}` });
+
+  // #8b Heading hierarchy — no skipped levels, not multiple H1s (SOFT, low)
+  if (usingReal){
+    const hierBad = doc.multipleH1 || (doc.skips && doc.skips.length);
+    let hdetail;
+    if (doc.multipleH1) hdetail = `More than one H1 (title) heading — a page should have a single H1, then H2/H3 beneath it. Demote the extras to H2.`;
+    else if (doc.skips && doc.skips.length) hdetail = `Heading level jumps from H${doc.skips[0].from} to H${doc.skips[0].to} at "${clip(doc.skips[0].text,50)}" — don't skip levels; nest H3s under an H2.`;
+    else hdetail = `Clean heading hierarchy — levels nest properly with no skips.`;
+    gates.push({ id:'heading_hierarchy', label:'Heading Hierarchy', type:'soft', low:true, na:false,
+      passed: !hierBad, warning: !!hierBad, detail: hdetail });
+  }
+
+  // #8c Internal links to your OWN posts — the "linkage with the blogs" check (SOFT)
+  // Only meaningful when formatting was pasted (plain text loses links entirely).
+  if (doc.hasHTML || (doc.links && doc.links.length)){
+    const nInt = (doc.internalLinks||[]).length;
+    const rec  = recommendedInternalLinks(wordCount);
+    const domNote = doc.resolvedDomain
+      ? (doc.domainWasInferred ? ` (treating ${doc.resolvedDomain} as your site — set "Your Site Domain" to be exact)` : '')
+      : ' — set "Your Site Domain" in the left panel so the tool can tell which links point to your own blog';
+    gates.push({ id:'internal_links', label:'Internal Links to Your Other Posts', type:'soft', low:false, na:false,
+      passed: nInt >= rec, warning: nInt < rec,
+      detail: nInt >= rec
+        ? `${nInt} internal link${nInt===1?'':'s'} to your own posts — meets the ~${rec} this length warrants${domNote}.`
+        : nInt === 0
+          ? `No internal links to your other posts${domNote}. A ${wordCount}-word post should link to about ${rec} related articles on your site to build topic-cluster authority and keep readers on-site.`
+          : `Only ${nInt} internal link${nInt===1?'':'s'} — a ${wordCount}-word post warrants about ${rec}. Add links to related articles on your own blog${domNote}.` });
+
+    // #8d Weak internal anchor text (SOFT, low)
+    const weak = (doc.weakInternalAnchors||[]).length;
+    if (nInt > 0){
+      gates.push({ id:'internal_anchor', label:'Internal-Link Anchor Text', type:'soft', low:true, na:false,
+        passed: weak === 0, warning: weak > 0,
+        detail: weak === 0
+          ? `All ${nInt} internal link${nInt===1?'':'s'} use descriptive anchor text.`
+          : `${weak} of ${nInt} internal link${nInt===1?'':'s'} use weak anchors (e.g. "click here", a bare URL, or a single word). Use the target article's topic as the anchor phrase.` });
+    }
+
+    // #8e Placeholder / broken links left in by the writer (SOFT)
+    const ph = (doc.placeholderLinks||[]).length;
+    if (ph > 0){
+      gates.push({ id:'placeholder_links', label:'Empty / Placeholder Links', type:'soft', low:false, na:false,
+        passed: false, warning: true,
+        detail: `${ph} link${ph===1?'':'s'} point nowhere (empty href, "#", or javascript:) — a placeholder the writer forgot to fill. Add the real URL or remove the link before publishing.` });
+    }
+  }
 
   // #9 Title-promise check (SOFT)
   const tp = gc.title_promise || {delivered:true};
@@ -1507,6 +2012,9 @@ async function analyze(){
   if (text.length < 80) { alert('Please paste your blog content first.'); return; }
   const enabledParams = getEnabledParams();
   const wordCount = text.split(/\s+/).length;
+  // Deterministic structure + link analysis from the pasted formatting — computed
+  // once, fed to the LLM as ground truth, and reused for the gates & report.
+  const doc = parseDoc(_lastDocHTML, text, currentSiteDomain());
 
   // UI — loading state
   switchTab('score');
@@ -1528,7 +2036,8 @@ async function analyze(){
     stepActive('sd1');
     const sysPrompt = buildEEATSys(enabledParams, selectedCT);
     const numParams = Object.keys(enabledParams).length;
-    const userPrefix = `Analyze this ${getCT(selectedCT).label} article. Title is the first line. Full text:\n\n`;
+    const facts = buildStructFacts(doc, wordCount);
+    const userPrefix = `Analyze this ${getCT(selectedCT).label} article. Title is the first line.\n${facts}\nFull text:\n\n`;
     let merged;
     if (engine === 'claude') {
       // Claude has a large context window — send the article near-whole and
@@ -1536,8 +2045,28 @@ async function analyze(){
       updateLoadText('Analysing with Claude (advanced engine)…');
       merged = await callClaude(claudeKey, sysPrompt, userPrefix + sampleArticle(text, 120000), 8000);
     } else {
+      // Escalate only as far as the article's length forces us to — this keeps
+      // short/normal articles on the full-quality prompt and one call, and only
+      // long ones pay any cost. Full text is always covered; nothing is sampled.
+      const onWait = ms => updateLoadText(`Free-tier rate limit — retrying in ${Math.round(ms/1000)}s…`);
       const plan = planRequest(sysPrompt, userPrefix, text, numParams);
-      merged = await callGroq(key, sysPrompt, plan.userMsg, plan.maxTokens);
+      if (!plan.trimmed) {
+        // (1) Fits in one call on the full prompt — the fast path, best quality.
+        merged = await callGroqRetry(key, sysPrompt, plan.userMsg, plan.maxTokens, onWait);
+      } else {
+        const sysCompact = buildEEATSys(enabledParams, selectedCT, true);
+        const planC = planRequest(sysCompact, userPrefix, text, numParams);
+        if (!planC.trimmed) {
+          // (2) Doesn't fit full, but fits one call on the leaner prompt — still one call.
+          updateLoadText('Analysing (length-optimised, full coverage)…');
+          merged = await callGroqRetry(key, sysCompact, planC.userMsg, planC.maxTokens, onWait);
+        } else {
+          // (3) Genuinely long → FULL-COVERAGE chunked analysis (no text dropped).
+          updateLoadText('Long article — running full-coverage analysis in parts…');
+          merged = await analyzeChunked(key, sysCompact, facts, text, numParams, enabledParams,
+            getCT(selectedCT).label, updateLoadText);
+        }
+      }
     }
     merged._engine = engine;
     stepDone('sd1'); stepActive('sd2');
@@ -1578,10 +2107,10 @@ async function analyze(){
     stepDone('sd3'); stepActive('sd4');
 
     updateLoadText('Computing scores & publish decision…');
-    const gates = computeGates(merged, selectedCT, wordCount, enabledParams, metrics);
+    const gates = computeGates(merged, selectedCT, wordCount, enabledParams, metrics, doc);
     stepDone('sd4');
 
-    render(merged, enabledParams, gates, text, metrics);
+    render(merged, enabledParams, gates, text, metrics, doc);
 
   } catch(err){
     document.getElementById('loading').style.display = 'none';
@@ -1770,6 +2299,71 @@ function renderRankedList(items, good, emptyMsg){
   return `<div class="fixlist">${items.map((it, i) => resultRowHTML(it, i, good)).join('')}</div>`;
 }
 
+// ── Structure & internal-linking section (deterministic, from real formatting) ──
+function renderStructureSection(doc, wordCount){
+  if (!doc || (!doc.hasHTML && !(doc.links && doc.links.length))){
+    return `<div class="struct-empty">This report was run on <strong>plain text</strong>, so structure and links couldn't be measured.<br>Paste the article again straight from Google Docs (select all → copy → paste) and the tool will read your real headings, internal links, lists and tables.</div>`;
+  }
+  const rec = recommendedInternalLinks(wordCount);
+  const nInt = (doc.internalLinks||[]).length, nExt = (doc.externalLinks||[]).length;
+  const wph = doc.wordsPerHeading;
+
+  // Stat cards
+  const card = (num, lbl, sub, subCls) => `<div class="struct-card"><div class="struct-num">${num}</div><div class="struct-lbl">${lbl}</div>${sub?`<div class="struct-sub ${subCls||''}">${sub}</div>`:''}</div>`;
+  const headSub = doc.headings.length===0 ? ['No sections','sub-bad'] : (wph && wph>450 ? [`~1 per ${wph}w — thin`,'sub-warn'] : [`~1 per ${wph}w`,'sub-ok']);
+  const introSub = doc.introPct==null ? ['','' ] : (doc.introPct>12 ? [`${doc.introPct}% — long`,'sub-warn'] : [`${doc.introPct}% — lean`,'sub-ok']);
+  const intSub = nInt>=rec ? [`meets ~${rec}`,'sub-ok'] : (nInt===0?[`need ~${rec}`,'sub-bad']:[`need ~${rec}`,'sub-warn']);
+  const imgSub = doc.images.total===0 ? ['',''] : (doc.images.withoutAlt>0?[`${doc.images.withoutAlt} missing alt`,'sub-warn']:['all have alt','sub-ok']);
+  const grid = `<div class="struct-grid">
+    ${card(doc.headings.length, 'Subheadings', headSub[0], headSub[1])}
+    ${card(nInt, 'Internal links', intSub[0], intSub[1])}
+    ${card(nExt, 'External sources', nExt>0?'source citations':'', nExt>0?'sub-ok':'')}
+    ${card(doc.lists, 'Lists', '', '')}
+    ${card(doc.tables, 'Tables', '', '')}
+    ${doc.introPct!=null?card(doc.introPct+'%', 'Intro length', introSub[0], introSub[1]):''}
+    ${doc.images.total?card(doc.images.total, 'Images', imgSub[0], imgSub[1]):''}
+  </div>`;
+
+  // Heading outline
+  let outline;
+  if (doc.headings.length){
+    const rows = doc.headings.map((h, i) => {
+      const sec = doc.sections[i] || {};
+      const thin = sec.words != null && sec.words > 450;
+      const flag = thin ? `<span class="oflag">· ${sec.words}w — consider splitting</span>` : (sec.words!=null?`<span class="owords">${sec.words}w</span>`:'');
+      return `<div class="oitem ${thin?'warn':''}"><span class="olvl">H${h.level}</span><span class="otext">${escHtml(h.text)}${thin?flag:''}</span>${thin?'':flag}</div>`;
+    }).join('');
+    const warn = doc.multipleH1 ? `<span class="oflag">⚠ more than one H1</span>` : (doc.skips&&doc.skips.length?`<span class="oflag">⚠ level skip H${doc.skips[0].from}→H${doc.skips[0].to}</span>`:'');
+    outline = `<div class="outline"><div class="outline-title">🧭 Heading outline ${warn}</div>${rows}</div>`;
+  } else {
+    outline = `<div class="outline"><div class="outline-title">🧭 Heading outline</div><div class="struct-sub sub-bad">No headings found — the article is one undifferentiated block. Add H2 subheadings so readers and search engines can scan it. (If you used bold text instead of Google-Docs heading styles, apply Heading 2/3 styles and re-paste.)</div></div>`;
+  }
+
+  // Internal-linking panel — the headline "linkage with the blogs" answer
+  let callout;
+  if (nInt >= rec) callout = `<div class="link-callout lc-good">✅ <strong>${nInt} internal link${nInt===1?'':'s'}</strong> to your own posts — meets the ~${rec} a ${wordCount}-word article warrants. Good topic-cluster linkage.</div>`;
+  else if (nInt === 0) callout = `<div class="link-callout lc-bad">⚠ <strong>No internal links</strong> to your other posts. This article is an orphan — a ${wordCount}-word post should link to about <strong>${rec}</strong> related articles on your own blog to build topic authority and keep readers on-site.</div>`;
+  else callout = `<div class="link-callout lc-warn">⚠ Only <strong>${nInt} internal link${nInt===1?'':'s'}</strong> — a ${wordCount}-word post warrants about <strong>${rec}</strong>. Add links to related articles on your own blog.</div>`;
+  const domLine = doc.resolvedDomain
+    ? `<div class="struct-sub" style="margin-bottom:8px">Internal = links to <strong>${escHtml(doc.resolvedDomain)}</strong>${doc.domainWasInferred?' (auto-detected — set "Your Site Domain" to be exact)':''}.</div>`
+    : `<div class="struct-sub sub-warn" style="margin-bottom:8px">Set <strong>"Your Site Domain"</strong> in the left panel so the tool can tell which links point to your own blog.</div>`;
+
+  const linkRow = (l) => {
+    let badge = l.internal ? `<span class="lbadge lb-int">INTERNAL</span>` : `<span class="lbadge lb-ext">EXTERNAL</span>`;
+    if (l.isPlaceholder) badge = `<span class="lbadge lb-bad">EMPTY</span>`;
+    else if (l.internal && !l.descriptive) badge += ` <span class="lbadge lb-weak">WEAK ANCHOR</span>`;
+    const anchor = l.anchor ? escHtml(clip(l.anchor, 80)) : '<em style="color:var(--t3)">(no anchor text)</em>';
+    const url = l.href ? `<span class="lurl">${escHtml(clip(l.href, 90))}</span>` : '';
+    return `<div class="linkrow"><span class="lanchor">${anchor}${url}</span>${badge}</div>`;
+  };
+  const allLinks = doc.links || [];
+  const linkList = allLinks.length
+    ? `<div class="linkpanel"><div class="linkpanel-title">🔗 Every link found (${allLinks.length})</div>${allLinks.slice(0,40).map(linkRow).join('')}${allLinks.length>40?`<div class="struct-sub">…and ${allLinks.length-40} more</div>`:''}</div>`
+    : `<div class="linkpanel"><div class="linkpanel-title">🔗 Links</div><div class="struct-sub">No hyperlinks found in the article.</div></div>`;
+
+  return grid + outline + `<div class="linkpanel">${domLine}${callout}</div>` + linkList;
+}
+
 
 // ── Report helpers ─────────────────────────────────────────────
 function escHtml(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
@@ -1935,8 +2529,8 @@ function reportSection(num, favicon, title, sub, body){
   </div>`;
 }
 
-// ── Main Render — 4 clear sections ─────────────────────────────
-function render(r, enabledParams, gates, articleText, metrics){
+// ── Main Render — 5 clear sections ─────────────────────────────
+function render(r, enabledParams, gates, articleText, metrics, doc){
   _editorFeedback = {}; _revMeta = {};
   const p = r.params || {};
   const ct = getCT(selectedCT);
@@ -1990,8 +2584,12 @@ function render(r, enabledParams, gates, articleText, metrics){
   const goodItems = rankedGood(r, enabledParams);
   const sec3 = renderRankedList(goodItems, true, 'No check scored as fully strong yet — see section 2 for what to strengthen.');
 
-  // SECTION 4 — the content, marked red and green
-  const sec4 = renderContentView(articleText || (document.getElementById('content')||{}).value || '', r);
+  // SECTION 4 — structure & internal linking (deterministic, from real formatting)
+  const wcForStruct = (articleText || '').split(/\s+/).filter(Boolean).length;
+  const sec4 = renderStructureSection(doc, wcForStruct);
+
+  // SECTION 5 — the content, marked red and green
+  const sec5 = renderContentView(articleText || (document.getElementById('content')||{}).value || '', r);
 
   document.getElementById('results').innerHTML = `
     <div class="report-toolbar no-print">
@@ -2008,7 +2606,8 @@ function render(r, enabledParams, gates, articleText, metrics){
     ${reportSection(1, '🎯', 'Verdict, Score &amp; Gate Rules', 'Read top to bottom: can you publish it, the one key fix, the quality score with its breakdown, then every gate check behind the decision.', sec1)}
     ${reportSection(2, '🔧', 'What Needs Fixing', `${badItems.length} finding${badItems.length === 1 ? '' : 's'}, ranked by impact — blocking gates and required checks first. Add a remark on any row you disagree with.`, sec2)}
     ${reportSection(3, '✅', "What's Good", `${goodItems.length} strength${goodItems.length === 1 ? '' : 's'}, ranked by value — required checks the article meets lead. Add a remark on any row you disagree with.`, sec3)}
-    ${reportSection(4, '🖍️', 'The Content, Marked Up', 'Your article with the weak passages in red and the strong ones in green — hover any highlight for the reason.', sec4)}`;
+    ${reportSection(4, '🧭', 'Structure &amp; Internal Linking', 'Read from your real formatting: the heading outline, section balance, and every link — with internal links to your own posts called out.', sec4)}
+    ${reportSection(5, '🖍️', 'The Content, Marked Up', 'Your article with the weak passages in red and the strong ones in green — hover any highlight for the reason.', sec5)}`;
   document.getElementById('results').style.display = 'block';
   document.getElementById('paneScore').scrollTop = 0;
   revStatus();
